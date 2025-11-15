@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
+#include "touchsensing.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -107,6 +108,7 @@ int main(void)
   MX_CAN1_Init();
   MX_I2C1_Init();
   MX_TSC_Init();
+  MX_TOUCHSENSING_Init();
   /* USER CODE BEGIN 2 */
 
   /* Turn all the end LEDs on*/
@@ -171,7 +173,7 @@ int main(void)
   HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_RESET);
   HAL_Delay(500);
   HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
-  
+
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -465,7 +467,17 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void TSC_Handler(void)
+{
+    if(MyTKeysB[0].p_Data->StateId == TSL_STATEID_DETECT)
+    {
+        HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
+    }
+    else if(MyTKeysB[0].p_Data->StateId == TSL_STATEID_RELEASE)
+    {
+        HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
+    }
+}
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -480,8 +492,10 @@ void StartDefaultTask(void *argument)
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
   for(;;)
-  {
-    osDelay(1);
+  {      
+    tsl_user_Exec();
+      TSC_Handler();
+      HAL_Delay(1);
   }
   /* USER CODE END 5 */
 }
