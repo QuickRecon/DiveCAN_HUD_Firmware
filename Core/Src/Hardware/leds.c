@@ -10,9 +10,9 @@ const uint32_t TIMER_MHZ = 8;
 const uint32_t STARTUP_DELAY_MS = 500;
 const uint8_t LED_MAX_BRIGHTNESS = 32;
 const uint8_t LED_BRIGHTNESS[3] = {10, 3, 3}; // R, G, B brightness levels, gotta push red a bit harder because its a lower voltage
+const uint8_t LED_MIN_BRIGHTNESS = 1;
 const uint8_t MAX_BLINKS = 10;
-const uint32_t BLINK_PERIOD = 250;
-
+const uint32_t BLINK_PERIOD = TIMEOUT_250MS_TICKS;
 
 struct GPIO_PinMap
 {
@@ -68,7 +68,6 @@ void initLEDs(void)
     HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_RESET);
     HAL_Delay(STARTUP_DELAY_MS);
     HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
-
 }
 
 void setLEDBrightness(uint8_t level, GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
@@ -107,11 +106,26 @@ void setRGB(uint8_t channel, uint8_t r, uint8_t g, uint8_t b)
  * @param c1 Channel 1 blinks
  * @param c2 Channel 2 blinks
  * @param c3 Channel 3 blinks
+ * @param statusMask 3 bit wide mask to indicate which cells are voted in, voted out cells get a yellow background
  */
-void blinkCode(int8_t c1, int8_t c2, int8_t c3)
+void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask)
 {
     int8_t channel_values[3] = {c1, c2, c3};
-    for (uint8_t i = 0; i < MAX_BLINKS; i++)
+
+    /* Work out the max of the absolute values */
+    uint8_t max_blinks = 0;
+    for (uint8_t channel = 0; channel < 3; channel++)
+    {
+        if (abs(channel_values[channel]) > max_blinks)
+        {
+            max_blinks = abs(channel_values[channel]);
+        }
+    }
+
+    assert(max_blinks <= MAX_BLINKS);
+
+    /* Do the loop and blink the blink*/
+    for (uint8_t i = 0; i < max_blinks; i++)
     {
         for (uint8_t channel = 0; channel < 3; channel++)
         {
@@ -121,28 +135,66 @@ void blinkCode(int8_t c1, int8_t c2, int8_t c3)
                 {
                     if (channel_values[channel] > 0)
                     {
-                        setRGB(channel, 0, LED_BRIGHTNESS[channel], 0); // Green
+                        setRGB(channel, 0, LED_BRIGHTNESS[1], 0); // Green
                     }
                     else
                     {
-                        setRGB(channel, LED_BRIGHTNESS[channel], 0, 0); // Red
+                        setRGB(channel, LED_BRIGHTNESS[0], 0, 0); // Red
                     }
                 }
                 else
                 {
-                    setRGB(channel, 0, 0, 0); // Off
+                    if ((statusMask & (1 << channel)) == 0)
+                    {
+                        setRGB(channel, LED_MIN_BRIGHTNESS, LED_MIN_BRIGHTNESS, 0); // Yellow background for voted out cells
+                    }
+                    else
+                    {
+                        setRGB(channel, 0, 0, 0); // Off
+                    }
                 }
             }
         }
-        HAL_Delay(BLINK_PERIOD); // Let the digits cook for a bit
+        osDelay(BLINK_PERIOD);                            // Let the digits cook for a bit
+        for (uint8_t channel = 0; channel < 3; channel++) // Turn everything off
+        {
+            if ((statusMask & (1 << channel)) == 0)
+            {
+                setRGB(channel, LED_MIN_BRIGHTNESS, LED_MIN_BRIGHTNESS, 0); // Yellow background for voted out cells
+            }
+            else
+            {
+                setRGB(channel, 0, 0, 0); // Off
+            }
+        }
+        osDelay(BLINK_PERIOD);
+    }
+    osDelay(BLINK_PERIOD * 2); // Extra delay at the end
+}
+
+/**
+ * @brief Do a blue blink to indicate that the displayed data is stale
+ * @param
+ */
+void blinkNoData(void)
+{
+    /* Do the loop and blink the blink*/
+    for (uint8_t i = 0; i <2; i++)
+    {
+        for (uint8_t channel = 0; channel < 3; channel++)
+        {
+            setRGB(channel, 0, 0, LED_BRIGHTNESS[2]); // Blue
+        }
+        osDelay(BLINK_PERIOD);                            // Let the digits cook for a bit
         for (uint8_t channel = 0; channel < 3; channel++) // Turn everything off
         {
             setRGB(channel, 0, 0, 0); // Off
         }
-        HAL_Delay(BLINK_PERIOD);
+        osDelay(BLINK_PERIOD);
     }
+    osDelay(BLINK_PERIOD * 2); // Extra delay at the end
 }
 
-void blinkAlarm(int8_t c1, int8_t c2, int8_t c3)
+void blinkAlarm()
 {
 }

@@ -28,6 +28,7 @@ extern "C"
     static const TickType_t TIMEOUT_10MS_TICKS = pdMS_TO_TICKS(10);
     static const TickType_t TIMEOUT_100MS_TICKS = pdMS_TO_TICKS(100);
     static const TickType_t TIMEOUT_500MS_TICKS = pdMS_TO_TICKS(500);
+    static const TickType_t TIMEOUT_250MS_TICKS = pdMS_TO_TICKS(500);
     static const TickType_t TIMEOUT_1S_TICKS = pdMS_TO_TICKS(1000);
     static const TickType_t TIMEOUT_2S_TICKS = pdMS_TO_TICKS(2000);
     static const TickType_t TIMEOUT_4S_TICKS = pdMS_TO_TICKS(4000);

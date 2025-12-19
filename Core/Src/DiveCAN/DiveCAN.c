@@ -3,6 +3,7 @@
 #include "cmsis_os.h"
 #include "../Hardware/pwr_management.h"
 #include "../Hardware/printer.h"
+#include "../errors.h"
 
 void CANTask(void *arg);
 void RespBusInit(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
@@ -13,12 +14,16 @@ void RespSetpoint(const DiveCANMessage_t *const message, const DiveCANDevice_t *
 void RespAtmos(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
 void RespShutdown(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
 void RespSerialNumber(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
+void RespPPO2(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
 void RespDiving(const DiveCANMessage_t *const message);
 void updatePIDPGain(const DiveCANMessage_t *const message);
 void updatePIDIGain(const DiveCANMessage_t *const message);
 void updatePIDDGain(const DiveCANMessage_t *const message);
 
 static const uint8_t DIVECAN_TYPE_MASK = 0xF;
+
+extern osMessageQueueId_t PPO2QueueHandle;
+
 
 /* FreeRTOS tasks */
 
@@ -88,6 +93,7 @@ void CANTask(void *arg)
                 break;
             case PPO2_PPO2_ID:
                 message.type = "PPO2_PPO2";
+                RespPPO2(&message, deviceSpec);
                 break;
             case HUD_STAT_ID:
                 message.type = "HUD_STAT";
@@ -192,6 +198,23 @@ void RespPing(const DiveCANMessage_t *const message, const DiveCANDevice_t *cons
     {
         txID(devType, deviceSpec->manufacturerID, deviceSpec->firmwareVersion);
         txName(devType, deviceSpec->name);
+    }
+}
+
+void RespPPO2(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec)
+{
+    (void)deviceSpec; /* Unused, but we need to match the function signature */
+    CellValues_t cell_values;
+    
+    cell_values.C1 = message->data[1];
+    cell_values.C2 = message->data[2];
+    cell_values.C3 = message->data[3];
+
+    /* Send the values to the PPO2 processing queue */
+    osStatus_t enQueueStatus = osMessageQueuePut(PPO2QueueHandle, &cell_values, 0, 0);
+    if (enQueueStatus != osOK)
+    {
+        NON_FATAL_ERROR_DETAIL(QUEUEING_ERR, enQueueStatus);
     }
 }
 

@@ -24,6 +24,12 @@ extern "C"
         uint8_t firmwareVersion;
     } DiveCANDevice_t;
 
+    typedef struct {
+        int16_t C1;
+        int16_t C2;
+        int16_t C3;
+    } CellValues_t;
+
     void InitDiveCAN(const DiveCANDevice_t *const deviceSpec);
 
 #ifdef __cplusplus
