@@ -185,9 +185,18 @@ C_INCLUDES =  \
 
 
 # compile gcc flags
-ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+WARN_FLAGS = -Wall -Wwrite-strings -Wextra \
+ -Wduplicated-cond -Wlogical-op -Wrestrict  -Wnull-dereference -Wcast-align -Wsequence-point -Wcast-qual -Wuninitialized -Wchar-subscripts -Wrestrict -Wstringop-truncation \
+ -Wunused-parameter -Wunused-value -Wjump-misses-init  -Wshadow -Wswitch -Wundef -Wswitch-default  -Wstrict-prototypes -Wtrigraphs -Wformat -Wformat-security  -Wimplicit -Wcomment -Wunreachable-code \
+ -Wreturn-type -Wno-unused-parameter -Werror=vla \
+ -D_FORTIFY_SOURCE=3 -D__STDC_FORMAT_MACROS -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS -D_GLIBCXX_ASSERTIONS \
+ -fanalyzer \
+ -pedantic \
+-fdump-analyzer-callgraph -fdump-analyzer-supergraph -ftrivial-auto-var-init=pattern -fstack-protector-strong -fstack-clash-protection -fharden-compares -fharden-conditional-branches \
+-Wstack-usage=1305 -Wstack-protector -Wunsuffixed-float-constants
+ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) $(WARN_FLAGS) -fdata-sections -ffunction-sections -fstack-usage -fdump-tree-optimized -fdump-rtl-dfinish
 
-CFLAGS += $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+CFLAGS += $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) $(WARN_FLAGS) -fdata-sections -ffunction-sections -Werror -std=gnu23 -fstack-usage -fdump-tree-optimized -fdump-rtl-dfinish
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2
@@ -207,7 +216,7 @@ LDSCRIPT = STM32L431XX_FLASH.ld
 # libraries
 LIBS = -lc -lm -lnosys 
 LIBDIR = 
-LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
+LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections -Wl,--print-memory-usage
 
 # default action: build all
 all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin

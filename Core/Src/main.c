@@ -107,7 +107,11 @@ void BlinkTaskFunc(void *argument);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+static inline int16_t div10_round(int16_t x)
+{
+    /* rounds x/10 to nearest integer, handles negatives safely via int64_t */
+    return (int16_t)(((int32_t)x + (x >= 0 ? 5 : -5)) / 10);
+}
 /* USER CODE END 0 */
 
 /**
@@ -522,6 +526,10 @@ void BlinkTaskFunc(void *argument)
     cellValues.C1 -= centerValue;
     cellValues.C2 -= centerValue;
     cellValues.C2 -= centerValue;
+
+    cellValues.C1 = div10_round(cellValues.C1);
+    cellValues.C2 = div10_round(cellValues.C2);
+    cellValues.C3 = div10_round(cellValues.C3);
     
     blinkCode((int8_t)cellValues.C1, (int8_t)cellValues.C2, (int8_t)cellValues.C3, 0b111);
   }
