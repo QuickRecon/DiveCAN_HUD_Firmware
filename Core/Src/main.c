@@ -97,7 +97,7 @@ static void MX_GPIO_Init(void);
 static void MX_CAN1_Init(void);
 static void MX_TSC_Init(void);
 static void MX_CRC_Init(void);
-//static void MX_IWDG_Init(void);
+// static void MX_IWDG_Init(void);
 void TSCTaskFunc(void *argument);
 void BlinkTaskFunc(void *argument);
 
@@ -521,17 +521,19 @@ void BlinkTaskFunc(void *argument)
     if (osStat != osOK)
     {
       blinkNoData();
+    } else {
+      osDelay(TIMEOUT_500MS_TICKS); /* Use an extra delay to "partition" the segments */
     }
 
-    cellValues.C1 -= centerValue;
-    cellValues.C2 -= centerValue;
-    cellValues.C2 -= centerValue;
+    int16_t c1 = cellValues.C1 - centerValue;
+    int16_t c2 = cellValues.C2 - centerValue;
+    int16_t c3 = cellValues.C3 - centerValue;
 
-    cellValues.C1 = div10_round(cellValues.C1);
-    cellValues.C2 = div10_round(cellValues.C2);
-    cellValues.C3 = div10_round(cellValues.C3);
+    c1 = div10_round(c1);
+    c2 = div10_round(c2);
+    c3 = div10_round(c3);
 
-    blinkCode((int8_t)cellValues.C1, (int8_t)cellValues.C2, (int8_t)cellValues.C3, 0b111);
+    blinkCode((int8_t)c1, (int8_t)c2, (int8_t)c3, 0b111);
   }
   /* USER CODE END BlinkTaskFunc */
 }

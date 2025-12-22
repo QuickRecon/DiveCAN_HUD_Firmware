@@ -3,10 +3,7 @@
 #include <assert.h>
 #include "../common.h"
 
-extern TIM_HandleTypeDef htim15;
-
 /* The frequency of the internal clock used to estimate an ~1uS delay */
-const uint32_t TIMER_MHZ = 8;
 const uint32_t STARTUP_DELAY_MS = 500;
 const uint8_t LED_MAX_BRIGHTNESS = 32;
 const uint8_t LED_BRIGHTNESS[3] = {10, 3, 3}; // R, G, B brightness levels, gotta push red a bit harder because its a lower voltage
@@ -169,7 +166,6 @@ void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask)
         }
         osDelay(BLINK_PERIOD);
     }
-    osDelay(BLINK_PERIOD * 2); // Extra delay at the end
 }
 
 /**
