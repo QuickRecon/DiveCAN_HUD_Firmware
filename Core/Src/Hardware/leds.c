@@ -103,9 +103,10 @@ void setRGB(uint8_t channel, uint8_t r, uint8_t g, uint8_t b)
  * @param c1 Channel 1 blinks
  * @param c2 Channel 2 blinks
  * @param c3 Channel 3 blinks
- * @param statusMask 3 bit wide mask to indicate which cells are voted in, voted out cells get a yellow background
+ * @param statusMask 3 bit wide mask to indicate which cells are voted in, voted out cells get a yellow background, 1 implies cell voted in
+ * @param failMask 3 bit wide mask to indicate which cells are in fail state, failed cells get constant red indication, 1 implies cell OK
  */
-void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask)
+void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t failMask)
 {
     int8_t channel_values[3] = {c1, c2, c3};
 
@@ -155,7 +156,11 @@ void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask)
         osDelay(BLINK_PERIOD);                            // Let the digits cook for a bit
         for (uint8_t channel = 0; channel < 3; channel++) // Turn everything off
         {
-            if ((statusMask & (1 << channel)) == 0)
+            if ((failMask & (1 << channel)) == 0)
+            {
+                setRGB(channel, LED_MIN_BRIGHTNESS, 0, 0); // Red background for failed cells
+            }
+            else if ((statusMask & (1 << channel)) == 0)
             {
                 setRGB(channel, LED_MIN_BRIGHTNESS, LED_MIN_BRIGHTNESS, 0); // Yellow background for voted out cells
             }

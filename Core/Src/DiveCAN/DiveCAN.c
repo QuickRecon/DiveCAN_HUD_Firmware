@@ -156,20 +156,6 @@ void CANTask(void *arg)
                 message.type = "CAN_SERIAL_NUMBER";
                 RespSerialNumber(&message, deviceSpec);
                 break;
-
-            /* Here lie the unofficial extensions, I want to remove these once the bluetooth is working*/
-            case PID_P_GAIN_ID:
-                message.type = "PID_P_GAIN";
-                updatePIDPGain(&message);
-                break;
-            case PID_I_GAIN_ID:
-                message.type = "PID_I_GAIN";
-                updatePIDIGain(&message);
-                break;
-            case PID_D_GAIN_ID:
-                message.type = "PID_D_GAIN";
-                updatePIDDGain(&message);
-                break;
             default:
                 message.type = "UNKNOWN";
                 serial_printf("Unknown message 0x%x: [0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x]\n\r", message_id,

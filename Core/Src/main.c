@@ -25,6 +25,7 @@
 /* USER CODE BEGIN Includes */
 #include "Hardware/leds.h"
 #include "DiveCAN/DiveCAN.h"
+#include "DiveCAN/Transciever.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -149,7 +150,16 @@ int main(void)
   MX_CRC_Init();
   // MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
+  const DiveCANDevice_t defaultDeviceSpec = {
+      .name = "ALHUD",
+      .type = DIVECAN_MONITOR,
+      .manufacturerID = DIVECAN_MANUFACTURER_SRI,
+      .firmwareVersion = 1};
+
+
   initLEDs();
+  
+  InitDiveCAN(&defaultDeviceSpec);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -533,7 +543,11 @@ void BlinkTaskFunc(void *argument)
     c2 = div10_round(c2);
     c3 = div10_round(c3);
 
-    blinkCode((int8_t)c1, (int8_t)c2, (int8_t)c3, 0b111);
+    uint8_t failMask = ((cellValues.C1 == 0xFF ? 0 : 1) << 0) |
+                       ((cellValues.C2 == 0xFF ? 0 : 1) << 1) |
+                       ((cellValues.C3 == 0xFF ? 0 : 1) << 2);
+
+    blinkCode((int8_t)c1, (int8_t)c2, (int8_t)c3, 0b111, failMask);
   }
   /* USER CODE END BlinkTaskFunc */
 }
