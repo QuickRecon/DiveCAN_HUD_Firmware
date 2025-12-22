@@ -15,6 +15,7 @@ void RespAtmos(const DiveCANMessage_t *const message, const DiveCANDevice_t *con
 void RespShutdown(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
 void RespSerialNumber(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
 void RespPPO2(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
+void RespPPO2Status(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
 void RespDiving(const DiveCANMessage_t *const message);
 void updatePIDPGain(const DiveCANMessage_t *const message);
 void updatePIDIGain(const DiveCANMessage_t *const message);
@@ -23,6 +24,7 @@ void updatePIDDGain(const DiveCANMessage_t *const message);
 static const uint8_t DIVECAN_TYPE_MASK = 0xF;
 
 extern osMessageQueueId_t PPO2QueueHandle;
+extern osMessageQueueId_t CellStatQueueHandle;
 
 /* FreeRTOS tasks */
 
@@ -145,6 +147,7 @@ void CANTask(void *arg)
                 break;
             case PPO2_STATUS_ID:
                 message.type = "PPO2_STATUS";
+                RespPPO2Status(&message, deviceSpec);
                 break;
             case BUS_STATUS_ID:
                 message.type = "BUS_STATUS";
@@ -198,6 +201,20 @@ void RespPPO2(const DiveCANMessage_t *const message, const DiveCANDevice_t *cons
     /* Send the values to the PPO2 processing queue */
     osMessageQueueReset(PPO2QueueHandle);
     osStatus_t enQueueStatus = osMessageQueuePut(PPO2QueueHandle, &cell_values, 0, 0);
+    if (enQueueStatus != osOK)
+    {
+        NON_FATAL_ERROR_DETAIL(QUEUEING_ERR, enQueueStatus);
+    }
+}
+
+void RespPPO2Status(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec)
+{
+    (void)deviceSpec; /* Unused, but we need to match the function signature */
+    uint8_t status = message->data[0];
+
+    /* Send the status to the Cell Status processing queue */
+    osMessageQueueReset(CellStatQueueHandle);
+    osStatus_t enQueueStatus = osMessageQueuePut(CellStatQueueHandle, &status, 0, 0);
     if (enQueueStatus != osOK)
     {
         NON_FATAL_ERROR_DETAIL(QUEUEING_ERR, enQueueStatus);

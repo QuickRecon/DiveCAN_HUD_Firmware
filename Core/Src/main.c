@@ -89,7 +89,15 @@ const osMessageQueueAttr_t PPO2Queue_attributes = {
     .mq_mem = &PPO2QueueBuffer,
     .mq_size = sizeof(PPO2QueueBuffer)};
 /* USER CODE BEGIN PV */
-
+osMessageQueueId_t CellStatQueueHandle;
+uint8_t CellStatQueueBuffer[1 * sizeof(uint8_t)];
+osStaticMessageQDef_t CellStatQueueControlBlock;
+const osMessageQueueAttr_t CellStatQueue_attributes = {
+    .name = "PPO2Queue",
+    .cb_mem = &CellStatQueueControlBlock,
+    .cb_size = sizeof(CellStatQueueControlBlock),
+    .mq_mem = &CellStatQueueBuffer,
+    .mq_size = sizeof(CellStatQueueBuffer)};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -186,6 +194,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
+  CellStatQueueHandle = osMessageQueueNew(1, sizeof(uint8_t), &CellStatQueue_attributes);
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -552,7 +561,7 @@ void BlinkTaskFunc(void *argument)
 {
   /* USER CODE BEGIN BlinkTaskFunc */
   const uint8_t centerValue = 100;
-  osDelay(TIMEOUT_500MS_TICKS); /* Initial delay to for the DiveCAN system to start up and prime the queue */
+  osDelay(TIMEOUT_2S_TICKS); /* Initial delay to for the DiveCAN system to start up and prime the queue */
   CellValues_t cellValues = {0};
   for (;;)
   {
@@ -579,7 +588,14 @@ void BlinkTaskFunc(void *argument)
                        ((cellValues.C2 == 0xFF ? 0 : 1) << 1) |
                        ((cellValues.C3 == 0xFF ? 0 : 1) << 2);
 
-    blinkCode((int8_t)c1, (int8_t)c2, (int8_t)c3, 0b110, failMask);
+    uint8_t statusMask = 0b111;
+    osStat = osMessageQueueGet(CellStatQueueHandle, &statusMask, NULL, 0);
+    if(osStat != osOK)
+    {
+      statusMask = 0b111; // Default to all good if no status available
+    }
+
+    blinkCode((int8_t)c1, (int8_t)c2, (int8_t)c3, statusMask, failMask);
   }
   /* USER CODE END BlinkTaskFunc */
 }
