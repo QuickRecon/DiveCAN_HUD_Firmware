@@ -30,28 +30,28 @@ extern "C"
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l4xx_hal.h"
 
-  /* Private includes ----------------------------------------------------------*/
-  /* USER CODE BEGIN Includes */
+    /* Private includes ----------------------------------------------------------*/
+    /* USER CODE BEGIN Includes */
 
-  /* USER CODE END Includes */
+    /* USER CODE END Includes */
 
-  /* Exported types ------------------------------------------------------------*/
-  /* USER CODE BEGIN ET */
+    /* Exported types ------------------------------------------------------------*/
+    /* USER CODE BEGIN ET */
 
-  /* USER CODE END ET */
+    /* USER CODE END ET */
 
-  /* Exported constants --------------------------------------------------------*/
-  /* USER CODE BEGIN EC */
+    /* Exported constants --------------------------------------------------------*/
+    /* USER CODE BEGIN EC */
 
-  /* USER CODE END EC */
+    /* USER CODE END EC */
 
-  /* Exported macro ------------------------------------------------------------*/
-  /* USER CODE BEGIN EM */
+    /* Exported macro ------------------------------------------------------------*/
+    /* USER CODE BEGIN EM */
 
-  /* USER CODE END EM */
+    /* USER CODE END EM */
 
-  /* Exported functions prototypes ---------------------------------------------*/
-  void Error_Handler(void);
+    /* Exported functions prototypes ---------------------------------------------*/
+    void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
@@ -60,6 +60,7 @@ extern "C"
 /* Private defines -----------------------------------------------------------*/
 #define CAN_EN_Pin GPIO_PIN_14
 #define CAN_EN_GPIO_Port GPIOC
+#define CAN_EN_EXTI_IRQn EXTI15_10_IRQn
 #define ASC_EN_Pin GPIO_PIN_15
 #define ASC_EN_GPIO_Port GPIOC
 #define B1_Pin GPIO_PIN_1
@@ -89,9 +90,9 @@ extern "C"
 #define LED_3_Pin GPIO_PIN_7
 #define LED_3_GPIO_Port GPIOB
 
-  /* USER CODE BEGIN Private defines */
+    /* USER CODE BEGIN Private defines */
 
-  /* USER CODE END Private defines */
+    /* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }

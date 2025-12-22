@@ -102,6 +102,7 @@ static void MX_CRC_Init(void);
 void TSCTaskFunc(void *argument);
 void BlinkTaskFunc(void *argument);
 
+static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -149,6 +150,9 @@ int main(void)
   MX_TOUCHSENSING_Init();
   MX_CRC_Init();
   // MX_IWDG_Init();
+
+  /* Initialize interrupts */
+  MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
   const DiveCANDevice_t defaultDeviceSpec = {
       .name = "ALHUD",
@@ -156,9 +160,8 @@ int main(void)
       .manufacturerID = DIVECAN_MANUFACTURER_SRI,
       .firmwareVersion = 1};
 
-
   initLEDs();
-  
+
   InitDiveCAN(&defaultDeviceSpec);
   /* USER CODE END 2 */
 
@@ -179,7 +182,7 @@ int main(void)
 
   /* Create the queue(s) */
   /* creation of PPO2Queue */
-  PPO2QueueHandle = osMessageQueueNew(1, sizeof(uint32_t), &PPO2Queue_attributes);
+  PPO2QueueHandle = osMessageQueueNew(1, sizeof(CellValues_t), &PPO2Queue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
@@ -210,8 +213,8 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-    NVIC_SystemReset();
     /* USER CODE BEGIN 3 */
+    NVIC_SystemReset();
   }
   /* USER CODE END 3 */
 }
@@ -254,7 +257,7 @@ void SystemClock_Config(void)
    */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV2;
+  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
@@ -266,6 +269,23 @@ void SystemClock_Config(void)
   /** Enables the Clock Security System
    */
   HAL_RCC_EnableCSS();
+}
+
+/**
+ * @brief NVIC Configuration.
+ * @retval None
+ */
+static void MX_NVIC_Init(void)
+{
+  /* EXTI15_10_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+  /* CAN1_RX0_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(CAN1_RX0_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(CAN1_RX0_IRQn);
+  /* CAN1_RX1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(CAN1_RX1_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(CAN1_RX1_IRQn);
 }
 
 /**
@@ -284,14 +304,14 @@ static void MX_CAN1_Init(void)
 
   /* USER CODE END CAN1_Init 1 */
   hcan1.Instance = CAN1;
-  hcan1.Init.Prescaler = 16;
+  hcan1.Init.Prescaler = 4;
   hcan1.Init.Mode = CAN_MODE_NORMAL;
-  hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan1.Init.TimeSeg1 = CAN_BS1_1TQ;
-  hcan1.Init.TimeSeg2 = CAN_BS2_1TQ;
+  hcan1.Init.SyncJumpWidth = CAN_SJW_4TQ;
+  hcan1.Init.TimeSeg1 = CAN_BS1_13TQ;
+  hcan1.Init.TimeSeg2 = CAN_BS2_2TQ;
   hcan1.Init.TimeTriggeredMode = DISABLE;
-  hcan1.Init.AutoBusOff = DISABLE;
-  hcan1.Init.AutoWakeUp = DISABLE;
+  hcan1.Init.AutoBusOff = ENABLE;
+  hcan1.Init.AutoWakeUp = ENABLE;
   hcan1.Init.AutoRetransmission = DISABLE;
   hcan1.Init.ReceiveFifoLocked = DISABLE;
   hcan1.Init.TransmitFifoPriority = DISABLE;
@@ -300,7 +320,17 @@ static void MX_CAN1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CAN1_Init 2 */
-
+  CAN_FilterTypeDef sFilterConfig = {0};
+  sFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0; /* set fifo assignment */
+  sFilterConfig.FilterIdHigh = 0;
+  sFilterConfig.FilterIdLow = 0;
+  sFilterConfig.FilterMaskIdHigh = 0;
+  sFilterConfig.FilterMaskIdLow = 0;
+  sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT; /* set filter scale */
+  sFilterConfig.FilterActivation = ENABLE;
+  (void)HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig);
+  (void)HAL_CAN_Start(&hcan1);                                             /* start CAN */
+  (void)HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING); /* enable interrupts */
   /* USER CODE END CAN1_Init 2 */
 }
 
@@ -522,7 +552,7 @@ void BlinkTaskFunc(void *argument)
 {
   /* USER CODE BEGIN BlinkTaskFunc */
   const uint8_t centerValue = 100;
-
+  osDelay(TIMEOUT_500MS_TICKS); /* Initial delay to for the DiveCAN system to start up and prime the queue */
   CellValues_t cellValues = {0};
   for (;;)
   {
@@ -531,7 +561,9 @@ void BlinkTaskFunc(void *argument)
     if (osStat != osOK)
     {
       blinkNoData();
-    } else {
+    }
+    else
+    {
       osDelay(TIMEOUT_500MS_TICKS); /* Use an extra delay to "partition" the segments */
     }
 
@@ -547,7 +579,7 @@ void BlinkTaskFunc(void *argument)
                        ((cellValues.C2 == 0xFF ? 0 : 1) << 1) |
                        ((cellValues.C3 == 0xFF ? 0 : 1) << 2);
 
-    blinkCode((int8_t)c1, (int8_t)c2, (int8_t)c3, 0b111, failMask);
+    blinkCode((int8_t)c1, (int8_t)c2, (int8_t)c3, 0b110, failMask);
   }
   /* USER CODE END BlinkTaskFunc */
 }

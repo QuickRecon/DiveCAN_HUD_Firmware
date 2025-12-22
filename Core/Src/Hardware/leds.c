@@ -7,8 +7,8 @@
 const uint32_t STARTUP_DELAY_MS = 500;
 const uint8_t LED_MAX_BRIGHTNESS = 32;
 const uint8_t LED_BRIGHTNESS[3] = {10, 3, 3}; // R, G, B brightness levels, gotta push red a bit harder because its a lower voltage
-const uint8_t LED_MIN_BRIGHTNESS = 1;
-const uint8_t MAX_BLINKS = 10;
+const uint8_t LED_MIN_BRIGHTNESS = 3;
+const uint8_t MAX_BLINKS = 25;
 const uint32_t BLINK_PERIOD = TIMEOUT_250MS_TICKS;
 
 struct GPIO_PinMap
@@ -114,7 +114,8 @@ void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t fail
     uint8_t max_blinks = 0;
     for (uint8_t channel = 0; channel < 3; channel++)
     {
-        if (abs(channel_values[channel]) > max_blinks)
+        /* Only count non-failed cells towards the blinking */
+        if ((abs(channel_values[channel]) > max_blinks) && ((failMask & (1 << channel)) != 0))
         {
             max_blinks = abs(channel_values[channel]);
         }
@@ -131,7 +132,7 @@ void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t fail
             {
                 if (i < abs(channel_values[channel]))
                 {
-                    if (channel_values[channel] > 0)
+                    if (channel_values[channel] > 0 && ((failMask & (1 << channel)) != 0))
                     {
                         setRGB(channel, 0, LED_BRIGHTNESS[1], 0); // Green
                     }
@@ -142,7 +143,11 @@ void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t fail
                 }
                 else
                 {
-                    if ((statusMask & (1 << channel)) == 0)
+                    if ((failMask & (1 << channel)) == 0)
+                    {
+                        setRGB(channel, LED_MIN_BRIGHTNESS, 0, 0); // Red background for failed cells
+                    }
+                    else if ((statusMask & (1 << channel)) == 0)
                     {
                         setRGB(channel, LED_MIN_BRIGHTNESS, LED_MIN_BRIGHTNESS, 0); // Yellow background for voted out cells
                     }
@@ -162,7 +167,7 @@ void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t fail
             }
             else if ((statusMask & (1 << channel)) == 0)
             {
-                setRGB(channel, LED_MIN_BRIGHTNESS, LED_MIN_BRIGHTNESS, 0); // Yellow background for voted out cells
+                setRGB(channel, 15, 3, 0); // Yellow background for voted out cells
             }
             else
             {

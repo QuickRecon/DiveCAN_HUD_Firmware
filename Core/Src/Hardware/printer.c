@@ -85,7 +85,7 @@ void InitPrinter(bool printToCanbus)
 
 void PrinterTask(void *arg)
 {
-    //const PrinterTask_params_t *const taskParams = (PrinterTask_params_t *)arg;
+    // const PrinterTask_params_t *const taskParams = (PrinterTask_params_t *)arg;
     QueueHandle_t *printQueue = getQueueHandle();
     while (true)
     {

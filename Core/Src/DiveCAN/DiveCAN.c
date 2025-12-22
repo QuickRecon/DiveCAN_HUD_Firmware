@@ -196,6 +196,7 @@ void RespPPO2(const DiveCANMessage_t *const message, const DiveCANDevice_t *cons
     cell_values.C3 = message->data[3];
 
     /* Send the values to the PPO2 processing queue */
+    osMessageQueueReset(PPO2QueueHandle);
     osStatus_t enQueueStatus = osMessageQueuePut(PPO2QueueHandle, &cell_values, 0, 0);
     if (enQueueStatus != osOK)
     {
