@@ -68,7 +68,7 @@ const osThreadAttr_t TSCTask_attributes = {
 };
 /* Definitions for BlinkTask */
 osThreadId_t BlinkTaskHandle;
-uint32_t BlinkTaskBuffer[1280];
+uint32_t BlinkTaskBuffer[512];
 osStaticThreadDef_t BlinkTaskControlBlock;
 const osThreadAttr_t BlinkTask_attributes = {
     .name = "BlinkTask",
@@ -76,7 +76,19 @@ const osThreadAttr_t BlinkTask_attributes = {
     .cb_size = sizeof(BlinkTaskControlBlock),
     .stack_mem = &BlinkTaskBuffer[0],
     .stack_size = sizeof(BlinkTaskBuffer),
-    .priority = (osPriority_t)osPriorityHigh,
+    .priority = (osPriority_t)osPriorityAboveNormal,
+};
+/* Definitions for AlertTask */
+osThreadId_t AlertTaskHandle;
+uint32_t AlertTaskBuffer[128];
+osStaticThreadDef_t AlertTaskControlBlock;
+const osThreadAttr_t AlertTask_attributes = {
+    .name = "AlertTask",
+    .cb_mem = &AlertTaskControlBlock,
+    .cb_size = sizeof(AlertTaskControlBlock),
+    .stack_mem = &AlertTaskBuffer[0],
+    .stack_size = sizeof(AlertTaskBuffer),
+    .priority = (osPriority_t)osPriorityNormal,
 };
 /* Definitions for PPO2Queue */
 osMessageQueueId_t PPO2QueueHandle;
@@ -88,16 +100,17 @@ const osMessageQueueAttr_t PPO2Queue_attributes = {
     .cb_size = sizeof(PPO2QueueControlBlock),
     .mq_mem = &PPO2QueueBuffer,
     .mq_size = sizeof(PPO2QueueBuffer)};
-/* USER CODE BEGIN PV */
+/* Definitions for CellStatQueue */
 osMessageQueueId_t CellStatQueueHandle;
-uint8_t CellStatQueueBuffer[1 * sizeof(uint8_t)];
-osStaticMessageQDef_t CellStatQueueControlBlock;
+uint8_t CellStatBuffer[1 * sizeof(uint8_t)];
+osStaticMessageQDef_t CellStatControlBlock;
 const osMessageQueueAttr_t CellStatQueue_attributes = {
-    .name = "PPO2Queue",
-    .cb_mem = &CellStatQueueControlBlock,
-    .cb_size = sizeof(CellStatQueueControlBlock),
-    .mq_mem = &CellStatQueueBuffer,
-    .mq_size = sizeof(CellStatQueueBuffer)};
+    .name = "CellStatQueue",
+    .cb_mem = &CellStatControlBlock,
+    .cb_size = sizeof(CellStatControlBlock),
+    .mq_mem = &CellStatBuffer,
+    .mq_size = sizeof(CellStatBuffer)};
+/* USER CODE BEGIN PV */
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -109,6 +122,7 @@ static void MX_CRC_Init(void);
 // static void MX_IWDG_Init(void);
 void TSCTaskFunc(void *argument);
 void BlinkTaskFunc(void *argument);
+void AlertTaskFunc(void *argument);
 
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
@@ -121,6 +135,11 @@ static inline int16_t div10_round(int16_t x)
 {
   /* rounds x/10 to nearest integer, handles negatives safely via int64_t */
   return (int16_t)(((int32_t)x + (x >= 0 ? 5 : -5)) / 10);
+}
+
+static inline bool cell_alert(uint8_t cellVal)
+{
+  return (cellVal < 40 || cellVal > 165);
 }
 /* USER CODE END 0 */
 
@@ -192,9 +211,11 @@ int main(void)
   /* creation of PPO2Queue */
   PPO2QueueHandle = osMessageQueueNew(1, sizeof(CellValues_t), &PPO2Queue_attributes);
 
+  /* creation of CellStatQueue */
+  CellStatQueueHandle = osMessageQueueNew(1, sizeof(uint8_t), &CellStatQueue_attributes);
+
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
-  CellStatQueueHandle = osMessageQueueNew(1, sizeof(uint8_t), &CellStatQueue_attributes);
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
@@ -203,6 +224,9 @@ int main(void)
 
   /* creation of BlinkTask */
   BlinkTaskHandle = osThreadNew(BlinkTaskFunc, NULL, &BlinkTask_attributes);
+
+  /* creation of AlertTask */
+  AlertTaskHandle = osThreadNew(AlertTaskFunc, NULL, &AlertTask_attributes);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -222,6 +246,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
     /* USER CODE BEGIN 3 */
     NVIC_SystemReset();
   }
@@ -521,11 +546,11 @@ void TSC_Handler(void)
 {
   if (MyTKeysB[0].p_Data->StateId == TSL_STATEID_DETECT)
   {
-    HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
+    //HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
   }
   else if (MyTKeysB[0].p_Data->StateId == TSL_STATEID_RELEASE)
   {
-    HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
+    //HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
   }
 }
 /* USER CODE END 4 */
@@ -556,6 +581,7 @@ void TSCTaskFunc(void *argument)
  * @param argument: Not used
  * @retval None
  */
+static bool alerting = false;
 /* USER CODE END Header_BlinkTaskFunc */
 void BlinkTaskFunc(void *argument)
 {
@@ -571,8 +597,14 @@ void BlinkTaskFunc(void *argument)
     {
       blinkNoData();
     }
+    else if (cell_alert(cellValues.C1) || cell_alert(cellValues.C2) || cell_alert(cellValues.C3))
+    {
+      alerting = true;
+      blinkAlarm();
+    }
     else
     {
+      alerting = false;
       osDelay(TIMEOUT_500MS_TICKS); /* Use an extra delay to "partition" the segments */
     }
 
@@ -590,7 +622,7 @@ void BlinkTaskFunc(void *argument)
 
     uint8_t statusMask = 0b111;
     osStat = osMessageQueueGet(CellStatQueueHandle, &statusMask, NULL, 0);
-    if(osStat != osOK)
+    if (osStat != osOK)
     {
       statusMask = 0b111; // Default to all good if no status available
     }
@@ -598,6 +630,36 @@ void BlinkTaskFunc(void *argument)
     blinkCode((int8_t)c1, (int8_t)c2, (int8_t)c3, statusMask, failMask);
   }
   /* USER CODE END BlinkTaskFunc */
+}
+
+/* USER CODE BEGIN Header_AlertTaskFunc */
+/**
+ * @brief Function implementing the AlertTask thread.
+ * @param argument: Not used
+ * @retval None
+ */
+/* USER CODE END Header_AlertTaskFunc */
+void AlertTaskFunc(void *argument)
+{
+  /* USER CODE BEGIN AlertTaskFunc */
+  /* Infinite loop */
+  for (;;)
+  {
+    if (alerting)
+    {
+      HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(LED_2_GPIO_Port, LED_2_Pin, GPIO_PIN_SET);
+      HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, GPIO_PIN_SET);
+      osDelay(TIMEOUT_100MS_TICKS);
+      HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(LED_2_GPIO_Port, LED_2_Pin, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, GPIO_PIN_RESET);
+    }
+    osDelay(TIMEOUT_100MS_TICKS);
+  }
+  /* USER CODE END AlertTaskFunc */
 }
 
 /**

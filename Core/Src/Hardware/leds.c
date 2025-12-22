@@ -203,4 +203,24 @@ void blinkNoData(void)
 
 void blinkAlarm()
 {
+    /* We go do a "nightrider" sweep to the left and back to the right 3 times (100ms per LED) */
+    for (int i = 0; i < 5; i++)
+    {
+        setRGB(0, LED_MAX_BRIGHTNESS, 0, 0);
+        osDelay(TIMEOUT_50MS_TICKS);
+        setRGB(0, 0, 0, 0);
+        setRGB(1, LED_MAX_BRIGHTNESS, 0, 0);
+        osDelay(TIMEOUT_50MS_TICKS);
+        setRGB(1, 0, 0, 0);
+        setRGB(2, LED_MAX_BRIGHTNESS, 0, 0);
+        osDelay(TIMEOUT_50MS_TICKS);
+        setRGB(2, 0, 0, 0);
+        setRGB(1, LED_MAX_BRIGHTNESS, 0, 0);
+        osDelay(TIMEOUT_50MS_TICKS);
+        setRGB(1, 0, 0, 0);
+        setRGB(0, LED_MAX_BRIGHTNESS, 0, 0);
+        osDelay(TIMEOUT_50MS_TICKS);
+        setRGB(0, 0, 0, 0);
+        osDelay(TIMEOUT_50MS_TICKS);
+    }
 }
