@@ -23,8 +23,9 @@ extern "C"
         UNDEFINED_STATE_FERR = 10,
         /** @brief The stack smashing protection has triggered, no longer safe to continue */
         STACK_GUARD_FERR = 11,
+        EXIT_TRIGGERED_FERR = 12,
         /** @brief The largest nonfatal error code in use, we use this to manage the flash storage of the errors **/
-        MAX_FERR = STACK_GUARD_FERR
+        MAX_FERR = EXIT_TRIGGERED_FERR
     } FatalError_t;
 
     typedef enum

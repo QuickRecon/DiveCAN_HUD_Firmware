@@ -199,13 +199,13 @@
 #include "stm32l4xx_hal.h"
 
 /** @addtogroup STM32L4xx_HAL_Driver
-  * @{
-  */
+ * @{
+ */
 
 /** @defgroup TSC TSC
-  * @brief HAL TSC module driver
-  * @{
-  */
+ * @brief HAL TSC module driver
+ * @{
+ */
 
 #ifdef HAL_TSC_MODULE_ENABLED
 
@@ -219,8 +219,8 @@ static uint32_t TSC_extract_groups(uint32_t iomask);
 /* Exported functions --------------------------------------------------------*/
 
 /** @defgroup TSC_Exported_Functions TSC Exported Functions
-  * @{
-  */
+ * @{
+ */
 
 /** @defgroup TSC_Exported_Functions_Group1 Initialization and de-initialization functions
   *  @brief    Initialization and Configuration functions
@@ -237,11 +237,11 @@ static uint32_t TSC_extract_groups(uint32_t iomask);
   */
 
 /**
-  * @brief  Initialize the TSC peripheral according to the specified parameters
-  *         in the TSC_InitTypeDef structure and initialize the associated handle.
-  * @param  htsc TSC handle
-  * @retval HAL status
-  */
+ * @brief  Initialize the TSC peripheral according to the specified parameters
+ *         in the TSC_InitTypeDef structure and initialize the associated handle.
+ * @param  htsc TSC handle
+ * @retval HAL status
+ */
 HAL_StatusTypeDef HAL_TSC_Init(TSC_HandleTypeDef *htsc)
 {
   /* Check TSC handle allocation */
@@ -275,8 +275,8 @@ HAL_StatusTypeDef HAL_TSC_Init(TSC_HandleTypeDef *htsc)
 
 #if (USE_HAL_TSC_REGISTER_CALLBACKS == 1)
     /* Init the TSC Callback settings */
-    htsc->ConvCpltCallback  = HAL_TSC_ConvCpltCallback; /* Legacy weak ConvCpltCallback     */
-    htsc->ErrorCallback     = HAL_TSC_ErrorCallback;    /* Legacy weak ErrorCallback        */
+    htsc->ConvCpltCallback = HAL_TSC_ConvCpltCallback; /* Legacy weak ConvCpltCallback     */
+    htsc->ErrorCallback = HAL_TSC_ErrorCallback;       /* Legacy weak ErrorCallback        */
 
     if (htsc->MspInitCallback == NULL)
     {
@@ -344,10 +344,10 @@ HAL_StatusTypeDef HAL_TSC_Init(TSC_HandleTypeDef *htsc)
 }
 
 /**
-  * @brief  Deinitialize the TSC peripheral registers to their default reset values.
-  * @param  htsc TSC handle
-  * @retval HAL status
-  */
+ * @brief  Deinitialize the TSC peripheral registers to their default reset values.
+ * @param  htsc TSC handle
+ * @retval HAL status
+ */
 HAL_StatusTypeDef HAL_TSC_DeInit(TSC_HandleTypeDef *htsc)
 {
   /* Check TSC handle allocation */
@@ -386,11 +386,11 @@ HAL_StatusTypeDef HAL_TSC_DeInit(TSC_HandleTypeDef *htsc)
 }
 
 /**
-  * @brief  Initialize the TSC MSP.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @retval None
-  */
+ * @brief  Initialize the TSC MSP.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @retval None
+ */
 __weak void HAL_TSC_MspInit(TSC_HandleTypeDef *htsc)
 {
   /* Prevent unused argument(s) compilation warning */
@@ -402,11 +402,11 @@ __weak void HAL_TSC_MspInit(TSC_HandleTypeDef *htsc)
 }
 
 /**
-  * @brief  DeInitialize the TSC MSP.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @retval None
-  */
+ * @brief  DeInitialize the TSC MSP.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @retval None
+ */
 __weak void HAL_TSC_MspDeInit(TSC_HandleTypeDef *htsc)
 {
   /* Prevent unused argument(s) compilation warning */
@@ -419,19 +419,19 @@ __weak void HAL_TSC_MspDeInit(TSC_HandleTypeDef *htsc)
 
 #if (USE_HAL_TSC_REGISTER_CALLBACKS == 1)
 /**
-  * @brief  Register a User TSC Callback
-  *         To be used instead of the weak predefined callback
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *                the configuration information for the specified TSC.
-  * @param  CallbackID ID of the callback to be registered
-  *         This parameter can be one of the following values:
-  *          @arg @ref HAL_TSC_CONV_COMPLETE_CB_ID Conversion completed callback ID
-  *          @arg @ref HAL_TSC_ERROR_CB_ID Error callback ID
-  *          @arg @ref HAL_TSC_MSPINIT_CB_ID MspInit callback ID
-  *          @arg @ref HAL_TSC_MSPDEINIT_CB_ID MspDeInit callback ID
-  * @param  pCallback pointer to the Callback function
-  * @retval HAL status
-  */
+ * @brief  Register a User TSC Callback
+ *         To be used instead of the weak predefined callback
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *                the configuration information for the specified TSC.
+ * @param  CallbackID ID of the callback to be registered
+ *         This parameter can be one of the following values:
+ *          @arg @ref HAL_TSC_CONV_COMPLETE_CB_ID Conversion completed callback ID
+ *          @arg @ref HAL_TSC_ERROR_CB_ID Error callback ID
+ *          @arg @ref HAL_TSC_MSPINIT_CB_ID MspInit callback ID
+ *          @arg @ref HAL_TSC_MSPDEINIT_CB_ID MspDeInit callback ID
+ * @param  pCallback pointer to the Callback function
+ * @retval HAL status
+ */
 HAL_StatusTypeDef HAL_TSC_RegisterCallback(TSC_HandleTypeDef *htsc, HAL_TSC_CallbackIDTypeDef CallbackID,
                                            pTSC_CallbackTypeDef pCallback)
 {
@@ -451,50 +451,50 @@ HAL_StatusTypeDef HAL_TSC_RegisterCallback(TSC_HandleTypeDef *htsc, HAL_TSC_Call
   {
     switch (CallbackID)
     {
-      case HAL_TSC_CONV_COMPLETE_CB_ID :
-        htsc->ConvCpltCallback = pCallback;
-        break;
+    case HAL_TSC_CONV_COMPLETE_CB_ID:
+      htsc->ConvCpltCallback = pCallback;
+      break;
 
-      case HAL_TSC_ERROR_CB_ID :
-        htsc->ErrorCallback = pCallback;
-        break;
+    case HAL_TSC_ERROR_CB_ID:
+      htsc->ErrorCallback = pCallback;
+      break;
 
-      case HAL_TSC_MSPINIT_CB_ID :
-        htsc->MspInitCallback = pCallback;
-        break;
+    case HAL_TSC_MSPINIT_CB_ID:
+      htsc->MspInitCallback = pCallback;
+      break;
 
-      case HAL_TSC_MSPDEINIT_CB_ID :
-        htsc->MspDeInitCallback = pCallback;
-        break;
+    case HAL_TSC_MSPDEINIT_CB_ID:
+      htsc->MspDeInitCallback = pCallback;
+      break;
 
-      default :
-        /* Update the error code */
-        htsc->ErrorCode |= HAL_TSC_ERROR_INVALID_CALLBACK;
+    default:
+      /* Update the error code */
+      htsc->ErrorCode |= HAL_TSC_ERROR_INVALID_CALLBACK;
 
-        /* Return error status */
-        status =  HAL_ERROR;
-        break;
+      /* Return error status */
+      status = HAL_ERROR;
+      break;
     }
   }
   else if (HAL_TSC_STATE_RESET == htsc->State)
   {
     switch (CallbackID)
     {
-      case HAL_TSC_MSPINIT_CB_ID :
-        htsc->MspInitCallback = pCallback;
-        break;
+    case HAL_TSC_MSPINIT_CB_ID:
+      htsc->MspInitCallback = pCallback;
+      break;
 
-      case HAL_TSC_MSPDEINIT_CB_ID :
-        htsc->MspDeInitCallback = pCallback;
-        break;
+    case HAL_TSC_MSPDEINIT_CB_ID:
+      htsc->MspDeInitCallback = pCallback;
+      break;
 
-      default :
-        /* Update the error code */
-        htsc->ErrorCode |= HAL_TSC_ERROR_INVALID_CALLBACK;
+    default:
+      /* Update the error code */
+      htsc->ErrorCode |= HAL_TSC_ERROR_INVALID_CALLBACK;
 
-        /* Return error status */
-        status =  HAL_ERROR;
-        break;
+      /* Return error status */
+      status = HAL_ERROR;
+      break;
     }
   }
   else
@@ -503,7 +503,7 @@ HAL_StatusTypeDef HAL_TSC_RegisterCallback(TSC_HandleTypeDef *htsc, HAL_TSC_Call
     htsc->ErrorCode |= HAL_TSC_ERROR_INVALID_CALLBACK;
 
     /* Return error status */
-    status =  HAL_ERROR;
+    status = HAL_ERROR;
   }
 
   /* Release Lock */
@@ -512,19 +512,19 @@ HAL_StatusTypeDef HAL_TSC_RegisterCallback(TSC_HandleTypeDef *htsc, HAL_TSC_Call
 }
 
 /**
-  * @brief  Unregister an TSC Callback
-  *         TSC callback is redirected to the weak predefined callback
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *                the configuration information for the specified TSC.
-  * @param  CallbackID ID of the callback to be unregistered
-  *         This parameter can be one of the following values:
-  *         This parameter can be one of the following values:
-  *          @arg @ref HAL_TSC_CONV_COMPLETE_CB_ID Conversion completed callback ID
-  *          @arg @ref HAL_TSC_ERROR_CB_ID Error callback ID
-  *          @arg @ref HAL_TSC_MSPINIT_CB_ID MspInit callback ID
-  *          @arg @ref HAL_TSC_MSPDEINIT_CB_ID MspDeInit callback ID
-  * @retval HAL status
-  */
+ * @brief  Unregister an TSC Callback
+ *         TSC callback is redirected to the weak predefined callback
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *                the configuration information for the specified TSC.
+ * @param  CallbackID ID of the callback to be unregistered
+ *         This parameter can be one of the following values:
+ *         This parameter can be one of the following values:
+ *          @arg @ref HAL_TSC_CONV_COMPLETE_CB_ID Conversion completed callback ID
+ *          @arg @ref HAL_TSC_ERROR_CB_ID Error callback ID
+ *          @arg @ref HAL_TSC_MSPINIT_CB_ID MspInit callback ID
+ *          @arg @ref HAL_TSC_MSPDEINIT_CB_ID MspDeInit callback ID
+ * @retval HAL status
+ */
 HAL_StatusTypeDef HAL_TSC_UnRegisterCallback(TSC_HandleTypeDef *htsc, HAL_TSC_CallbackIDTypeDef CallbackID)
 {
   HAL_StatusTypeDef status = HAL_OK;
@@ -536,50 +536,50 @@ HAL_StatusTypeDef HAL_TSC_UnRegisterCallback(TSC_HandleTypeDef *htsc, HAL_TSC_Ca
   {
     switch (CallbackID)
     {
-      case HAL_TSC_CONV_COMPLETE_CB_ID :
-        htsc->ConvCpltCallback = HAL_TSC_ConvCpltCallback;       /* Legacy weak ConvCpltCallback      */
-        break;
+    case HAL_TSC_CONV_COMPLETE_CB_ID:
+      htsc->ConvCpltCallback = HAL_TSC_ConvCpltCallback; /* Legacy weak ConvCpltCallback      */
+      break;
 
-      case HAL_TSC_ERROR_CB_ID :
-        htsc->ErrorCallback = HAL_TSC_ErrorCallback;               /* Legacy weak ErrorCallback        */
-        break;
+    case HAL_TSC_ERROR_CB_ID:
+      htsc->ErrorCallback = HAL_TSC_ErrorCallback; /* Legacy weak ErrorCallback        */
+      break;
 
-      case HAL_TSC_MSPINIT_CB_ID :
-        htsc->MspInitCallback = HAL_TSC_MspInit;                   /* Legacy weak MspInit              */
-        break;
+    case HAL_TSC_MSPINIT_CB_ID:
+      htsc->MspInitCallback = HAL_TSC_MspInit; /* Legacy weak MspInit              */
+      break;
 
-      case HAL_TSC_MSPDEINIT_CB_ID :
-        htsc->MspDeInitCallback = HAL_TSC_MspDeInit;               /* Legacy weak MspDeInit            */
-        break;
+    case HAL_TSC_MSPDEINIT_CB_ID:
+      htsc->MspDeInitCallback = HAL_TSC_MspDeInit; /* Legacy weak MspDeInit            */
+      break;
 
-      default :
-        /* Update the error code */
-        htsc->ErrorCode |= HAL_TSC_ERROR_INVALID_CALLBACK;
+    default:
+      /* Update the error code */
+      htsc->ErrorCode |= HAL_TSC_ERROR_INVALID_CALLBACK;
 
-        /* Return error status */
-        status =  HAL_ERROR;
-        break;
+      /* Return error status */
+      status = HAL_ERROR;
+      break;
     }
   }
   else if (HAL_TSC_STATE_RESET == htsc->State)
   {
     switch (CallbackID)
     {
-      case HAL_TSC_MSPINIT_CB_ID :
-        htsc->MspInitCallback = HAL_TSC_MspInit;                   /* Legacy weak MspInit              */
-        break;
+    case HAL_TSC_MSPINIT_CB_ID:
+      htsc->MspInitCallback = HAL_TSC_MspInit; /* Legacy weak MspInit              */
+      break;
 
-      case HAL_TSC_MSPDEINIT_CB_ID :
-        htsc->MspDeInitCallback = HAL_TSC_MspDeInit;               /* Legacy weak MspDeInit            */
-        break;
+    case HAL_TSC_MSPDEINIT_CB_ID:
+      htsc->MspDeInitCallback = HAL_TSC_MspDeInit; /* Legacy weak MspDeInit            */
+      break;
 
-      default :
-        /* Update the error code */
-        htsc->ErrorCode |= HAL_TSC_ERROR_INVALID_CALLBACK;
+    default:
+      /* Update the error code */
+      htsc->ErrorCode |= HAL_TSC_ERROR_INVALID_CALLBACK;
 
-        /* Return error status */
-        status =  HAL_ERROR;
-        break;
+      /* Return error status */
+      status = HAL_ERROR;
+      break;
     }
   }
   else
@@ -588,7 +588,7 @@ HAL_StatusTypeDef HAL_TSC_UnRegisterCallback(TSC_HandleTypeDef *htsc, HAL_TSC_Ca
     htsc->ErrorCode |= HAL_TSC_ERROR_INVALID_CALLBACK;
 
     /* Return error status */
-    status =  HAL_ERROR;
+    status = HAL_ERROR;
   }
 
   /* Release Lock */
@@ -599,8 +599,8 @@ HAL_StatusTypeDef HAL_TSC_UnRegisterCallback(TSC_HandleTypeDef *htsc, HAL_TSC_Ca
 #endif /* USE_HAL_TSC_REGISTER_CALLBACKS */
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /** @defgroup TSC_Exported_Functions_Group2 Input and Output operation functions
   *  @brief    Input and Output operation functions
@@ -622,11 +622,11 @@ HAL_StatusTypeDef HAL_TSC_UnRegisterCallback(TSC_HandleTypeDef *htsc, HAL_TSC_Ca
   */
 
 /**
-  * @brief  Start the acquisition.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @retval HAL status
-  */
+ * @brief  Start the acquisition.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @retval HAL status
+ */
 HAL_StatusTypeDef HAL_TSC_Start(TSC_HandleTypeDef *htsc)
 {
   /* Check the parameters */
@@ -665,11 +665,11 @@ HAL_StatusTypeDef HAL_TSC_Start(TSC_HandleTypeDef *htsc)
 }
 
 /**
-  * @brief  Start the acquisition in interrupt mode.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @retval HAL status.
-  */
+ * @brief  Start the acquisition in interrupt mode.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @retval HAL status.
+ */
 HAL_StatusTypeDef HAL_TSC_Start_IT(TSC_HandleTypeDef *htsc)
 {
   /* Check the parameters */
@@ -719,11 +719,11 @@ HAL_StatusTypeDef HAL_TSC_Start_IT(TSC_HandleTypeDef *htsc)
 }
 
 /**
-  * @brief  Stop the acquisition previously launched in polling mode.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @retval HAL status
-  */
+ * @brief  Stop the acquisition previously launched in polling mode.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @retval HAL status
+ */
 HAL_StatusTypeDef HAL_TSC_Stop(TSC_HandleTypeDef *htsc)
 {
   /* Check the parameters */
@@ -752,11 +752,11 @@ HAL_StatusTypeDef HAL_TSC_Stop(TSC_HandleTypeDef *htsc)
 }
 
 /**
-  * @brief  Stop the acquisition previously launched in interrupt mode.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @retval HAL status
-  */
+ * @brief  Stop the acquisition previously launched in interrupt mode.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @retval HAL status
+ */
 HAL_StatusTypeDef HAL_TSC_Stop_IT(TSC_HandleTypeDef *htsc)
 {
   /* Check the parameters */
@@ -788,13 +788,13 @@ HAL_StatusTypeDef HAL_TSC_Stop_IT(TSC_HandleTypeDef *htsc)
 }
 
 /**
-  * @brief  Start acquisition and wait until completion.
-  * @note   There is no need of a timeout parameter as the max count error is already
-  *         managed by the TSC peripheral.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @retval HAL state
-  */
+ * @brief  Start acquisition and wait until completion.
+ * @note   There is no need of a timeout parameter as the max count error is already
+ *         managed by the TSC peripheral.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @retval HAL state
+ */
 HAL_StatusTypeDef HAL_TSC_PollForAcquisition(TSC_HandleTypeDef *htsc)
 {
   /* Check the parameters */
@@ -816,12 +816,12 @@ HAL_StatusTypeDef HAL_TSC_PollForAcquisition(TSC_HandleTypeDef *htsc)
 }
 
 /**
-  * @brief  Get the acquisition status for a group.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @param  gx_index Index of the group
-  * @retval Group status
-  */
+ * @brief  Get the acquisition status for a group.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @param  gx_index Index of the group
+ * @retval Group status
+ */
 TSC_GroupStatusTypeDef HAL_TSC_GroupGetStatus(const TSC_HandleTypeDef *htsc, uint32_t gx_index)
 {
   /* Check the parameters */
@@ -833,12 +833,12 @@ TSC_GroupStatusTypeDef HAL_TSC_GroupGetStatus(const TSC_HandleTypeDef *htsc, uin
 }
 
 /**
-  * @brief  Get the acquisition measure for a group.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @param  gx_index Index of the group
-  * @retval Acquisition measure
-  */
+ * @brief  Get the acquisition measure for a group.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @param  gx_index Index of the group
+ * @retval Acquisition measure
+ */
 uint32_t HAL_TSC_GroupGetValue(const TSC_HandleTypeDef *htsc, uint32_t gx_index)
 {
   /* Check the parameters */
@@ -850,8 +850,8 @@ uint32_t HAL_TSC_GroupGetValue(const TSC_HandleTypeDef *htsc, uint32_t gx_index)
 }
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /** @defgroup TSC_Exported_Functions_Group3 Peripheral Control functions
   *  @brief    Peripheral Control functions
@@ -868,12 +868,12 @@ uint32_t HAL_TSC_GroupGetValue(const TSC_HandleTypeDef *htsc, uint32_t gx_index)
   */
 
 /**
-  * @brief  Configure TSC IOs.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @param  config Pointer to the configuration structure.
-  * @retval HAL status
-  */
+ * @brief  Configure TSC IOs.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @param  config Pointer to the configuration structure.
+ * @retval HAL status
+ */
 HAL_StatusTypeDef HAL_TSC_IOConfig(TSC_HandleTypeDef *htsc, const TSC_IOConfigTypeDef *config)
 {
   /* Check the parameters */
@@ -908,12 +908,12 @@ HAL_StatusTypeDef HAL_TSC_IOConfig(TSC_HandleTypeDef *htsc, const TSC_IOConfigTy
 }
 
 /**
-  * @brief  Discharge TSC IOs.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @param  choice This parameter can be set to ENABLE or DISABLE.
-  * @retval HAL status
-  */
+ * @brief  Discharge TSC IOs.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @param  choice This parameter can be set to ENABLE or DISABLE.
+ * @retval HAL status
+ */
 HAL_StatusTypeDef HAL_TSC_IODischarge(TSC_HandleTypeDef *htsc, FunctionalState choice)
 {
   /* Check the parameters */
@@ -939,8 +939,8 @@ HAL_StatusTypeDef HAL_TSC_IODischarge(TSC_HandleTypeDef *htsc, FunctionalState c
 }
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /** @defgroup TSC_Exported_Functions_Group4 Peripheral State and Errors functions
   *  @brief   Peripheral State and Errors functions
@@ -958,11 +958,11 @@ HAL_StatusTypeDef HAL_TSC_IODischarge(TSC_HandleTypeDef *htsc, FunctionalState c
   */
 
 /**
-  * @brief  Return the TSC handle state.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @retval HAL state
-  */
+ * @brief  Return the TSC handle state.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @retval HAL state
+ */
 HAL_TSC_StateTypeDef HAL_TSC_GetState(TSC_HandleTypeDef *htsc)
 {
   /* Check the parameters */
@@ -992,19 +992,19 @@ HAL_TSC_StateTypeDef HAL_TSC_GetState(TSC_HandleTypeDef *htsc)
 }
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /** @defgroup TSC_IRQ_Handler_and_Callbacks IRQ Handler and Callbacks
-  * @{
-  */
+ * @{
+ */
 
 /**
-  * @brief  Handle TSC interrupt request.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @retval None
-  */
+ * @brief  Handle TSC interrupt request.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @retval None
+ */
 void HAL_TSC_IRQHandler(TSC_HandleTypeDef *htsc)
 {
   /* Check the parameters */
@@ -1045,11 +1045,11 @@ void HAL_TSC_IRQHandler(TSC_HandleTypeDef *htsc)
 }
 
 /**
-  * @brief  Acquisition completed callback in non-blocking mode.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @retval None
-  */
+ * @brief  Acquisition completed callback in non-blocking mode.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @retval None
+ */
 __weak void HAL_TSC_ConvCpltCallback(TSC_HandleTypeDef *htsc)
 {
   /* Prevent unused argument(s) compilation warning */
@@ -1061,11 +1061,11 @@ __weak void HAL_TSC_ConvCpltCallback(TSC_HandleTypeDef *htsc)
 }
 
 /**
-  * @brief  Error callback in non-blocking mode.
-  * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
-  *         the configuration information for the specified TSC.
-  * @retval None
-  */
+ * @brief  Error callback in non-blocking mode.
+ * @param  htsc Pointer to a TSC_HandleTypeDef structure that contains
+ *         the configuration information for the specified TSC.
+ * @retval None
+ */
 __weak void HAL_TSC_ErrorCallback(TSC_HandleTypeDef *htsc)
 {
   /* Prevent unused argument(s) compilation warning */
@@ -1077,23 +1077,23 @@ __weak void HAL_TSC_ErrorCallback(TSC_HandleTypeDef *htsc)
 }
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /* Private functions ---------------------------------------------------------*/
 /** @defgroup TSC_Private_Functions TSC Private Functions
-  * @{
-  */
+ * @{
+ */
 
 /**
-  * @brief  Utility function used to set the acquired groups mask.
-  * @param  iomask Channels IOs mask
-  * @retval Acquired groups mask
-  */
+ * @brief  Utility function used to set the acquired groups mask.
+ * @param  iomask Channels IOs mask
+ * @retval Acquired groups mask
+ */
 static uint32_t TSC_extract_groups(uint32_t iomask)
 {
   uint32_t groups = 0UL;
@@ -1111,16 +1111,15 @@ static uint32_t TSC_extract_groups(uint32_t iomask)
 }
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 #endif /* HAL_TSC_MODULE_ENABLED */
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 /**
-  * @}
-  */
-
+ * @}
+ */

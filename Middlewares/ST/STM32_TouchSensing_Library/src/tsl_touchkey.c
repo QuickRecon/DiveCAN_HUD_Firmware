@@ -1,27 +1,27 @@
 /**
-  ******************************************************************************
-  * @file    tsl_touchkey.c
-  * @author  MCD Application Team
-  * @brief   This file contains all functions to manage TouchKey sensors.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
-  *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
-  *
-  *        http://www.st.com/software_license_agreement_liberty_v2
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    tsl_touchkey.c
+ * @author  MCD Application Team
+ * @brief   This file contains all functions to manage TouchKey sensors.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+ *
+ * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ *
+ *        http://www.st.com/software_license_agreement_liberty_v2
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************
+ */
 
 /* Includes ------------------------------------------------------------------*/
 #include "tsl_touchkey.h"
@@ -34,46 +34,55 @@
 
 /* Private macros ------------------------------------------------------------*/
 
-#define THIS_MEAS                 TSL_Globals.This_TKey->p_ChD->Meas
-#define THIS_DELTA                TSL_Globals.This_TKey->p_ChD->Delta
-#define THIS_REF                  TSL_Globals.This_TKey->p_ChD->Ref
-#define THIS_REFREST              TSL_Globals.This_TKey->p_ChD->RefRest
-#define THIS_CHANNEL_DATA         TSL_Globals.This_TKey->p_ChD
-#define THIS_ACQ_STATUS           TSL_Globals.This_TKey->p_ChD->Flags.AcqStatus
-#define THIS_OBJ_STATUS           TSL_Globals.This_TKey->p_ChD->Flags.ObjStatus
-#define THIS_DATA_READY           TSL_Globals.This_TKey->p_ChD->Flags.DataReady
+#define THIS_MEAS TSL_Globals.This_TKey->p_ChD->Meas
+#define THIS_DELTA TSL_Globals.This_TKey->p_ChD->Delta
+#define THIS_REF TSL_Globals.This_TKey->p_ChD->Ref
+#define THIS_REFREST TSL_Globals.This_TKey->p_ChD->RefRest
+#define THIS_CHANNEL_DATA TSL_Globals.This_TKey->p_ChD
+#define THIS_ACQ_STATUS TSL_Globals.This_TKey->p_ChD->Flags.AcqStatus
+#define THIS_OBJ_STATUS TSL_Globals.This_TKey->p_ChD->Flags.ObjStatus
+#define THIS_DATA_READY TSL_Globals.This_TKey->p_ChD->Flags.DataReady
 
-#define THIS_STATEID              TSL_Globals.This_TKey->p_Data->StateId
-#define THIS_CHANGE               TSL_Globals.This_TKey->p_Data->Change
-#define THIS_COUNTER_DEB          TSL_Globals.This_TKey->p_Data->CounterDebounce
-#define THIS_COUNTER_DTO          TSL_Globals.This_TKey->p_Data->CounterDTO
-#define THIS_DXSLOCK              TSL_Globals.This_TKey->p_Data->DxSLock
+#define THIS_STATEID TSL_Globals.This_TKey->p_Data->StateId
+#define THIS_CHANGE TSL_Globals.This_TKey->p_Data->Change
+#define THIS_COUNTER_DEB TSL_Globals.This_TKey->p_Data->CounterDebounce
+#define THIS_COUNTER_DTO TSL_Globals.This_TKey->p_Data->CounterDTO
+#define THIS_DXSLOCK TSL_Globals.This_TKey->p_Data->DxSLock
 
-#define THIS_PROXIN_TH            TSL_Globals.This_TKey->p_Param->ProxInTh
-#define THIS_PROXOUT_TH           TSL_Globals.This_TKey->p_Param->ProxOutTh
-#define THIS_DETECTIN_TH          TSL_Globals.This_TKey->p_Param->DetectInTh
-#define THIS_DETECTOUT_TH         TSL_Globals.This_TKey->p_Param->DetectOutTh
-#define THIS_CALIB_TH             TSL_Globals.This_TKey->p_Param->CalibTh
+#define THIS_PROXIN_TH TSL_Globals.This_TKey->p_Param->ProxInTh
+#define THIS_PROXOUT_TH TSL_Globals.This_TKey->p_Param->ProxOutTh
+#define THIS_DETECTIN_TH TSL_Globals.This_TKey->p_Param->DetectInTh
+#define THIS_DETECTOUT_TH TSL_Globals.This_TKey->p_Param->DetectOutTh
+#define THIS_CALIB_TH TSL_Globals.This_TKey->p_Param->CalibTh
 
-#define THIS_COUNTER_DEB_CALIB    TSL_Globals.This_TKey->p_Param->CounterDebCalib
-#define THIS_COUNTER_DEB_PROX     TSL_Globals.This_TKey->p_Param->CounterDebProx
-#define THIS_COUNTER_DEB_DETECT   TSL_Globals.This_TKey->p_Param->CounterDebDetect
-#define THIS_COUNTER_DEB_RELEASE  TSL_Globals.This_TKey->p_Param->CounterDebRelease
-#define THIS_COUNTER_DEB_ERROR    TSL_Globals.This_TKey->p_Param->CounterDebError
+#define THIS_COUNTER_DEB_CALIB TSL_Globals.This_TKey->p_Param->CounterDebCalib
+#define THIS_COUNTER_DEB_PROX TSL_Globals.This_TKey->p_Param->CounterDebProx
+#define THIS_COUNTER_DEB_DETECT TSL_Globals.This_TKey->p_Param->CounterDebDetect
+#define THIS_COUNTER_DEB_RELEASE TSL_Globals.This_TKey->p_Param->CounterDebRelease
+#define THIS_COUNTER_DEB_ERROR TSL_Globals.This_TKey->p_Param->CounterDebError
 
 #if TSLPRM_DTO > 0
-#define DTO_GET_TIME  {TSL_tkey_DTOGetTime();}
+#define DTO_GET_TIME       \
+  {                        \
+    TSL_tkey_DTOGetTime(); \
+  }
 #else
 #define DTO_GET_TIME
 #endif
 
 #if TSLPRM_COEFF_TH > 0
-#define TEST_DELTA(OPER,TH)   (THIS_DELTA OPER (uint16_t)((uint16_t)TH << TSLPRM_COEFF_TH))
-#define TEST_DELTA_N(OPER,TH) (THIS_DELTA OPER -((uint16_t)((uint16_t)TH << TSLPRM_COEFF_TH)))
-#define TEST_DELTA_NEGATIVE   {if (THIS_DELTA < 0) {return;}}
+#define TEST_DELTA(OPER, TH) (THIS_DELTA OPER(uint16_t)((uint16_t)TH << TSLPRM_COEFF_TH))
+#define TEST_DELTA_N(OPER, TH) (THIS_DELTA OPER - ((uint16_t)((uint16_t)TH << TSLPRM_COEFF_TH)))
+#define TEST_DELTA_NEGATIVE \
+  {                         \
+    if (THIS_DELTA < 0)     \
+    {                       \
+      return;               \
+    }                       \
+  }
 #else
-#define TEST_DELTA(OPER,TH)   (THIS_DELTA OPER TH)
-#define TEST_DELTA_N(OPER,TH) (THIS_DELTA OPER -(TH))
+#define TEST_DELTA(OPER, TH) (THIS_DELTA OPER TH)
+#define TEST_DELTA_N(OPER, TH) (THIS_DELTA OPER - (TH))
 #define TEST_DELTA_NEGATIVE
 #endif
 
@@ -85,46 +94,44 @@ static TSL_tNb_T CalibDiv;
 
 void TSL_tkey_DTOGetTime(void);
 
-
 //==============================================================================
 // "Object methods" functions
 //==============================================================================
 
 /**
-  * @brief  Init parameters with default values from configuration file
-  * @param  None
-  * @retval None
-  */
+ * @brief  Init parameters with default values from configuration file
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_Init(void)
 {
   // Thresholds
 #if TSLPRM_USE_PROX > 0
-  THIS_PROXIN_TH    = TSLPRM_TKEY_PROX_IN_TH;
-  THIS_PROXOUT_TH   = TSLPRM_TKEY_PROX_OUT_TH;
+  THIS_PROXIN_TH = TSLPRM_TKEY_PROX_IN_TH;
+  THIS_PROXOUT_TH = TSLPRM_TKEY_PROX_OUT_TH;
 #endif
-  THIS_DETECTIN_TH  = TSLPRM_TKEY_DETECT_IN_TH;
+  THIS_DETECTIN_TH = TSLPRM_TKEY_DETECT_IN_TH;
   THIS_DETECTOUT_TH = TSLPRM_TKEY_DETECT_OUT_TH;
-  THIS_CALIB_TH     = TSLPRM_TKEY_CALIB_TH;
+  THIS_CALIB_TH = TSLPRM_TKEY_CALIB_TH;
 
   // Debounce counters
-  THIS_COUNTER_DEB_CALIB   = TSLPRM_DEBOUNCE_CALIB;
+  THIS_COUNTER_DEB_CALIB = TSLPRM_DEBOUNCE_CALIB;
 #if TSLPRM_USE_PROX > 0
-  THIS_COUNTER_DEB_PROX    = TSLPRM_DEBOUNCE_PROX;
+  THIS_COUNTER_DEB_PROX = TSLPRM_DEBOUNCE_PROX;
 #endif
-  THIS_COUNTER_DEB_DETECT  = TSLPRM_DEBOUNCE_DETECT;
+  THIS_COUNTER_DEB_DETECT = TSLPRM_DEBOUNCE_DETECT;
   THIS_COUNTER_DEB_RELEASE = TSLPRM_DEBOUNCE_RELEASE;
-  THIS_COUNTER_DEB_ERROR   = TSLPRM_DEBOUNCE_ERROR;
+  THIS_COUNTER_DEB_ERROR = TSLPRM_DEBOUNCE_ERROR;
 
   // Initial state
   TSL_tkey_SetStateCalibration(TSLPRM_CALIB_DELAY);
 }
 
-
 /**
-  * @brief  Process the State Machine
-  * @param  None
-  * @retval None
-  */
+ * @brief  Process the State Machine
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_Process(void)
 {
   TSL_StateId_enum_T prev_state_id;
@@ -172,20 +179,18 @@ void TSL_tkey_Process(void)
       THIS_STATEID = TSL_STATEID_DETECT;
     }
 #endif
-
   }
 }
-
 
 //==============================================================================
 // Utility functions
 //==============================================================================
 
 /**
-  * @brief  Go in Calibration state
-  * @param[in] delay Delay before calibration starts (stabilization of noise filter)
-  * @retval None
-  */
+ * @brief  Go in Calibration state
+ * @param[in] delay Delay before calibration starts (stabilization of noise filter)
+ * @retval None
+ */
 void TSL_tkey_SetStateCalibration(TSL_tCounter_T delay)
 {
   THIS_STATEID = TSL_STATEID_CALIB;
@@ -194,16 +199,16 @@ void TSL_tkey_SetStateCalibration(TSL_tCounter_T delay)
 
   switch (TSL_Params.NbCalibSamples)
   {
-    case 4:
-      CalibDiv = 2;
-      break;
-    case 16:
-      CalibDiv = 4;
-      break;
-    default:
-      TSL_Params.NbCalibSamples =  8;
-      CalibDiv = 3;
-      break;
+  case 4:
+    CalibDiv = 2;
+    break;
+  case 16:
+    CalibDiv = 4;
+    break;
+  default:
+    TSL_Params.NbCalibSamples = 8;
+    CalibDiv = 3;
+    break;
   }
 
   // If a noise filter is used, the counter must be initialized to a value
@@ -212,12 +217,11 @@ void TSL_tkey_SetStateCalibration(TSL_tCounter_T delay)
   THIS_REF = 0;
 }
 
-
 /**
-  * @brief  Go in Off state with sensor "off"
-  * @param  None
-  * @retval None
-  */
+ * @brief  Go in Off state with sensor "off"
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_SetStateOff(void)
 {
   THIS_STATEID = TSL_STATEID_OFF;
@@ -225,12 +229,11 @@ void TSL_tkey_SetStateOff(void)
   THIS_OBJ_STATUS = TSL_OBJ_STATUS_OFF;
 }
 
-
 /**
-  * @brief  Go in Off state with sensor in "Burst mode only"
-  * @param  None
-  * @retval None
-  */
+ * @brief  Go in Off state with sensor in "Burst mode only"
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_SetStateBurstOnly(void)
 {
   THIS_STATEID = TSL_STATEID_OFF;
@@ -238,23 +241,21 @@ void TSL_tkey_SetStateBurstOnly(void)
   THIS_OBJ_STATUS = TSL_OBJ_STATUS_BURST_ONLY;
 }
 
-
 /**
-  * @brief  Return the current state identifier
-  * @param  None
-  * @retval State id
-  */
+ * @brief  Return the current state identifier
+ * @param  None
+ * @retval State id
+ */
 TSL_StateId_enum_T TSL_tkey_GetStateId(void)
 {
-  return(THIS_STATEID);
+  return (THIS_STATEID);
 }
 
-
 /**
-  * @brief  Return the current state mask
-  * @param  None
-  * @retval State mask
-  */
+ * @brief  Return the current state mask
+ * @param  None
+ * @retval State mask
+ */
 TSL_StateMask_enum_T TSL_tkey_GetStateMask(void)
 {
   TSL_StateMask_enum_T state_mask = TSL_STATEMASK_UNKNOWN;
@@ -276,17 +277,15 @@ TSL_StateMask_enum_T TSL_tkey_GetStateMask(void)
   return state_mask;
 }
 
-
 /**
-  * @brief  Return the Change flag
-  * @param  None
-  * @retval Change flag status
-  */
+ * @brief  Return the Change flag
+ * @param  None
+ * @retval Change flag status
+ */
 TSL_tNb_T TSL_tkey_IsChanged(void)
 {
-  return(THIS_CHANGE);
+  return (THIS_CHANGE);
 }
-
 
 //==============================================================================
 // State machine functions
@@ -294,10 +293,10 @@ TSL_tNb_T TSL_tkey_IsChanged(void)
 
 #if TSLPRM_USE_PROX > 0
 /**
-  * @brief  Debounce Release processing (previous state = Proximity)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Release processing (previous state = Proximity)
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_DebReleaseProxStateProcess(void)
 {
   if (THIS_ACQ_STATUS & TSL_ACQ_STATUS_ERROR_MASK) // Acquisition error (min or max)
@@ -312,7 +311,10 @@ void TSL_tkey_DebReleaseProxStateProcess(void)
     }
     else
     {
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_RELEASE;
@@ -323,12 +325,11 @@ void TSL_tkey_DebReleaseProxStateProcess(void)
 }
 #endif // if TSLPRM_USE_PROX > 0
 
-
 /**
-  * @brief  Debounce Release processing (previous state = Detect)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Release processing (previous state = Detect)
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_DebReleaseDetectStateProcess(void)
 {
   if (THIS_ACQ_STATUS & TSL_ACQ_STATUS_ERROR_MASK) // Acquisition error (min or max)
@@ -337,7 +338,7 @@ void TSL_tkey_DebReleaseDetectStateProcess(void)
   }
   else // Acquisition is OK or has NOISE
   {
-    if TEST_DELTA(>, THIS_DETECTOUT_TH)
+    if TEST_DELTA (>, THIS_DETECTOUT_TH)
     {
       TEST_DELTA_NEGATIVE;
       THIS_STATEID = TSL_STATEID_DETECT;
@@ -351,7 +352,10 @@ void TSL_tkey_DebReleaseDetectStateProcess(void)
         return;
       }
 #endif
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_RELEASE;
@@ -361,13 +365,12 @@ void TSL_tkey_DebReleaseDetectStateProcess(void)
   }
 }
 
-
 /**
-  * @brief  Debounce Release processing (previous state = Touch)
-  * Same as Debounce Release Detect processing
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Release processing (previous state = Touch)
+ * Same as Debounce Release Detect processing
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_DebReleaseTouchStateProcess(void)
 {
   if (THIS_ACQ_STATUS & TSL_ACQ_STATUS_ERROR_MASK) // Acquisition error (min or max)
@@ -376,7 +379,7 @@ void TSL_tkey_DebReleaseTouchStateProcess(void)
   }
   else // Acquisition is OK or has NOISE
   {
-    if TEST_DELTA(>, THIS_DETECTOUT_TH)
+    if TEST_DELTA (>, THIS_DETECTOUT_TH)
     {
       TEST_DELTA_NEGATIVE;
       THIS_STATEID = TSL_STATEID_TOUCH;
@@ -390,7 +393,10 @@ void TSL_tkey_DebReleaseTouchStateProcess(void)
         return;
       }
 #endif
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_RELEASE;
@@ -400,12 +406,11 @@ void TSL_tkey_DebReleaseTouchStateProcess(void)
   }
 }
 
-
 /**
-  * @brief  Release state processing
-  * @param  None
-  * @retval None
-  */
+ * @brief  Release state processing
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_ReleaseStateProcess(void)
 {
   if (THIS_ACQ_STATUS & TSL_ACQ_STATUS_ERROR_MASK) // Acquisition error (min or max)
@@ -422,7 +427,7 @@ void TSL_tkey_ReleaseStateProcess(void)
   }
   else // Acquisition is OK or has NOISE
   {
-    if TEST_DELTA(>=, THIS_DETECTIN_TH)
+    if TEST_DELTA (>=, THIS_DETECTIN_TH)
     {
       TEST_DELTA_NEGATIVE;
       THIS_COUNTER_DEB = THIS_COUNTER_DEB_DETECT;
@@ -457,7 +462,7 @@ void TSL_tkey_ReleaseStateProcess(void)
 
     // Check delta for re-calibration
     // Warning: the threshold value is inverted in the macro
-    if TEST_DELTA_N(<=, THIS_CALIB_TH)
+    if TEST_DELTA_N (<=, THIS_CALIB_TH)
     {
       THIS_COUNTER_DEB = THIS_COUNTER_DEB_CALIB;
       if (THIS_COUNTER_DEB == 0)
@@ -472,12 +477,11 @@ void TSL_tkey_ReleaseStateProcess(void)
   }
 }
 
-
 /**
-  * @brief  Debounce Calibration processing (previous state = Release)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Calibration processing (previous state = Release)
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_DebCalibrationStateProcess(void)
 {
   if (THIS_ACQ_STATUS & TSL_ACQ_STATUS_ERROR_MASK) // Acquisition error (min or max)
@@ -488,9 +492,12 @@ void TSL_tkey_DebCalibrationStateProcess(void)
   {
     // Still below recalibration threshold
     // Warning: the threshold value is inverted in the macro
-    if TEST_DELTA_N(<=, THIS_CALIB_TH)
+    if TEST_DELTA_N (<=, THIS_CALIB_TH)
     {
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         TSL_tkey_SetStateCalibration(0);
@@ -504,12 +511,11 @@ void TSL_tkey_DebCalibrationStateProcess(void)
   }
 }
 
-
 /**
-  * @brief  Calibration state processing
-  * @param  None
-  * @retval None
-  */
+ * @brief  Calibration state processing
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_CalibrationStateProcess(void)
 {
   TSL_tMeas_T new_meas;
@@ -573,7 +579,10 @@ void TSL_tkey_CalibrationStateProcess(void)
     }
 
     // Check that we have all the needed measurements
-    if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+    if (THIS_COUNTER_DEB > 0)
+    {
+      THIS_COUNTER_DEB--;
+    }
     if (THIS_COUNTER_DEB == 0)
     {
       // Divide temporary Reference by the number of samples
@@ -585,13 +594,12 @@ void TSL_tkey_CalibrationStateProcess(void)
   }
 }
 
-
 #if TSLPRM_USE_PROX > 0
 /**
-  * @brief  Debounce Proximity processing (previous state = Release)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Proximity processing (previous state = Release)
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_DebProxStateProcess(void)
 {
   if (THIS_ACQ_STATUS & TSL_ACQ_STATUS_ERROR_MASK) // Acquisition error (min or max)
@@ -600,7 +608,7 @@ void TSL_tkey_DebProxStateProcess(void)
   }
   else // Acquisition is OK or has NOISE
   {
-    if TEST_DELTA(>=, THIS_DETECTIN_TH)
+    if TEST_DELTA (>=, THIS_DETECTIN_TH)
     {
       TEST_DELTA_NEGATIVE;
       THIS_COUNTER_DEB = THIS_COUNTER_DEB_DETECT;
@@ -618,7 +626,10 @@ void TSL_tkey_DebProxStateProcess(void)
 
     if (THIS_DELTA >= THIS_PROXIN_TH)
     {
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_PROX;
@@ -634,13 +645,12 @@ void TSL_tkey_DebProxStateProcess(void)
 }
 #endif
 
-
 #if TSLPRM_USE_PROX > 0
 /**
-  * @brief  Debounce Proximity processing (previous state = Detect)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Proximity processing (previous state = Detect)
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_DebProxDetectStateProcess(void)
 {
   if (THIS_ACQ_STATUS & TSL_ACQ_STATUS_ERROR_MASK) // Acquisition error (min or max)
@@ -649,7 +659,7 @@ void TSL_tkey_DebProxDetectStateProcess(void)
   }
   else // Acquisition is OK or has NOISE
   {
-    if TEST_DELTA(>, THIS_DETECTOUT_TH)
+    if TEST_DELTA (>, THIS_DETECTOUT_TH)
     {
       TEST_DELTA_NEGATIVE;
       THIS_STATEID = TSL_STATEID_DETECT;
@@ -658,7 +668,10 @@ void TSL_tkey_DebProxDetectStateProcess(void)
 
     if (THIS_DELTA > THIS_PROXOUT_TH)
     {
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_PROX;
@@ -682,13 +695,12 @@ void TSL_tkey_DebProxDetectStateProcess(void)
 }
 #endif
 
-
 #if TSLPRM_USE_PROX > 0
 /**
-  * @brief  Debounce Proximity processing (previous state = Touch)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Proximity processing (previous state = Touch)
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_DebProxTouchStateProcess(void)
 {
   if (THIS_ACQ_STATUS & TSL_ACQ_STATUS_ERROR_MASK) // Acquisition error (min or max)
@@ -697,7 +709,7 @@ void TSL_tkey_DebProxTouchStateProcess(void)
   }
   else // Acquisition is OK or has NOISE
   {
-    if TEST_DELTA(>, THIS_DETECTOUT_TH)
+    if TEST_DELTA (>, THIS_DETECTOUT_TH)
     {
       TEST_DELTA_NEGATIVE;
       THIS_STATEID = TSL_STATEID_TOUCH;
@@ -706,7 +718,10 @@ void TSL_tkey_DebProxTouchStateProcess(void)
 
     if (THIS_DELTA > THIS_PROXOUT_TH)
     {
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_PROX;
@@ -730,13 +745,12 @@ void TSL_tkey_DebProxTouchStateProcess(void)
 }
 #endif
 
-
 #if TSLPRM_USE_PROX > 0
 /**
-  * @brief  Proximity state processing
-  * @param  None
-  * @retval None
-  */
+ * @brief  Proximity state processing
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_ProxStateProcess(void)
 {
 #if TSLPRM_DTO > 0
@@ -757,7 +771,7 @@ void TSL_tkey_ProxStateProcess(void)
   }
   else // Acquisition is OK or has NOISE
   {
-    if TEST_DELTA(>=, THIS_DETECTIN_TH)
+    if TEST_DELTA (>=, THIS_DETECTIN_TH)
     {
       TEST_DELTA_NEGATIVE;
       THIS_COUNTER_DEB = THIS_COUNTER_DEB_DETECT;
@@ -802,17 +816,15 @@ void TSL_tkey_ProxStateProcess(void)
       }
     }
 #endif
-
   }
 }
 #endif
 
-
 /**
-  * @brief  Debounce Detect processing (previous state = Release or Proximity)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Detect processing (previous state = Release or Proximity)
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_DebDetectStateProcess(void)
 {
   if (THIS_ACQ_STATUS & TSL_ACQ_STATUS_ERROR_MASK) // Acquisition error (min or max)
@@ -821,10 +833,13 @@ void TSL_tkey_DebDetectStateProcess(void)
   }
   else // Acquisition is OK or has NOISE
   {
-    if TEST_DELTA(>=, THIS_DETECTIN_TH)
+    if TEST_DELTA (>=, THIS_DETECTIN_TH)
     {
       TEST_DELTA_NEGATIVE;
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_DETECT;
@@ -859,12 +874,11 @@ void TSL_tkey_DebDetectStateProcess(void)
   }
 }
 
-
 /**
-  * @brief  Detect state processing
-  * @param  None
-  * @retval None
-  */
+ * @brief  Detect state processing
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_DetectStateProcess(void)
 {
 #if TSLPRM_DTO > 0
@@ -885,7 +899,7 @@ void TSL_tkey_DetectStateProcess(void)
   }
   else // Acquisition is OK or has NOISE
   {
-    if TEST_DELTA(>, THIS_DETECTOUT_TH)
+    if TEST_DELTA (>, THIS_DETECTOUT_TH)
     {
       TEST_DELTA_NEGATIVE;
 #if TSLPRM_DTO > 0
@@ -931,17 +945,15 @@ void TSL_tkey_DetectStateProcess(void)
     {
       THIS_STATEID = TSL_STATEID_DEB_RELEASE_DETECT;
     }
-
   }
 }
 
-
 /**
-  * @brief  Touch state processing
-  * Same as Detect state
-  * @param  None
-  * @retval None
-  */
+ * @brief  Touch state processing
+ * Same as Detect state
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_TouchStateProcess(void)
 {
 #if TSLPRM_DTO > 0
@@ -962,7 +974,7 @@ void TSL_tkey_TouchStateProcess(void)
   }
   else // Acquisition is OK or has NOISE
   {
-    if TEST_DELTA(>, THIS_DETECTOUT_TH)
+    if TEST_DELTA (>, THIS_DETECTOUT_TH)
     {
       TEST_DELTA_NEGATIVE;
 #if TSLPRM_DTO > 0
@@ -1008,23 +1020,24 @@ void TSL_tkey_TouchStateProcess(void)
     {
       THIS_STATEID = TSL_STATEID_DEB_RELEASE_TOUCH;
     }
-
   }
 }
 
-
 /**
-  * @brief  Debounce error state processing
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce error state processing
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_DebErrorStateProcess(void)
 {
   volatile TSL_StateMask_enum_T mask;
 
   if (THIS_ACQ_STATUS & TSL_ACQ_STATUS_ERROR_MASK) // Acquisition error (min or max)
   {
-    if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+    if (THIS_COUNTER_DEB > 0)
+    {
+      THIS_COUNTER_DEB--;
+    }
     if (THIS_COUNTER_DEB == 0)
     {
       THIS_STATEID = TSL_STATEID_ERROR;
@@ -1039,35 +1052,34 @@ void TSL_tkey_DebErrorStateProcess(void)
     // Go back to the previous state
     switch (mask)
     {
-      case TSL_STATEMASK_RELEASE :
-        THIS_STATEID = TSL_STATEID_RELEASE;
-        break;
-      case TSL_STATEMASK_PROX :
-        THIS_STATEID = TSL_STATEID_PROX;
-        break;
-      case TSL_STATEMASK_DETECT :
-        THIS_STATEID = TSL_STATEID_DETECT;
-        break;
-      case TSL_STATEMASK_TOUCH :
-        THIS_STATEID = TSL_STATEID_TOUCH;
-        break;
-      default:
-        TSL_tkey_SetStateCalibration(0);
-        break;
+    case TSL_STATEMASK_RELEASE:
+      THIS_STATEID = TSL_STATEID_RELEASE;
+      break;
+    case TSL_STATEMASK_PROX:
+      THIS_STATEID = TSL_STATEID_PROX;
+      break;
+    case TSL_STATEMASK_DETECT:
+      THIS_STATEID = TSL_STATEID_DETECT;
+      break;
+    case TSL_STATEMASK_TOUCH:
+      THIS_STATEID = TSL_STATEID_TOUCH;
+      break;
+    default:
+      TSL_tkey_SetStateCalibration(0);
+      break;
     }
   }
 }
-
 
 //==============================================================================
 // Private functions
 //==============================================================================
 
 /**
-  * @brief  Get the current time in second and affect it to the DTO counter (Private)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Get the current time in second and affect it to the DTO counter (Private)
+ * @param  None
+ * @retval None
+ */
 void TSL_tkey_DTOGetTime(void)
 {
   disableInterrupts();

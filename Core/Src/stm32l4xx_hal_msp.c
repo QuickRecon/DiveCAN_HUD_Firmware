@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file         stm32l4xx_hal_msp.c
-  * @brief        This file provides code for the MSP Initialization
-  *               and de-Initialization codes.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file         stm32l4xx_hal_msp.c
+ * @brief        This file provides code for the MSP Initialization
+ *               and de-Initialization codes.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2025 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -58,8 +58,8 @@
 
 /* USER CODE END 0 */
 /**
-  * Initializes the Global MSP.
-  */
+ * Initializes the Global MSP.
+ */
 void HAL_MspInit(void)
 {
 
@@ -76,13 +76,13 @@ void HAL_MspInit(void)
   HAL_NVIC_SetPriority(PendSV_IRQn, 15, 0);
 
   /** PVD Configuration
-  */
+   */
   sConfigPVD.PVDLevel = PWR_PVDLEVEL_6;
   sConfigPVD.Mode = PWR_PVD_MODE_NORMAL;
   HAL_PWR_ConfigPVD(&sConfigPVD);
 
   /** Enable the PVD Output
-  */
+   */
   HAL_PWR_EnablePVD();
 
   /* USER CODE BEGIN MspInit 1 */
@@ -91,15 +91,15 @@ void HAL_MspInit(void)
 }
 
 /**
-  * @brief CAN MSP Initialization
-  * This function configures the hardware resources used in this example
-  * @param hcan: CAN handle pointer
-  * @retval None
-  */
-void HAL_CAN_MspInit(CAN_HandleTypeDef* hcan)
+ * @brief CAN MSP Initialization
+ * This function configures the hardware resources used in this example
+ * @param hcan: CAN handle pointer
+ * @retval None
+ */
+void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(hcan->Instance==CAN1)
+  if (hcan->Instance == CAN1)
   {
     /* USER CODE BEGIN CAN1_MspInit 0 */
 
@@ -112,7 +112,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* hcan)
     PA11     ------> CAN1_RX
     PA12     ------> CAN1_TX
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_11|GPIO_PIN_12;
+    GPIO_InitStruct.Pin = GPIO_PIN_11 | GPIO_PIN_12;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
@@ -122,20 +122,18 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* hcan)
     /* USER CODE BEGIN CAN1_MspInit 1 */
 
     /* USER CODE END CAN1_MspInit 1 */
-
   }
-
 }
 
 /**
-  * @brief CAN MSP De-Initialization
-  * This function freeze the hardware resources used in this example
-  * @param hcan: CAN handle pointer
-  * @retval None
-  */
-void HAL_CAN_MspDeInit(CAN_HandleTypeDef* hcan)
+ * @brief CAN MSP De-Initialization
+ * This function freeze the hardware resources used in this example
+ * @param hcan: CAN handle pointer
+ * @retval None
+ */
+void HAL_CAN_MspDeInit(CAN_HandleTypeDef *hcan)
 {
-  if(hcan->Instance==CAN1)
+  if (hcan->Instance == CAN1)
   {
     /* USER CODE BEGIN CAN1_MspDeInit 0 */
 
@@ -147,24 +145,23 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* hcan)
     PA11     ------> CAN1_RX
     PA12     ------> CAN1_TX
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_11|GPIO_PIN_12);
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_11 | GPIO_PIN_12);
 
     /* USER CODE BEGIN CAN1_MspDeInit 1 */
 
     /* USER CODE END CAN1_MspDeInit 1 */
   }
-
 }
 
 /**
-  * @brief CRC MSP Initialization
-  * This function configures the hardware resources used in this example
-  * @param hcrc: CRC handle pointer
-  * @retval None
-  */
-void HAL_CRC_MspInit(CRC_HandleTypeDef* hcrc)
+ * @brief CRC MSP Initialization
+ * This function configures the hardware resources used in this example
+ * @param hcrc: CRC handle pointer
+ * @retval None
+ */
+void HAL_CRC_MspInit(CRC_HandleTypeDef *hcrc)
 {
-  if(hcrc->Instance==CRC)
+  if (hcrc->Instance == CRC)
   {
     /* USER CODE BEGIN CRC_MspInit 0 */
 
@@ -174,20 +171,18 @@ void HAL_CRC_MspInit(CRC_HandleTypeDef* hcrc)
     /* USER CODE BEGIN CRC_MspInit 1 */
 
     /* USER CODE END CRC_MspInit 1 */
-
   }
-
 }
 
 /**
-  * @brief CRC MSP De-Initialization
-  * This function freeze the hardware resources used in this example
-  * @param hcrc: CRC handle pointer
-  * @retval None
-  */
-void HAL_CRC_MspDeInit(CRC_HandleTypeDef* hcrc)
+ * @brief CRC MSP De-Initialization
+ * This function freeze the hardware resources used in this example
+ * @param hcrc: CRC handle pointer
+ * @retval None
+ */
+void HAL_CRC_MspDeInit(CRC_HandleTypeDef *hcrc)
 {
-  if(hcrc->Instance==CRC)
+  if (hcrc->Instance == CRC)
   {
     /* USER CODE BEGIN CRC_MspDeInit 0 */
 
@@ -198,19 +193,18 @@ void HAL_CRC_MspDeInit(CRC_HandleTypeDef* hcrc)
 
     /* USER CODE END CRC_MspDeInit 1 */
   }
-
 }
 
 /**
-  * @brief TSC MSP Initialization
-  * This function configures the hardware resources used in this example
-  * @param htsc: TSC handle pointer
-  * @retval None
-  */
-void HAL_TSC_MspInit(TSC_HandleTypeDef* htsc)
+ * @brief TSC MSP Initialization
+ * This function configures the hardware resources used in this example
+ * @param htsc: TSC handle pointer
+ * @retval None
+ */
+void HAL_TSC_MspInit(TSC_HandleTypeDef *htsc)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(htsc->Instance==TSC)
+  if (htsc->Instance == TSC)
   {
     /* USER CODE BEGIN TSC_MspInit 0 */
 
@@ -240,20 +234,18 @@ void HAL_TSC_MspInit(TSC_HandleTypeDef* htsc)
     /* USER CODE BEGIN TSC_MspInit 1 */
 
     /* USER CODE END TSC_MspInit 1 */
-
   }
-
 }
 
 /**
-  * @brief TSC MSP De-Initialization
-  * This function freeze the hardware resources used in this example
-  * @param htsc: TSC handle pointer
-  * @retval None
-  */
-void HAL_TSC_MspDeInit(TSC_HandleTypeDef* htsc)
+ * @brief TSC MSP De-Initialization
+ * This function freeze the hardware resources used in this example
+ * @param htsc: TSC handle pointer
+ * @retval None
+ */
+void HAL_TSC_MspDeInit(TSC_HandleTypeDef *htsc)
 {
-  if(htsc->Instance==TSC)
+  if (htsc->Instance == TSC)
   {
     /* USER CODE BEGIN TSC_MspDeInit 0 */
 
@@ -265,13 +257,12 @@ void HAL_TSC_MspDeInit(TSC_HandleTypeDef* htsc)
     PB4 (NJTRST)     ------> TSC_G2_IO1
     PB5     ------> TSC_G2_IO2
     */
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_4|GPIO_PIN_5);
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_4 | GPIO_PIN_5);
 
     /* USER CODE BEGIN TSC_MspDeInit 1 */
 
     /* USER CODE END TSC_MspDeInit 1 */
   }
-
 }
 
 /* USER CODE BEGIN 1 */

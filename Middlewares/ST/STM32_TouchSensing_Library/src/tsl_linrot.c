@@ -1,27 +1,27 @@
 /**
-  ******************************************************************************
-  * @file    tsl_linrot.c
-  * @author  MCD Application Team
-  * @brief   This file contains all functions to manage Linear and Rotary sensors.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
-  *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
-  *
-  *        http://www.st.com/software_license_agreement_liberty_v2
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    tsl_linrot.c
+ * @author  MCD Application Team
+ * @brief   This file contains all functions to manage Linear and Rotary sensors.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+ *
+ * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ *
+ *        http://www.st.com/software_license_agreement_liberty_v2
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************
+ */
 
 /* Includes ------------------------------------------------------------------*/
 #include "tsl_linrot.h"
@@ -34,41 +34,44 @@
 
 /* Private macros ------------------------------------------------------------*/
 
-#define THIS_OBJ_TYPE             TSL_Globals.This_Obj->Type
+#define THIS_OBJ_TYPE TSL_Globals.This_Obj->Type
 
-#define THIS_STATEID              TSL_Globals.This_LinRot->p_Data->StateId
-#define THIS_RAW_POSITION         TSL_Globals.This_LinRot->p_Data->RawPosition
-#define THIS_POSITION             TSL_Globals.This_LinRot->p_Data->Position
-#define THIS_CHANGE               TSL_Globals.This_LinRot->p_Data->Change
-#define THIS_POSCHANGE            TSL_Globals.This_LinRot->p_Data->PosChange
-#define THIS_COUNTER_DEB          TSL_Globals.This_LinRot->p_Data->CounterDebounce
-#define THIS_COUNTER_DIR          TSL_Globals.This_LinRot->p_Data->CounterDirection
-#define THIS_COUNTER_DTO          TSL_Globals.This_LinRot->p_Data->CounterDTO
-#define THIS_DXSLOCK              TSL_Globals.This_LinRot->p_Data->DxSLock
-#define THIS_DIRECTION            TSL_Globals.This_LinRot->p_Data->Direction
+#define THIS_STATEID TSL_Globals.This_LinRot->p_Data->StateId
+#define THIS_RAW_POSITION TSL_Globals.This_LinRot->p_Data->RawPosition
+#define THIS_POSITION TSL_Globals.This_LinRot->p_Data->Position
+#define THIS_CHANGE TSL_Globals.This_LinRot->p_Data->Change
+#define THIS_POSCHANGE TSL_Globals.This_LinRot->p_Data->PosChange
+#define THIS_COUNTER_DEB TSL_Globals.This_LinRot->p_Data->CounterDebounce
+#define THIS_COUNTER_DIR TSL_Globals.This_LinRot->p_Data->CounterDirection
+#define THIS_COUNTER_DTO TSL_Globals.This_LinRot->p_Data->CounterDTO
+#define THIS_DXSLOCK TSL_Globals.This_LinRot->p_Data->DxSLock
+#define THIS_DIRECTION TSL_Globals.This_LinRot->p_Data->Direction
 
-#define THIS_PROXIN_TH            TSL_Globals.This_LinRot->p_Param->ProxInTh
-#define THIS_PROXOUT_TH           TSL_Globals.This_LinRot->p_Param->ProxOutTh
-#define THIS_DETECTIN_TH          TSL_Globals.This_LinRot->p_Param->DetectInTh
-#define THIS_DETECTOUT_TH         TSL_Globals.This_LinRot->p_Param->DetectOutTh
-#define THIS_CALIB_TH             TSL_Globals.This_LinRot->p_Param->CalibTh
+#define THIS_PROXIN_TH TSL_Globals.This_LinRot->p_Param->ProxInTh
+#define THIS_PROXOUT_TH TSL_Globals.This_LinRot->p_Param->ProxOutTh
+#define THIS_DETECTIN_TH TSL_Globals.This_LinRot->p_Param->DetectInTh
+#define THIS_DETECTOUT_TH TSL_Globals.This_LinRot->p_Param->DetectOutTh
+#define THIS_CALIB_TH TSL_Globals.This_LinRot->p_Param->CalibTh
 
-#define THIS_RESOLUTION           TSL_Globals.This_LinRot->p_Param->Resolution
-#define THIS_DIR_CHG_POS          TSL_Globals.This_LinRot->p_Param->DirChangePos
+#define THIS_RESOLUTION TSL_Globals.This_LinRot->p_Param->Resolution
+#define THIS_DIR_CHG_POS TSL_Globals.This_LinRot->p_Param->DirChangePos
 
-#define THIS_COUNTER_DEB_CALIB     TSL_Globals.This_LinRot->p_Param->CounterDebCalib
-#define THIS_COUNTER_DEB_PROX      TSL_Globals.This_LinRot->p_Param->CounterDebProx
-#define THIS_COUNTER_DEB_DETECT    TSL_Globals.This_LinRot->p_Param->CounterDebDetect
-#define THIS_COUNTER_DEB_RELEASE   TSL_Globals.This_LinRot->p_Param->CounterDebRelease
-#define THIS_COUNTER_DEB_ERROR     TSL_Globals.This_LinRot->p_Param->CounterDebError
+#define THIS_COUNTER_DEB_CALIB TSL_Globals.This_LinRot->p_Param->CounterDebCalib
+#define THIS_COUNTER_DEB_PROX TSL_Globals.This_LinRot->p_Param->CounterDebProx
+#define THIS_COUNTER_DEB_DETECT TSL_Globals.This_LinRot->p_Param->CounterDebDetect
+#define THIS_COUNTER_DEB_RELEASE TSL_Globals.This_LinRot->p_Param->CounterDebRelease
+#define THIS_COUNTER_DEB_ERROR TSL_Globals.This_LinRot->p_Param->CounterDebError
 #define THIS_COUNTER_DEB_DIRECTION TSL_Globals.This_LinRot->p_Param->CounterDebDirection
 
-#define THIS_NB_CHANNELS           TSL_Globals.This_LinRot->NbChannels
-#define THIS_SCT_COMP              TSL_Globals.This_LinRot->SctComp
-#define THIS_POS_CORR              TSL_Globals.This_LinRot->PosCorr
+#define THIS_NB_CHANNELS TSL_Globals.This_LinRot->NbChannels
+#define THIS_SCT_COMP TSL_Globals.This_LinRot->SctComp
+#define THIS_POS_CORR TSL_Globals.This_LinRot->PosCorr
 
 #if TSLPRM_DTO > 0
-#define DTO_GET_TIME  {TSL_linrot_DTOGetTime();}
+#define DTO_GET_TIME         \
+  {                          \
+    TSL_linrot_DTOGetTime(); \
+  }
 #else
 #define DTO_GET_TIME
 #endif
@@ -85,12 +88,12 @@
 //==============================================================================
 #if TSLPRM_USE_3CH_LIN_M1 > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_3CH_LIN_M1[3][3] =
-{
-// sec = 1     2     3
-//   j = 0     1     2
-    {    0,  -96,    0 }, // maj = 1; i = 0
-    {   32,    0, -160 }, // maj = 2; i = 1
-    {    0,   96,    0 }  // maj = 3; i = 2
+    {
+        // sec = 1     2     3
+        //   j = 0     1     2
+        {0, -96, 0},   // maj = 1; i = 0
+        {32, 0, -160}, // maj = 2; i = 1
+        {0, 96, 0}     // maj = 3; i = 2
 };
 #endif
 
@@ -100,12 +103,12 @@ CONST TSL_tsignPosition_T TSL_POSOFF_3CH_LIN_M1[3][3] =
 //==============================================================================
 #if TSLPRM_USE_3CH_LIN_M2 > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_3CH_LIN_M2[3][3] =
-{
-// sec = 1     2     3
-//   j = 0     1     2
-    {    0, -192,    0 }, // maj = 1; i = 0
-    {   64,    0, -320 }, // maj = 2; i = 1
-    {    0,  192,    0 }  // maj = 3; i = 2
+    {
+        // sec = 1     2     3
+        //   j = 0     1     2
+        {0, -192, 0},  // maj = 1; i = 0
+        {64, 0, -320}, // maj = 2; i = 1
+        {0, 192, 0}    // maj = 3; i = 2
 };
 #endif
 
@@ -115,12 +118,12 @@ CONST TSL_tsignPosition_T TSL_POSOFF_3CH_LIN_M2[3][3] =
 //==============================================================================
 #if TSLPRM_USE_3CH_LIN_H > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_3CH_LIN_H[3][3] =
-{
-// sec = 1     2     3
-//   j = 0     1     2
-    {    0,  -96,  160 }, // maj = 1; i = 0
-    {   32,    0, -160 }, // maj = 2; i = 1
-    { -224,   96,    0 }  // maj = 3; i = 2
+    {
+        // sec = 1     2     3
+        //   j = 0     1     2
+        {0, -96, 160}, // maj = 1; i = 0
+        {32, 0, -160}, // maj = 2; i = 1
+        {-224, 96, 0}  // maj = 3; i = 2
 };
 #endif
 
@@ -130,12 +133,12 @@ CONST TSL_tsignPosition_T TSL_POSOFF_3CH_LIN_H[3][3] =
 //==============================================================================
 #if TSLPRM_USE_3CH_ROT_M > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_3CH_ROT_M[3][3] =
-{
-// sec = 1     2     3
-//   j = 0     1     2
-    {    0,  -64,  107 }, // maj = 1; i = 0
-    {   21,    0, -107 }, // maj = 2; i = 1
-    { -149,   64,    0 }  // maj = 3; i = 2
+    {
+        // sec = 1     2     3
+        //   j = 0     1     2
+        {0, -64, 107}, // maj = 1; i = 0
+        {21, 0, -107}, // maj = 2; i = 1
+        {-149, 64, 0}  // maj = 3; i = 2
 };
 #endif
 
@@ -145,13 +148,13 @@ CONST TSL_tsignPosition_T TSL_POSOFF_3CH_ROT_M[3][3] =
 //==============================================================================
 #if TSLPRM_USE_4CH_LIN_M1 > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_4CH_LIN_M1[4][4] =
-{
-// sec = 1     2     3     4
-//   j = 0     1     2     3
-    {    0,  -64,    0,    0 }, // maj = 1; i = 0
-    {   21,    0, -107,    0 }, // maj = 2; i = 1
-    {    0,   64,    0, -149 }, // maj = 3; i = 2
-    {    0,    0,  107,    0 }  // maj = 4; i = 3
+    {
+        // sec = 1     2     3     4
+        //   j = 0     1     2     3
+        {0, -64, 0, 0},   // maj = 1; i = 0
+        {21, 0, -107, 0}, // maj = 2; i = 1
+        {0, 64, 0, -149}, // maj = 3; i = 2
+        {0, 0, 107, 0}    // maj = 4; i = 3
 };
 #endif
 
@@ -161,13 +164,13 @@ CONST TSL_tsignPosition_T TSL_POSOFF_4CH_LIN_M1[4][4] =
 //==============================================================================
 #if TSLPRM_USE_4CH_LIN_M2 > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_4CH_LIN_M2[4][4] =
-{
-// sec = 1     2     3     4
-//   j = 0     1     2     3
-    {    0,  -96,    0,    0 }, // maj = 1; i = 0
-    {   32,    0, -160,    0 }, // maj = 2; i = 1
-    {    0,   96,    0, -224 }, // maj = 3; i = 2
-    {    0,    0,  160,    0 }  // maj = 4; i = 3
+    {
+        // sec = 1     2     3     4
+        //   j = 0     1     2     3
+        {0, -96, 0, 0},   // maj = 1; i = 0
+        {32, 0, -160, 0}, // maj = 2; i = 1
+        {0, 96, 0, -224}, // maj = 3; i = 2
+        {0, 0, 160, 0}    // maj = 4; i = 3
 };
 #endif
 
@@ -177,13 +180,13 @@ CONST TSL_tsignPosition_T TSL_POSOFF_4CH_LIN_M2[4][4] =
 //==============================================================================
 #if TSLPRM_USE_4CH_LIN_H > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_4CH_LIN_H[4][4] =
-{
-// sec = 1     2     3     4
-//   j = 0     1     2     3
-    {    0,  -64,    0,  149 }, // maj = 1; i = 0
-    {   21,    0, -107,    0 }, // maj = 2; i = 1
-    {    0,   64,    0, -149 }, // maj = 3; i = 2
-    { -192,    0,  107,    0 }  // maj = 4; i = 3
+    {
+        // sec = 1     2     3     4
+        //   j = 0     1     2     3
+        {0, -64, 0, 149}, // maj = 1; i = 0
+        {21, 0, -107, 0}, // maj = 2; i = 1
+        {0, 64, 0, -149}, // maj = 3; i = 2
+        {-192, 0, 107, 0} // maj = 4; i = 3
 };
 #endif
 
@@ -193,13 +196,13 @@ CONST TSL_tsignPosition_T TSL_POSOFF_4CH_LIN_H[4][4] =
 //==============================================================================
 #if TSLPRM_USE_4CH_ROT_M > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_4CH_ROT_M[4][4] =
-{
-// sec = 1     2     3     4
-//   j = 0     1     2     3
-    {    0,  -48,    0,  112 }, // maj = 1; i = 0
-    {   16,    0,  -80,    0 }, // maj = 2; i = 1
-    {    0,   48,    0, -112 }, // maj = 3; i = 2
-    { -144,    0,   80,    0 }  // maj = 4; i = 3
+    {
+        // sec = 1     2     3     4
+        //   j = 0     1     2     3
+        {0, -48, 0, 112}, // maj = 1; i = 0
+        {16, 0, -80, 0},  // maj = 2; i = 1
+        {0, 48, 0, -112}, // maj = 3; i = 2
+        {-144, 0, 80, 0}  // maj = 4; i = 3
 };
 #endif
 
@@ -209,14 +212,14 @@ CONST TSL_tsignPosition_T TSL_POSOFF_4CH_ROT_M[4][4] =
 //==============================================================================
 #if TSLPRM_USE_5CH_LIN_M1 > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_5CH_LIN_M1[5][5] =
-{
-// sec = 1     2     3     4     5
-//   j = 0     1     2     3     4
-    {    0,  -48,    0,    0,    0 }, // maj = 1; i = 0
-    {   16,    0,  -80,    0,    0 }, // maj = 2; i = 1
-    {    0,   48,    0, -112,    0 }, // maj = 3; i = 2
-    {    0,    0,   80,    0, -144 }, // maj = 4; i = 3
-    {    0,    0,    0,  112,    0 }  // maj = 5; i = 4
+    {
+        // sec = 1     2     3     4     5
+        //   j = 0     1     2     3     4
+        {0, -48, 0, 0, 0},   // maj = 1; i = 0
+        {16, 0, -80, 0, 0},  // maj = 2; i = 1
+        {0, 48, 0, -112, 0}, // maj = 3; i = 2
+        {0, 0, 80, 0, -144}, // maj = 4; i = 3
+        {0, 0, 0, 112, 0}    // maj = 5; i = 4
 };
 #endif
 
@@ -226,14 +229,14 @@ CONST TSL_tsignPosition_T TSL_POSOFF_5CH_LIN_M1[5][5] =
 //==============================================================================
 #if TSLPRM_USE_5CH_LIN_M2 > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_5CH_LIN_M2[5][5] =
-{
-// sec = 1     2     3     4     5
-//   j = 0     1     2     3     4
-    {    0,  -64,    0,    0,    0 }, // maj = 1; i = 0
-    {   21,    0, -107,    0,    0 }, // maj = 2; i = 1
-    {    0,   64,    0, -149,    0 }, // maj = 3; i = 2
-    {    0,    0,  107,    0, -192 }, // maj = 4; i = 3
-    {    0,    0,    0,  149,    0 }  // maj = 5; i = 4
+    {
+        // sec = 1     2     3     4     5
+        //   j = 0     1     2     3     4
+        {0, -64, 0, 0, 0},    // maj = 1; i = 0
+        {21, 0, -107, 0, 0},  // maj = 2; i = 1
+        {0, 64, 0, -149, 0},  // maj = 3; i = 2
+        {0, 0, 107, 0, -192}, // maj = 4; i = 3
+        {0, 0, 0, 149, 0}     // maj = 5; i = 4
 };
 #endif
 
@@ -243,14 +246,14 @@ CONST TSL_tsignPosition_T TSL_POSOFF_5CH_LIN_M2[5][5] =
 //==============================================================================
 #if TSLPRM_USE_5CH_LIN_H > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_5CH_LIN_H[5][5] =
-{
-// sec = 1     2     3     4     5
-//   j = 0     1     2     3     4
-    {    0,  -48,    0,    0,  144 }, // maj = 1; i = 0
-    {   16,    0,  -80,    0,    0 }, // maj = 2; i = 1
-    {    0,   48,    0, -112,    0 }, // maj = 3; i = 2
-    {    0,    0,   80,    0, -144 }, // maj = 4; i = 3
-    { -176,    0,    0,  112,    0 }  // maj = 5; i = 4
+    {
+        // sec = 1     2     3     4     5
+        //   j = 0     1     2     3     4
+        {0, -48, 0, 0, 144}, // maj = 1; i = 0
+        {16, 0, -80, 0, 0},  // maj = 2; i = 1
+        {0, 48, 0, -112, 0}, // maj = 3; i = 2
+        {0, 0, 80, 0, -144}, // maj = 4; i = 3
+        {-176, 0, 0, 112, 0} // maj = 5; i = 4
 };
 #endif
 
@@ -260,14 +263,14 @@ CONST TSL_tsignPosition_T TSL_POSOFF_5CH_LIN_H[5][5] =
 //==============================================================================
 #if TSLPRM_USE_5CH_ROT_M > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_5CH_ROT_M[5][5] =
-{
-// sec = 1     2     3     4     5
-//   j = 0     1     2     3     4
-     {   0,  -38,    0,    0,  115 }, // maj = 1; i = 0
-     {  13,    0,  -64,    0,    0 }, // maj = 2; i = 1
-     {   0,   38,    0,  -90,    0 }, // maj = 3; i = 2
-     {   0,    0,   64,    0, -115 }, // maj = 4; i = 3
-     {-141,    0,    0,   90,    0 }  // maj = 5; i = 4
+    {
+        // sec = 1     2     3     4     5
+        //   j = 0     1     2     3     4
+        {0, -38, 0, 0, 115}, // maj = 1; i = 0
+        {13, 0, -64, 0, 0},  // maj = 2; i = 1
+        {0, 38, 0, -90, 0},  // maj = 3; i = 2
+        {0, 0, 64, 0, -115}, // maj = 4; i = 3
+        {-141, 0, 0, 90, 0}  // maj = 5; i = 4
 };
 #endif
 
@@ -277,14 +280,14 @@ CONST TSL_tsignPosition_T TSL_POSOFF_5CH_ROT_M[5][5] =
 //==============================================================================
 #if TSLPRM_USE_5CH_ROT_D > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_5CH_ROT_D[5][5] =
-{
-// sec = 1     2     3     4     5
-//   j = 0     1     2     3     4
-     {   0,  -19,  -83,  122,   58 }, // maj = 1; i = 0
-     {   6,    0,  -32, -122,   96 }, // maj = 2; i = 1
-     {  70,   19,    0,  -45,  -96 }, // maj = 3; i = 2
-     {-134,  109,   32,    0,  -58 }, // maj = 4; i = 3
-     { -70, -109,   83,   45,    0 }  // maj = 5; i = 4
+    {
+        // sec = 1     2     3     4     5
+        //   j = 0     1     2     3     4
+        {0, -19, -83, 122, 58},  // maj = 1; i = 0
+        {6, 0, -32, -122, 96},   // maj = 2; i = 1
+        {70, 19, 0, -45, -96},   // maj = 3; i = 2
+        {-134, 109, 32, 0, -58}, // maj = 4; i = 3
+        {-70, -109, 83, 45, 0}   // maj = 5; i = 4
 };
 #endif
 
@@ -294,15 +297,15 @@ CONST TSL_tsignPosition_T TSL_POSOFF_5CH_ROT_D[5][5] =
 //==============================================================================
 #if TSLPRM_USE_6CH_LIN_M1 > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_6CH_LIN_M1[6][6] =
-{
-// sec = 1     2     3     4     5     6
-//   j = 0     1     2     3     4     5
-     {   0,  -38,    0,    0,    0,    0 }, // maj = 1; i = 0
-     {  13,    0,  -64,    0,    0,    0 }, // maj = 2; i = 1
-     {   0,   38,    0,  -90,    0,    0 }, // maj = 3; i = 2
-     {   0,    0,   64,    0, -115,    0 }, // maj = 4; i = 3
-     {   0,    0,    0,   90,    0, -141 }, // maj = 5; i = 4
-     {   0,    0,    0,    0,  115,    0 }  // maj = 6; i = 5
+    {
+        // sec = 1     2     3     4     5     6
+        //   j = 0     1     2     3     4     5
+        {0, -38, 0, 0, 0, 0},   // maj = 1; i = 0
+        {13, 0, -64, 0, 0, 0},  // maj = 2; i = 1
+        {0, 38, 0, -90, 0, 0},  // maj = 3; i = 2
+        {0, 0, 64, 0, -115, 0}, // maj = 4; i = 3
+        {0, 0, 0, 90, 0, -141}, // maj = 5; i = 4
+        {0, 0, 0, 0, 115, 0}    // maj = 6; i = 5
 };
 #endif
 
@@ -312,15 +315,15 @@ CONST TSL_tsignPosition_T TSL_POSOFF_6CH_LIN_M1[6][6] =
 //==============================================================================
 #if TSLPRM_USE_6CH_LIN_M2 > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_6CH_LIN_M2[6][6] =
-{
-// sec = 1     2     3     4     5     6
-//   j = 0     1     2     3     4     5
-     {   0,  -48,    0,    0,    0,    0 }, // maj = 1; i = 0
-     {  16,    0,  -80,    0,    0,    0 }, // maj = 2; i = 1
-     {   0,   48,    0, -112,    0,    0 }, // maj = 3; i = 2
-     {   0,    0,   80,    0, -144,    0 }, // maj = 4; i = 3
-     {   0,    0,    0,  112,    0, -176 }, // maj = 5; i = 4
-     {   0,    0,    0,    0,  144,    0 }  // maj = 6; i = 5
+    {
+        // sec = 1     2     3     4     5     6
+        //   j = 0     1     2     3     4     5
+        {0, -48, 0, 0, 0, 0},    // maj = 1; i = 0
+        {16, 0, -80, 0, 0, 0},   // maj = 2; i = 1
+        {0, 48, 0, -112, 0, 0},  // maj = 3; i = 2
+        {0, 0, 80, 0, -144, 0},  // maj = 4; i = 3
+        {0, 0, 0, 112, 0, -176}, // maj = 5; i = 4
+        {0, 0, 0, 0, 144, 0}     // maj = 6; i = 5
 };
 #endif
 
@@ -330,15 +333,15 @@ CONST TSL_tsignPosition_T TSL_POSOFF_6CH_LIN_M2[6][6] =
 //==============================================================================
 #if TSLPRM_USE_6CH_LIN_H > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_6CH_LIN_H[6][6] =
-{
-// sec = 1     2     3     4     5     6
-//   j = 0     1     2     3     4     5
-     {   0,  -38,    0,    0,    0,  141 }, // maj = 1; i = 0
-     {  13,    0,  -64,    0,    0,    0 }, // maj = 2; i = 1
-     {   0,   38,    0,  -90,    0,    0 }, // maj = 3; i = 2
-     {   0,    0,   64,    0, -115,    0 }, // maj = 4; i = 3
-     {   0,    0,    0,   90,    0, -141 }, // maj = 5; i = 4
-     {-166,    0,    0,    0,  115,    0 }  // maj = 6; i = 5
+    {
+        // sec = 1     2     3     4     5     6
+        //   j = 0     1     2     3     4     5
+        {0, -38, 0, 0, 0, 141}, // maj = 1; i = 0
+        {13, 0, -64, 0, 0, 0},  // maj = 2; i = 1
+        {0, 38, 0, -90, 0, 0},  // maj = 3; i = 2
+        {0, 0, 64, 0, -115, 0}, // maj = 4; i = 3
+        {0, 0, 0, 90, 0, -141}, // maj = 5; i = 4
+        {-166, 0, 0, 0, 115, 0} // maj = 6; i = 5
 };
 #endif
 
@@ -348,15 +351,15 @@ CONST TSL_tsignPosition_T TSL_POSOFF_6CH_LIN_H[6][6] =
 //==============================================================================
 #if TSLPRM_USE_6CH_ROT_M > 0
 CONST TSL_tsignPosition_T TSL_POSOFF_6CH_ROT_M[6][6] =
-{
-// sec = 1     2     3     4     5     6
-//   j = 0     1     2     3     4     5
-     {   0,  -32,    0,    0,    0,  117 }, // maj = 1; i = 0
-     {  11,    0,  -53,    0,    0,    0 }, // maj = 2; i = 1
-     {   0,   32,    0,  -75,    0,    0 }, // maj = 3; i = 2
-     {   0,    0,   53,    0,  -96,    0 }, // maj = 4; i = 3
-     {   0,    0,    0,   75,    0, -117 }, // maj = 5; i = 4
-     {-139,    0,    0,    0,   96,    0 }  // maj = 6; i = 5
+    {
+        // sec = 1     2     3     4     5     6
+        //   j = 0     1     2     3     4     5
+        {0, -32, 0, 0, 0, 117}, // maj = 1; i = 0
+        {11, 0, -53, 0, 0, 0},  // maj = 2; i = 1
+        {0, 32, 0, -75, 0, 0},  // maj = 3; i = 2
+        {0, 0, 53, 0, -96, 0},  // maj = 4; i = 3
+        {0, 0, 0, 75, 0, -117}, // maj = 5; i = 4
+        {-139, 0, 0, 0, 96, 0}  // maj = 6; i = 5
 };
 #endif
 
@@ -365,8 +368,8 @@ CONST TSL_tsignPosition_T TSL_POSOFF_6CH_ROT_M[6][6] =
 //------------------
 
 #define DIRECTION_CHANGE_MAX_DISPLACEMENT (255)
-#define DIRECTION_CHANGE_TOTAL_STEPS      (256)
-#define RESOLUTION_CALCULATION            (8)
+#define DIRECTION_CHANGE_TOTAL_STEPS (256)
+#define RESOLUTION_CALCULATION (8)
 
 static TSL_tNb_T CalibDiv;
 
@@ -384,51 +387,49 @@ TSL_Status_enum_T TSL_linrot_ProcessCh_All_DeltaBelowEqu(TSL_tThreshold_T th, TS
 void TSL_linrot_ProcessCh_All_ClearRef(void);
 TSL_tDelta_T TSL_linrot_NormDelta(TSL_ChannelData_T *ch, TSL_tIndex_T idx);
 
-
 //==============================================================================
 // "Object methods" functions
 //==============================================================================
 
 /**
-  * @brief  Init parameters with default values from configuration file
-  * @param  None
-  * @retval None
-  */
+ * @brief  Init parameters with default values from configuration file
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_Init(void)
 {
   // Thresholds
 #if TSLPRM_USE_PROX > 0
-  THIS_PROXIN_TH    = TSLPRM_LINROT_PROX_IN_TH;
-  THIS_PROXOUT_TH   = TSLPRM_LINROT_PROX_OUT_TH;
+  THIS_PROXIN_TH = TSLPRM_LINROT_PROX_IN_TH;
+  THIS_PROXOUT_TH = TSLPRM_LINROT_PROX_OUT_TH;
 #endif
-  THIS_DETECTIN_TH  = TSLPRM_LINROT_DETECT_IN_TH;
+  THIS_DETECTIN_TH = TSLPRM_LINROT_DETECT_IN_TH;
   THIS_DETECTOUT_TH = TSLPRM_LINROT_DETECT_OUT_TH;
-  THIS_CALIB_TH     = TSLPRM_LINROT_CALIB_TH;
+  THIS_CALIB_TH = TSLPRM_LINROT_CALIB_TH;
 
   // Debounce counters
-  THIS_COUNTER_DEB_CALIB   = TSLPRM_DEBOUNCE_CALIB;
+  THIS_COUNTER_DEB_CALIB = TSLPRM_DEBOUNCE_CALIB;
 #if TSLPRM_USE_PROX > 0
-  THIS_COUNTER_DEB_PROX    = TSLPRM_DEBOUNCE_PROX;
+  THIS_COUNTER_DEB_PROX = TSLPRM_DEBOUNCE_PROX;
 #endif
-  THIS_COUNTER_DEB_DETECT  = TSLPRM_DEBOUNCE_DETECT;
+  THIS_COUNTER_DEB_DETECT = TSLPRM_DEBOUNCE_DETECT;
   THIS_COUNTER_DEB_RELEASE = TSLPRM_DEBOUNCE_RELEASE;
-  THIS_COUNTER_DEB_ERROR   = TSLPRM_DEBOUNCE_ERROR;
+  THIS_COUNTER_DEB_ERROR = TSLPRM_DEBOUNCE_ERROR;
 
   // Other parameters for linear/rotary only
-  THIS_RESOLUTION            = TSLPRM_LINROT_RESOLUTION;
-  THIS_DIR_CHG_POS           = TSLPRM_LINROT_DIR_CHG_POS;
+  THIS_RESOLUTION = TSLPRM_LINROT_RESOLUTION;
+  THIS_DIR_CHG_POS = TSLPRM_LINROT_DIR_CHG_POS;
   THIS_COUNTER_DEB_DIRECTION = TSLPRM_LINROT_DIR_CHG_DEB;
 
   // Initial state
   TSL_linrot_SetStateCalibration(TSLPRM_CALIB_DELAY);
 }
 
-
 /**
-  * @brief  Process the State Machine
-  * @param  None
-  * @retval None
-  */
+ * @brief  Process the State Machine
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_Process(void)
 {
   TSL_StateId_enum_T prev_state_id;
@@ -477,17 +478,15 @@ void TSL_linrot_Process(void)
       THIS_STATEID = TSL_STATEID_DETECT;
     }
 #endif
-
   }
 }
 
-
 /**
-  * @brief  Calculate the position
-  * @param  None
-  * @retval Status Return OK if position calculation is correct
-  * @note   The position is calculated only if the number of channels is greater than 2
-  */
+ * @brief  Calculate the position
+ * @param  None
+ * @retval Status Return OK if position calculation is correct
+ * @note   The position is calculated only if the number of channels is greater than 2
+ */
 TSL_Status_enum_T TSL_linrot_CalcPos(void)
 {
   TSL_tIndex_T idx;
@@ -537,7 +536,10 @@ TSL_Status_enum_T TSL_linrot_CalcPos(void)
 #endif
 
     // The Delta must be positive only otherwise it is noise
-    if (norm_delta < 0) {norm_delta = 0;}
+    if (norm_delta < 0)
+    {
+      norm_delta = 0;
+    }
 
     if (norm_delta > delta1)
     {
@@ -582,16 +584,16 @@ TSL_Status_enum_T TSL_linrot_CalcPos(void)
     B = Biggest signal measured (Delta1/Index1)
     M = Middle signal measured (Delta2/Index2)
     S = Smallest signal measured (Delta3/Index3)
-    
+
     - The equation to find the position is:
       Position = Offset +/- [ Sector_Size x ( Major / (Major + Minor) ) ]
-   
+
     - The Offset is the position of the middle of the Middle signal segment.
       All the Offset values are stored in the ROM table Table_POSITION_OFFSET.
-   
+
     - Major = Biggest - Smallest signals
       Minor = Middle - Smallest signals
-   
+
     - The Sector_Size depends of the number of channels used
   ----------------------------------------------------------------------------*/
 
@@ -647,7 +649,6 @@ TSL_Status_enum_T TSL_linrot_CalcPos(void)
     {
       new_position = 255;
     }
-
   }
   else // ROTARY sensor: keep only the low byte
   {
@@ -675,7 +676,7 @@ TSL_Status_enum_T TSL_linrot_CalcPos(void)
         if (!THIS_COUNTER_DIR)
         {
           THIS_COUNTER_DIR = THIS_COUNTER_DEB_DIRECTION;
-          THIS_DIRECTION = TSL_FALSE;  // New direction accepted: clockwise.
+          THIS_DIRECTION = TSL_FALSE; // New direction accepted: clockwise.
         }
         else
         {
@@ -698,7 +699,7 @@ TSL_Status_enum_T TSL_linrot_CalcPos(void)
         if (!THIS_COUNTER_DIR)
         {
           THIS_COUNTER_DIR = THIS_COUNTER_DEB_DIRECTION;
-          THIS_DIRECTION = TSL_FALSE;  // New direction accepted: clockwise.
+          THIS_DIRECTION = TSL_FALSE; // New direction accepted: clockwise.
         }
         else
         {
@@ -706,7 +707,6 @@ TSL_Status_enum_T TSL_linrot_CalcPos(void)
         }
       }
     }
-
   }
   else // Clockwise direction... DEFAULT SETTING !
   {
@@ -725,7 +725,7 @@ TSL_Status_enum_T TSL_linrot_CalcPos(void)
         if (!THIS_COUNTER_DIR)
         {
           THIS_COUNTER_DIR = THIS_COUNTER_DEB_DIRECTION;
-          THIS_DIRECTION = TSL_TRUE;  // New direction accepted: anticlockwise.
+          THIS_DIRECTION = TSL_TRUE; // New direction accepted: anticlockwise.
         }
         else
         {
@@ -748,7 +748,7 @@ TSL_Status_enum_T TSL_linrot_CalcPos(void)
         if (!THIS_COUNTER_DIR)
         {
           THIS_COUNTER_DIR = THIS_COUNTER_DEB_DIRECTION;
-          THIS_DIRECTION = TSL_TRUE;  // New direction accepted: anticlockwise.
+          THIS_DIRECTION = TSL_TRUE; // New direction accepted: anticlockwise.
         }
         else
         {
@@ -756,7 +756,6 @@ TSL_Status_enum_T TSL_linrot_CalcPos(void)
         }
       }
     }
-
   }
 
   //----------------------------------------------------------------------------
@@ -780,19 +779,17 @@ TSL_Status_enum_T TSL_linrot_CalcPos(void)
     THIS_POSCHANGE = TSL_STATE_CHANGED;
     return TSL_STATUS_OK;
   }
-
 }
-
 
 //==============================================================================
 // Utility functions
 //==============================================================================
 
 /**
-  * @brief  Go in Calibration state
-  * @param[in] delay Delay before calibration starts (stabilization of noise filter)
-  * @retval None
-  */
+ * @brief  Go in Calibration state
+ * @param[in] delay Delay before calibration starts (stabilization of noise filter)
+ * @retval None
+ */
 void TSL_linrot_SetStateCalibration(TSL_tCounter_T delay)
 {
   THIS_STATEID = TSL_STATEID_CALIB;
@@ -801,16 +798,16 @@ void TSL_linrot_SetStateCalibration(TSL_tCounter_T delay)
 
   switch (TSL_Params.NbCalibSamples)
   {
-    case 4:
-      CalibDiv = 2;
-      break;
-    case 16:
-      CalibDiv = 4;
-      break;
-    default:
-      TSL_Params.NbCalibSamples =  8;
-      CalibDiv = 3;
-      break;
+  case 4:
+    CalibDiv = 2;
+    break;
+  case 16:
+    CalibDiv = 4;
+    break;
+  default:
+    TSL_Params.NbCalibSamples = 8;
+    CalibDiv = 3;
+    break;
   }
 
   // If a noise filter is used, the counter must be initialized to a value
@@ -819,12 +816,11 @@ void TSL_linrot_SetStateCalibration(TSL_tCounter_T delay)
   TSL_linrot_ProcessCh_All_ClearRef();
 }
 
-
 /**
-  * @brief  Go in Off state with sensor "off"
-  * @param  None
-  * @retval None
-  */
+ * @brief  Go in Off state with sensor "off"
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_SetStateOff(void)
 {
   THIS_STATEID = TSL_STATEID_OFF;
@@ -832,12 +828,11 @@ void TSL_linrot_SetStateOff(void)
   TSL_linrot_ProcessCh_All_SetStatus(TSL_OBJ_STATUS_OFF);
 }
 
-
 /**
-  * @brief  Go in Off state with sensor in "Burst mode only"
-  * @param  None
-  * @retval None
-  */
+ * @brief  Go in Off state with sensor in "Burst mode only"
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_SetStateBurstOnly(void)
 {
   THIS_STATEID = TSL_STATEID_OFF;
@@ -845,23 +840,21 @@ void TSL_linrot_SetStateBurstOnly(void)
   TSL_linrot_ProcessCh_All_SetStatus(TSL_OBJ_STATUS_BURST_ONLY);
 }
 
-
 /**
-  * @brief  Return the current state identifier
-  * @param  None
-  * @retval State id
-  */
+ * @brief  Return the current state identifier
+ * @param  None
+ * @retval State id
+ */
 TSL_StateId_enum_T TSL_linrot_GetStateId(void)
 {
-  return(THIS_STATEID);
+  return (THIS_STATEID);
 }
 
-
 /**
-  * @brief  Return the current state mask
-  * @param  None
-  * @retval State mask
-  */
+ * @brief  Return the current state mask
+ * @param  None
+ * @retval State mask
+ */
 TSL_StateMask_enum_T TSL_linrot_GetStateMask(void)
 {
   TSL_StateMask_enum_T state_mask = TSL_STATEMASK_UNKNOWN;
@@ -885,17 +878,15 @@ TSL_StateMask_enum_T TSL_linrot_GetStateMask(void)
   return state_mask;
 }
 
-
 /**
-  * @brief  Return the Change flag
-  * @param  None
-  * @retval Change flag status
-  */
+ * @brief  Return the Change flag
+ * @param  None
+ * @retval Change flag status
+ */
 TSL_tNb_T TSL_linrot_IsChanged(void)
 {
-  return(THIS_CHANGE);
+  return (THIS_CHANGE);
 }
-
 
 //==============================================================================
 // State machine functions
@@ -903,10 +894,10 @@ TSL_tNb_T TSL_linrot_IsChanged(void)
 
 #if TSLPRM_USE_PROX > 0
 /**
-  * @brief  Debounce Release processing (previous state = Proximity)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Release processing (previous state = Proximity)
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_DebReleaseProxStateProcess(void)
 {
   if (TSL_linrot_ProcessCh_One_AcqStatusError() == TSL_STATUS_OK) // Acquisition error (min or max)
@@ -921,7 +912,10 @@ void TSL_linrot_DebReleaseProxStateProcess(void)
     }
     else
     {
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_RELEASE;
@@ -932,12 +926,11 @@ void TSL_linrot_DebReleaseProxStateProcess(void)
 }
 #endif // if TSLPRM_USE_PROX > 0
 
-
 /**
-  * @brief  Debounce Release processing (previous state = Detect)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Release processing (previous state = Detect)
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_DebReleaseDetectStateProcess(void)
 {
   if (TSL_linrot_ProcessCh_One_AcqStatusError() == TSL_STATUS_OK) // Acquisition error (min or max)
@@ -959,7 +952,10 @@ void TSL_linrot_DebReleaseDetectStateProcess(void)
         return;
       }
 #endif
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_RELEASE;
@@ -969,13 +965,12 @@ void TSL_linrot_DebReleaseDetectStateProcess(void)
   }
 }
 
-
 /**
-  * @brief  Debounce Release processing (previous state = Touch)
-  * Same as Debounce Release Detect processing
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Release processing (previous state = Touch)
+ * Same as Debounce Release Detect processing
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_DebReleaseTouchStateProcess(void)
 {
   if (TSL_linrot_ProcessCh_One_AcqStatusError() == TSL_STATUS_OK) // Acquisition error (min or max)
@@ -997,7 +992,10 @@ void TSL_linrot_DebReleaseTouchStateProcess(void)
         return;
       }
 #endif
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_RELEASE;
@@ -1007,12 +1005,11 @@ void TSL_linrot_DebReleaseTouchStateProcess(void)
   }
 }
 
-
 /**
-  * @brief  Release state processing
-  * @param  None
-  * @retval None
-  */
+ * @brief  Release state processing
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_ReleaseStateProcess(void)
 {
   if (TSL_linrot_ProcessCh_One_AcqStatusError() == TSL_STATUS_OK) // Acquisition error (min or max)
@@ -1077,12 +1074,11 @@ void TSL_linrot_ReleaseStateProcess(void)
   }
 }
 
-
 /**
-  * @brief  Debounce Calibration processing (previous state = Release)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Calibration processing (previous state = Release)
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_DebCalibrationStateProcess(void)
 {
   if (TSL_linrot_ProcessCh_One_AcqStatusError() == TSL_STATUS_OK) // Acquisition error (min or max)
@@ -1093,7 +1089,10 @@ void TSL_linrot_DebCalibrationStateProcess(void)
   {
     if (TSL_linrot_ProcessCh_One_DeltaBelowEquMinus(THIS_CALIB_TH, 1) == TSL_STATUS_OK) // Still below recalibration threshold
     {
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         TSL_linrot_SetStateCalibration(0);
@@ -1107,12 +1106,11 @@ void TSL_linrot_DebCalibrationStateProcess(void)
   }
 }
 
-
 /**
-  * @brief  Calibration state processing
-  * @param  None
-  * @retval None
-  */
+ * @brief  Calibration state processing
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_CalibrationStateProcess(void)
 {
   TSL_tMeas_T new_meas;
@@ -1186,7 +1184,10 @@ void TSL_linrot_CalibrationStateProcess(void)
     }
 
     // Check that we have all the needed measurements
-    if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+    if (THIS_COUNTER_DEB > 0)
+    {
+      THIS_COUNTER_DEB--;
+    }
     if (THIS_COUNTER_DEB == 0)
     {
       // Process all channels
@@ -1204,13 +1205,12 @@ void TSL_linrot_CalibrationStateProcess(void)
   }
 }
 
-
 #if TSLPRM_USE_PROX > 0
 /**
-  * @brief  Debounce Proximity processing (previous state = Release)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Proximity processing (previous state = Release)
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_DebProxStateProcess(void)
 {
   if (TSL_linrot_ProcessCh_One_AcqStatusError() == TSL_STATUS_OK) // Acquisition error (min or max)
@@ -1236,7 +1236,10 @@ void TSL_linrot_DebProxStateProcess(void)
 
     if (TSL_linrot_ProcessCh_One_DeltaAboveEqu(THIS_PROXIN_TH, 0) == TSL_STATUS_OK)
     {
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_PROX;
@@ -1252,13 +1255,12 @@ void TSL_linrot_DebProxStateProcess(void)
 }
 #endif
 
-
 #if TSLPRM_USE_PROX > 0
 /**
-  * @brief  Debounce Proximity processing (previous state = Detect)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Proximity processing (previous state = Detect)
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_DebProxDetectStateProcess(void)
 {
   if (TSL_linrot_ProcessCh_One_AcqStatusError() == TSL_STATUS_OK) // Acquisition error (min or max)
@@ -1275,7 +1277,10 @@ void TSL_linrot_DebProxDetectStateProcess(void)
 
     if (TSL_linrot_ProcessCh_One_DeltaAbove(THIS_PROXOUT_TH, 0) == TSL_STATUS_OK)
     {
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_PROX;
@@ -1299,13 +1304,12 @@ void TSL_linrot_DebProxDetectStateProcess(void)
 }
 #endif
 
-
 #if TSLPRM_USE_PROX > 0
 /**
-  * @brief  Debounce Proximity processing (previous state = Touch)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Proximity processing (previous state = Touch)
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_DebProxTouchStateProcess(void)
 {
   if (TSL_linrot_ProcessCh_One_AcqStatusError() == TSL_STATUS_OK) // Acquisition error (min or max)
@@ -1322,7 +1326,10 @@ void TSL_linrot_DebProxTouchStateProcess(void)
 
     if (TSL_linrot_ProcessCh_One_DeltaAbove(THIS_PROXOUT_TH, 0) == TSL_STATUS_OK)
     {
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_PROX;
@@ -1346,13 +1353,12 @@ void TSL_linrot_DebProxTouchStateProcess(void)
 }
 #endif
 
-
 #if TSLPRM_USE_PROX > 0
 /**
-  * @brief  Proximity state processing
-  * @param  None
-  * @retval None
-  */
+ * @brief  Proximity state processing
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_ProxStateProcess(void)
 {
 #if TSLPRM_DTO > 0
@@ -1417,17 +1423,15 @@ void TSL_linrot_ProxStateProcess(void)
       }
     }
 #endif
-
   }
 }
 #endif
 
-
 /**
-  * @brief  Debounce Detect processing (previous state = Release or Proximity)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce Detect processing (previous state = Release or Proximity)
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_DebDetectStateProcess(void)
 {
   if (TSL_linrot_ProcessCh_One_AcqStatusError() == TSL_STATUS_OK) // Acquisition error (min or max)
@@ -1438,7 +1442,10 @@ void TSL_linrot_DebDetectStateProcess(void)
   {
     if (TSL_linrot_ProcessCh_One_DeltaAboveEqu(THIS_DETECTIN_TH, 1) == TSL_STATUS_OK)
     {
-      if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+      if (THIS_COUNTER_DEB > 0)
+      {
+        THIS_COUNTER_DEB--;
+      }
       if (THIS_COUNTER_DEB == 0)
       {
         THIS_STATEID = TSL_STATEID_DETECT;
@@ -1473,12 +1480,11 @@ void TSL_linrot_DebDetectStateProcess(void)
   }
 }
 
-
 /**
-  * @brief  Detect state processing
-  * @param  None
-  * @retval None
-  */
+ * @brief  Detect state processing
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_DetectStateProcess(void)
 {
 #if TSLPRM_DTO > 0
@@ -1575,17 +1581,15 @@ void TSL_linrot_DetectStateProcess(void)
     {
       THIS_STATEID = TSL_STATEID_DEB_RELEASE_DETECT;
     }
-
   }
 }
 
-
 /**
-  * @brief  Touch state processing
-  * Same as Detect state
-  * @param  None
-  * @retval None
-  */
+ * @brief  Touch state processing
+ * Same as Detect state
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_TouchStateProcess(void)
 {
 #if TSLPRM_DTO > 0
@@ -1682,23 +1686,24 @@ void TSL_linrot_TouchStateProcess(void)
     {
       THIS_STATEID = TSL_STATEID_DEB_RELEASE_TOUCH;
     }
-
   }
 }
 
-
 /**
-  * @brief  Debounce error state processing
-  * @param  None
-  * @retval None
-  */
+ * @brief  Debounce error state processing
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_DebErrorStateProcess(void)
 {
   volatile TSL_StateMask_enum_T mask;
 
   if (TSL_linrot_ProcessCh_One_AcqStatusError() == TSL_STATUS_OK) // Acquisition error (min or max)
   {
-    if (THIS_COUNTER_DEB > 0) {THIS_COUNTER_DEB--;}
+    if (THIS_COUNTER_DEB > 0)
+    {
+      THIS_COUNTER_DEB--;
+    }
     if (THIS_COUNTER_DEB == 0)
     {
       THIS_STATEID = TSL_STATEID_ERROR;
@@ -1713,35 +1718,34 @@ void TSL_linrot_DebErrorStateProcess(void)
     // Go back to the previous state
     switch (mask)
     {
-      case TSL_STATEMASK_RELEASE :
-        THIS_STATEID = TSL_STATEID_RELEASE;
-        break;
-      case TSL_STATEMASK_PROX :
-        THIS_STATEID = TSL_STATEID_PROX;
-        break;
-      case TSL_STATEMASK_DETECT :
-        THIS_STATEID = TSL_STATEID_DETECT;
-        break;
-      case TSL_STATEMASK_TOUCH :
-        THIS_STATEID = TSL_STATEID_TOUCH;
-        break;
-      default:
-        TSL_linrot_SetStateCalibration(0);
-        break;
+    case TSL_STATEMASK_RELEASE:
+      THIS_STATEID = TSL_STATEID_RELEASE;
+      break;
+    case TSL_STATEMASK_PROX:
+      THIS_STATEID = TSL_STATEID_PROX;
+      break;
+    case TSL_STATEMASK_DETECT:
+      THIS_STATEID = TSL_STATEID_DETECT;
+      break;
+    case TSL_STATEMASK_TOUCH:
+      THIS_STATEID = TSL_STATEID_TOUCH;
+      break;
+    default:
+      TSL_linrot_SetStateCalibration(0);
+      break;
     }
   }
 }
-
 
 //==============================================================================
 // Private functions
 //==============================================================================
 
 /**
-  * @brief  Get the current time in second and affect it to the DTO counter (Private)
-  * @param  None
-  * @retval None
-  */
+ * @brief  Get the current time in second and affect it to the DTO counter (Private)
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_DTOGetTime(void)
 {
   disableInterrupts();
@@ -1749,12 +1753,11 @@ void TSL_linrot_DTOGetTime(void)
   enableInterrupts();
 }
 
-
 /**
-  * @brief  Set all channels status to ON, OFF or BURST ONLY
-  * @param  sts  Channel status
-  * @retval None
-  */
+ * @brief  Set all channels status to ON, OFF or BURST ONLY
+ * @param  sts  Channel status
+ * @retval None
+ */
 void TSL_linrot_ProcessCh_All_SetStatus(TSL_ObjStatus_enum_T sts)
 {
   TSL_tIndex_T idx;
@@ -1767,12 +1770,11 @@ void TSL_linrot_ProcessCh_All_SetStatus(TSL_ObjStatus_enum_T sts)
   }
 }
 
-
 /**
-  * @brief  Check if at least one channel has a data ready
-  * @param  None
-  * @retval Status
-  */
+ * @brief  Check if at least one channel has a data ready
+ * @param  None
+ * @retval Status
+ */
 TSL_Status_enum_T TSL_linrot_ProcessCh_One_DataReady(void)
 {
   TSL_tIndex_T idx;
@@ -1791,12 +1793,11 @@ TSL_Status_enum_T TSL_linrot_ProcessCh_One_DataReady(void)
   return retval;
 }
 
-
 /**
-  * @brief  Check if all channels are equal to the status passed
-  * @param  sts  Status to be checked
-  * @retval Status
-  */
+ * @brief  Check if all channels are equal to the status passed
+ * @param  sts  Status to be checked
+ * @retval Status
+ */
 TSL_Status_enum_T TSL_linrot_ProcessCh_All_AcqStatus(TSL_AcqStatus_enum_T sts)
 {
   TSL_tIndex_T idx;
@@ -1813,12 +1814,11 @@ TSL_Status_enum_T TSL_linrot_ProcessCh_All_AcqStatus(TSL_AcqStatus_enum_T sts)
   return TSL_STATUS_OK;
 }
 
-
 /**
-  * @brief  Check if at least one channel is in error
-  * @param  None
-  * @retval Status
-  */
+ * @brief  Check if at least one channel is in error
+ * @param  None
+ * @retval Status
+ */
 TSL_Status_enum_T TSL_linrot_ProcessCh_One_AcqStatusError(void)
 {
   TSL_tIndex_T idx;
@@ -1835,13 +1835,12 @@ TSL_Status_enum_T TSL_linrot_ProcessCh_One_AcqStatusError(void)
   return TSL_STATUS_ERROR;
 }
 
-
 /**
-  * @brief  Check if at least one channel is below or equal a threshold (inverted)
-  * @param  th Threshold
-  * @param  coeff Enable or Disable the multiplier coefficient on threshold
-  * @retval Status
-  */
+ * @brief  Check if at least one channel is below or equal a threshold (inverted)
+ * @param  th Threshold
+ * @param  coeff Enable or Disable the multiplier coefficient on threshold
+ * @retval Status
+ */
 TSL_Status_enum_T TSL_linrot_ProcessCh_One_DeltaBelowEquMinus(TSL_tThreshold_T th, TSL_tIndex_T coeff)
 {
   TSL_tIndex_T idx;
@@ -1859,7 +1858,7 @@ TSL_Status_enum_T TSL_linrot_ProcessCh_One_DeltaBelowEquMinus(TSL_tThreshold_T t
     lth = th;
   }
 #endif
-  
+
   // Return OK if at least one channel is below or equal the threshold
   for (idx = 0; idx < THIS_NB_CHANNELS; idx++)
   {
@@ -1878,20 +1877,19 @@ TSL_Status_enum_T TSL_linrot_ProcessCh_One_DeltaBelowEquMinus(TSL_tThreshold_T t
     {
       return TSL_STATUS_OK;
     }
-    
+
     p_Ch++;
   }
-  
+
   return TSL_STATUS_ERROR;
 }
 
-
 /**
-  * @brief  Check if at least one channel is above or equal a threshold
-  * @param  th Threshold
-  * @param  coeff Enable or Disable the multiplier coefficient on threshold
-  * @retval Status
-  */
+ * @brief  Check if at least one channel is above or equal a threshold
+ * @param  th Threshold
+ * @param  coeff Enable or Disable the multiplier coefficient on threshold
+ * @retval Status
+ */
 TSL_Status_enum_T TSL_linrot_ProcessCh_One_DeltaAboveEqu(TSL_tThreshold_T th, TSL_tIndex_T coeff)
 {
   TSL_tIndex_T idx;
@@ -1940,13 +1938,12 @@ TSL_Status_enum_T TSL_linrot_ProcessCh_One_DeltaAboveEqu(TSL_tThreshold_T th, TS
   return TSL_STATUS_ERROR;
 }
 
-
 /**
-  * @brief  Check if at least one channel is stricly above a threshold
-  * @param  th Threshold
-  * @param  coeff Enable or Disable the multiplier coefficient on threshold
-  * @retval Status
-  */
+ * @brief  Check if at least one channel is stricly above a threshold
+ * @param  th Threshold
+ * @param  coeff Enable or Disable the multiplier coefficient on threshold
+ * @retval Status
+ */
 TSL_Status_enum_T TSL_linrot_ProcessCh_One_DeltaAbove(TSL_tThreshold_T th, TSL_tIndex_T coeff)
 {
   TSL_tIndex_T idx;
@@ -1995,13 +1992,12 @@ TSL_Status_enum_T TSL_linrot_ProcessCh_One_DeltaAbove(TSL_tThreshold_T th, TSL_t
   return TSL_STATUS_ERROR;
 }
 
-
 /**
-  * @brief  Check if all channels are below or equal a threshold
-  * @param  th Threshold
-  * @param  coeff Enable or Disable the multiplier coefficient on threshold
-  * @retval Status
-  */
+ * @brief  Check if all channels are below or equal a threshold
+ * @param  th Threshold
+ * @param  coeff Enable or Disable the multiplier coefficient on threshold
+ * @retval Status
+ */
 TSL_Status_enum_T TSL_linrot_ProcessCh_All_DeltaBelowEqu(TSL_tThreshold_T th, TSL_tIndex_T coeff)
 {
   TSL_tIndex_T idx;
@@ -2050,12 +2046,11 @@ TSL_Status_enum_T TSL_linrot_ProcessCh_All_DeltaBelowEqu(TSL_tThreshold_T th, TS
   return TSL_STATUS_OK;
 }
 
-
 /**
-  * @brief  Clear the Reference and ReferenceRest for all channels
-  * @param  None
-  * @retval None
-  */
+ * @brief  Clear the Reference and ReferenceRest for all channels
+ * @param  None
+ * @retval None
+ */
 void TSL_linrot_ProcessCh_All_ClearRef(void)
 {
   TSL_tIndex_T idx;
@@ -2068,13 +2063,12 @@ void TSL_linrot_ProcessCh_All_ClearRef(void)
   }
 }
 
-
 /**
-  * @brief  Normalize a Delta value
-  * @param  ch Pointer to the current channel
-  * @param  idx Index of the channel
-  * @retval Normalized Delta value
-  */
+ * @brief  Normalize a Delta value
+ * @param  ch Pointer to the current channel
+ * @param  idx Index of the channel
+ * @retval Normalized Delta value
+ */
 TSL_tDelta_T TSL_linrot_NormDelta(TSL_ChannelData_T *ch, TSL_tIndex_T idx)
 {
   uint32_t tmpdelta = ch->Delta;

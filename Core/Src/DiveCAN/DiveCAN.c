@@ -24,7 +24,6 @@ static const uint8_t DIVECAN_TYPE_MASK = 0xF;
 
 extern osMessageQueueId_t PPO2QueueHandle;
 
-
 /* FreeRTOS tasks */
 
 static osThreadId_t *getOSThreadId(void)
@@ -205,7 +204,7 @@ void RespPPO2(const DiveCANMessage_t *const message, const DiveCANDevice_t *cons
 {
     (void)deviceSpec; /* Unused, but we need to match the function signature */
     CellValues_t cell_values;
-    
+
     cell_values.C1 = message->data[1];
     cell_values.C2 = message->data[2];
     cell_values.C3 = message->data[3];
@@ -233,7 +232,6 @@ void RespShutdown(const DiveCANMessage_t *, const DiveCANDevice_t *)
     serial_printf("Shutdown attempted but timed out due to missing en signal");
 }
 
-
 void RespSerialNumber(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec)
 {
     (void)deviceSpec; /* Unused, but we need to match the function signature */
@@ -242,4 +240,3 @@ void RespSerialNumber(const DiveCANMessage_t *const message, const DiveCANDevice
     (void)memcpy(serial_number, message->data, sizeof(message->data));
     serial_printf("Received Serial Number of device %d: %s", origin, serial_number);
 }
-

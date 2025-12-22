@@ -179,7 +179,7 @@ void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask)
 void blinkNoData(void)
 {
     /* Do the loop and blink the blink*/
-    for (uint8_t i = 0; i <2; i++)
+    for (uint8_t i = 0; i < 2; i++)
     {
         for (uint8_t channel = 0; channel < 3; channel++)
         {

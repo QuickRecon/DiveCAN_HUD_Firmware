@@ -4,11 +4,7 @@
 #include <assert.h>
 #include "string.h"
 
-/*  Define where stuff lives in the eeprom (only 100 vars up for grabs with current configuration) */
-static const uint8_t ANALOG_CELL_EEPROM_BASE_ADDR = 0x01;
 static const uint8_t FATAL_ERROR_BASE_ADDR = 0x04;
-/* 0x05 Used to be NON_FATAL recording point, but decided that was too hard because recursion*/
-static const uint8_t CONFIG_BASE_ADDRESS = 0x06;
 
 static const uint8_t MAX_WRITE_ATTEMPTS = 3;
 
@@ -169,7 +165,7 @@ static bool WriteInt32(uint16_t addr, uint32_t value)
     EE_Status result = EE_OK;
     do
     {
-        if(false)/*if (checkCoreVoltage()) */ /* This causes spurious cal fails some of the time (voltage sag?)*/
+        if (false) /*if (checkCoreVoltage()) */ /* This causes spurious cal fails some of the time (voltage sag?)*/
         {
             NON_FATAL_ERROR(VCC_UNDER_VOLTAGE_ERR);
         }

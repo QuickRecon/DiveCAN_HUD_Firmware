@@ -97,7 +97,7 @@ static void MX_GPIO_Init(void);
 static void MX_CAN1_Init(void);
 static void MX_TSC_Init(void);
 static void MX_CRC_Init(void);
-static void MX_IWDG_Init(void);
+//static void MX_IWDG_Init(void);
 void TSCTaskFunc(void *argument);
 void BlinkTaskFunc(void *argument);
 
@@ -109,8 +109,8 @@ void BlinkTaskFunc(void *argument);
 /* USER CODE BEGIN 0 */
 static inline int16_t div10_round(int16_t x)
 {
-    /* rounds x/10 to nearest integer, handles negatives safely via int64_t */
-    return (int16_t)(((int32_t)x + (x >= 0 ? 5 : -5)) / 10);
+  /* rounds x/10 to nearest integer, handles negatives safely via int64_t */
+  return (int16_t)(((int32_t)x + (x >= 0 ? 5 : -5)) / 10);
 }
 /* USER CODE END 0 */
 
@@ -147,7 +147,7 @@ int main(void)
   MX_TSC_Init();
   MX_TOUCHSENSING_Init();
   MX_CRC_Init();
-  //MX_IWDG_Init();
+  // MX_IWDG_Init();
   /* USER CODE BEGIN 2 */
   initLEDs();
   /* USER CODE END 2 */
@@ -200,7 +200,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    NVIC_SystemReset();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -324,33 +324,33 @@ static void MX_CRC_Init(void)
   /* USER CODE END CRC_Init 2 */
 }
 
-/**
- * @brief IWDG Initialization Function
- * @param None
- * @retval None
- */
-static void MX_IWDG_Init(void)
-{
+// /**
+//  * @brief IWDG Initialization Function
+//  * @param None
+//  * @retval None
+//  */
+// static void MX_IWDG_Init(void)
+// {
 
-  /* USER CODE BEGIN IWDG_Init 0 */
+//   /* USER CODE BEGIN IWDG_Init 0 */
 
-  /* USER CODE END IWDG_Init 0 */
+//   /* USER CODE END IWDG_Init 0 */
 
-  /* USER CODE BEGIN IWDG_Init 1 */
+//   /* USER CODE BEGIN IWDG_Init 1 */
 
-  /* USER CODE END IWDG_Init 1 */
-  hiwdg.Instance = IWDG;
-  hiwdg.Init.Prescaler = IWDG_PRESCALER_4;
-  hiwdg.Init.Window = 4095;
-  hiwdg.Init.Reload = 4095;
-  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN IWDG_Init 2 */
+//   /* USER CODE END IWDG_Init 1 */
+//   hiwdg.Instance = IWDG;
+//   hiwdg.Init.Prescaler = IWDG_PRESCALER_4;
+//   hiwdg.Init.Window = 4095;
+//   hiwdg.Init.Reload = 4095;
+//   if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+//   {
+//     Error_Handler();
+//   }
+//   /* USER CODE BEGIN IWDG_Init 2 */
 
-  /* USER CODE END IWDG_Init 2 */
-}
+//   /* USER CODE END IWDG_Init 2 */
+// }
 
 /**
  * @brief TSC Initialization Function
@@ -530,7 +530,7 @@ void BlinkTaskFunc(void *argument)
     cellValues.C1 = div10_round(cellValues.C1);
     cellValues.C2 = div10_round(cellValues.C2);
     cellValues.C3 = div10_round(cellValues.C3);
-    
+
     blinkCode((int8_t)cellValues.C1, (int8_t)cellValues.C2, (int8_t)cellValues.C3, 0b111);
   }
   /* USER CODE END BlinkTaskFunc */
@@ -566,10 +566,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+  NON_FATAL_ERROR(CRITICAL_ERR);
   /* USER CODE END Error_Handler_Debug */
 }
 #ifdef USE_FULL_ASSERT
@@ -580,7 +577,7 @@ void Error_Handler(void)
  * @param  line: assert_param error line source number
  * @retval None
  */
-void assert_failed(uint8_t *file, uint32_t line)
+void assert_failed(const uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,

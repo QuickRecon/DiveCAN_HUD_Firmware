@@ -1,27 +1,27 @@
 /**
-  ******************************************************************************
-  * @file    tsl_acq.c
-  * @author  MCD Application Team
-  * @brief   This file contains all functions to manage the acquisition.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
-  *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
-  *
-  *        http://www.st.com/software_license_agreement_liberty_v2
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    tsl_acq.c
+ * @author  MCD Application Team
+ * @brief   This file contains all functions to manage the acquisition.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+ *
+ * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ *
+ *        http://www.st.com/software_license_agreement_liberty_v2
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************
+ */
 
 /* Includes ------------------------------------------------------------------*/
 #include "tsl_acq.h"
@@ -34,12 +34,12 @@
 /* Private functions prototype -----------------------------------------------*/
 
 /**
-  * @brief Read all channels measurement of a Bank, calculate Delta
-  * @param[in]  idx_bk  Index of the Bank to access
-  * @param[in]  mfilter Pointer to the Measure filter function
-  * @param[in]  dfilter Pointer to the Delta filter function
-  * @retval Status
-  */
+ * @brief Read all channels measurement of a Bank, calculate Delta
+ * @param[in]  idx_bk  Index of the Bank to access
+ * @param[in]  mfilter Pointer to the Measure filter function
+ * @param[in]  dfilter Pointer to the Delta filter function
+ * @retval Status
+ */
 TSL_Status_enum_T TSL_acq_BankGetResult(TSL_tIndex_T idx_bk, TSL_pFuncMeasFilter_T mfilter, TSL_pFuncDeltaFilter_T dfilter)
 {
   TSL_Status_enum_T retval = TSL_STATUS_OK;
@@ -144,18 +144,16 @@ TSL_Status_enum_T TSL_acq_BankGetResult(TSL_tIndex_T idx_bk, TSL_pFuncMeasFilter
     // Next channel
     pchDest++;
     pchSrc++;
-
   }
 
   return retval;
 }
 
-
 /**
-  * @brief Calibrate a Bank
-  * @param[in] idx_bk  Index of the Bank to access
-  * @retval Status
-  */
+ * @brief Calibrate a Bank
+ * @param[in] idx_bk  Index of the Bank to access
+ * @retval Status
+ */
 TSL_Status_enum_T TSL_acq_BankCalibrate(TSL_tIndex_T idx_bk)
 {
   TSL_Status_enum_T retval;
@@ -167,8 +165,8 @@ TSL_Status_enum_T TSL_acq_BankCalibrate(TSL_tIndex_T idx_bk)
   static TSL_tNb_T calibration_done = 0;
   static TSL_tNb_T div;
   CONST TSL_Bank_T *bank;
-  CONST  TSL_ChannelDest_T *pchDest; // Pointer to the current channel
-  CONST TSL_ChannelSrc_T *pchSrc; // Pointer to the current channel
+  CONST TSL_ChannelDest_T *pchDest; // Pointer to the current channel
+  CONST TSL_ChannelSrc_T *pchSrc;   // Pointer to the current channel
 
   if (idx_bk >= TSLPRM_TOTAL_BANKS)
   {
@@ -181,16 +179,16 @@ TSL_Status_enum_T TSL_acq_BankCalibrate(TSL_tIndex_T idx_bk)
   {
     switch (TSL_Params.NbCalibSamples)
     {
-      case 4:
-        div = 2;
-        break;
-      case 16:
-        div = 4;
-        break;
-      default:
-        TSL_Params.NbCalibSamples =  8;
-        div = 3;
-        break;
+    case 4:
+      div = 2;
+      break;
+    case 16:
+      div = 4;
+      break;
+    default:
+      TSL_Params.NbCalibSamples = 8;
+      div = 3;
+      break;
     }
     // Clear data for all channels of the bank
     TSL_acq_BankClearData(idx_bk);
@@ -211,7 +209,6 @@ TSL_Status_enum_T TSL_acq_BankCalibrate(TSL_tIndex_T idx_bk)
       calibration_ongoing = 0;
       retval = TSL_STATUS_ERROR;
     }
-
   }
   else // Calibration is on-going
   {
@@ -283,30 +280,28 @@ TSL_Status_enum_T TSL_acq_BankCalibrate(TSL_tIndex_T idx_bk)
         retval = TSL_STATUS_BUSY;
       }
     }
+    else if (acq_status == TSL_STATUS_ERROR)
+    {
+      // Stop calibration
+      // Clear data for all channels of the bank
+      TSL_acq_BankClearData(idx_bk);
+      calibration_ongoing = 0;
+      retval = TSL_STATUS_ERROR;
+    }
     else
-      if (acq_status == TSL_STATUS_ERROR)
-      {
-        // Stop calibration
-        // Clear data for all channels of the bank
-        TSL_acq_BankClearData(idx_bk);
-        calibration_ongoing = 0;
-        retval = TSL_STATUS_ERROR;
-      }
-      else
-      {
-        retval = TSL_STATUS_BUSY;
-      }
+    {
+      retval = TSL_STATUS_BUSY;
+    }
   }
 
   return retval;
 }
 
-
 /**
-  * @brief Clear Reference and Delta on all channels of a Bank
-  * @param[in] idx_bk  Index of the Bank to access
-  * @retval None
-  */
+ * @brief Clear Reference and Delta on all channels of a Bank
+ * @param[in] idx_bk  Index of the Bank to access
+ * @retval None
+ */
 void TSL_acq_BankClearData(TSL_tIndex_T idx_bk)
 {
   TSL_tIndex_T idx_ch;

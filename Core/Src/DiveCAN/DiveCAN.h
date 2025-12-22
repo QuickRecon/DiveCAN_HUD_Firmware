@@ -24,7 +24,8 @@ extern "C"
         uint8_t firmwareVersion;
     } DiveCANDevice_t;
 
-    typedef struct {
+    typedef struct
+    {
         int16_t C1;
         int16_t C2;
         int16_t C3;

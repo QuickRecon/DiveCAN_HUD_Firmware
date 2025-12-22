@@ -1,27 +1,27 @@
 /**
-  ******************************************************************************
-  * @file    tsl_filter.c
-  * @author  MCD Application Team
-  * @brief   This file contains all functions to manage the signal or delta filters.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
-  *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
-  *
-  *        http://www.st.com/software_license_agreement_liberty_v2
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    tsl_filter.c
+ * @author  MCD Application Team
+ * @brief   This file contains all functions to manage the signal or delta filters.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+ *
+ * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ *
+ *        http://www.st.com/software_license_agreement_liberty_v2
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************
+ */
 
 /* Includes ------------------------------------------------------------------*/
 #include "tsl_filter.h"
@@ -90,16 +90,16 @@ Meas(n) = Meas(n-1) + K.[ Meas(n)*2^P - Meas(n-1)]/2^8
 In this case the static error is reduced to 1/(k.2^P)
 */
 
-#define ACQ_FILTER_RANGE (0)   /* Range[0..5] - Warning: all thresholds must be shifted if different from 0 */
+#define ACQ_FILTER_RANGE (0) /* Range[0..5] - Warning: all thresholds must be shifted if different from 0 */
 
 #define ACQ_FILTER_COEFF (128) /* Range[1..255] - First order filter coefficient (k = ACQ_FILTER_COEFF/256) */
 
 /**
-  * @brief Example of measure value filter
-  * @param[in] measn1 Previous measure value
-  * @param[in] measn  Current measure value
-  * @retval Filtered measure
-  */
+ * @brief Example of measure value filter
+ * @param[in] measn1 Previous measure value
+ * @param[in] measn  Current measure value
+ * @retval Filtered measure
+ */
 TSL_tMeas_T TSL_filt_MeasFilter(TSL_tMeas_T measn1, TSL_tMeas_T measn)
 {
   TSL_tMeas_T val;
@@ -118,18 +118,17 @@ TSL_tMeas_T TSL_filt_MeasFilter(TSL_tMeas_T measn1, TSL_tMeas_T measn)
     }
   }
 
-  return(val);
+  return (val);
 }
 
-
 /**
-  * @brief Example of delta value filter
-  * @param[in] delta  Delta value to modify
-  * @retval Filtered delta
-  */
+ * @brief Example of delta value filter
+ * @param[in] delta  Delta value to modify
+ * @retval Filtered delta
+ */
 TSL_tDelta_T TSL_filt_DeltaFilter(TSL_tDelta_T delta)
 {
-  return(delta);
+  return (delta);
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

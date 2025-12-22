@@ -1,28 +1,28 @@
 /**
-  ******************************************************************************
-  * @file    tsl_check_config.h
-  * @author  MCD Application Team
-  * @brief   This file contains the check of all parameters defined in the
-  *          common configuration file.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
-  *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
-  *
-  *        http://www.st.com/software_license_agreement_liberty_v2
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    tsl_check_config.h
+ * @author  MCD Application Team
+ * @brief   This file contains the check of all parameters defined in the
+ *          common configuration file.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+ *
+ * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ *
+ *        http://www.st.com/software_license_agreement_liberty_v2
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************
+ */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __TSL_CHECK_CONFIG_H
@@ -99,11 +99,11 @@
 #error "TSLPRM_ACQ_MAX is not defined."
 #endif
 
-#if ((TSLPRM_ACQ_MIN < 1) || (TSLPRM_ACQ_MIN > (TSLPRM_ACQ_MAX-1)))
+#if ((TSLPRM_ACQ_MIN < 1) || (TSLPRM_ACQ_MIN > (TSLPRM_ACQ_MAX - 1)))
 #error "TSLPRM_ACQ_MIN is out of range (1 .. ACQ_MAX-1)."
 #endif
 
-#if ((TSLPRM_ACQ_MAX < (TSLPRM_ACQ_MIN+1)) || (TSLPRM_ACQ_MAX > 50000))
+#if ((TSLPRM_ACQ_MAX < (TSLPRM_ACQ_MIN + 1)) || (TSLPRM_ACQ_MAX > 50000))
 #error "TSLPRM_ACQ_MAX is out of range (ACQ_MIN+1 .. 50000)."
 #endif
 
@@ -117,12 +117,12 @@
 #error "TSLPRM_TKEY_PROX_OUT_TH is not defined."
 #endif
 
-#if ((TSLPRM_TKEY_PROX_OUT_TH < 0) || (TSLPRM_TKEY_PROX_OUT_TH > (TSLPRM_TKEY_PROX_IN_TH-1)))
+#if ((TSLPRM_TKEY_PROX_OUT_TH < 0) || (TSLPRM_TKEY_PROX_OUT_TH > (TSLPRM_TKEY_PROX_IN_TH - 1)))
 #error "TSLPRM_TKEY_PROX_OUT_TH is out of range (0 .. TSLPRM_TKEY_PROX_IN_TH-1)."
 #endif
 
 #if TSLPRM_COEFF_TH == 0
-#if ((TSLPRM_TKEY_PROX_IN_TH < (TSLPRM_TKEY_PROX_OUT_TH+1)) || (TSLPRM_TKEY_PROX_IN_TH > (TSLPRM_TKEY_DETECT_OUT_TH-1)))
+#if ((TSLPRM_TKEY_PROX_IN_TH < (TSLPRM_TKEY_PROX_OUT_TH + 1)) || (TSLPRM_TKEY_PROX_IN_TH > (TSLPRM_TKEY_DETECT_OUT_TH - 1)))
 #error "TSLPRM_TKEY_PROX_IN_TH is out of range (TSLPRM_TKEY_PROX_OUT_TH+1 .. TSLPRM_TKEY_DETECT_OUT_TH-1)."
 #endif
 #endif
@@ -137,12 +137,12 @@
 #error "TSLPRM_LINROT_PROX_OUT_TH is not defined."
 #endif
 
-#if ((TSLPRM_LINROT_PROX_OUT_TH < 0) || (TSLPRM_LINROT_PROX_OUT_TH > (TSLPRM_LINROT_PROX_IN_TH-1)))
+#if ((TSLPRM_LINROT_PROX_OUT_TH < 0) || (TSLPRM_LINROT_PROX_OUT_TH > (TSLPRM_LINROT_PROX_IN_TH - 1)))
 #error "TSLPRM_LINROT_PROX_OUT_TH is out of range (0 .. TSLPRM_LINROT_PROX_IN_TH-1)."
 #endif
 
 #if TSLPRM_COEFF_TH == 0
-#if ((TSLPRM_LINROT_PROX_IN_TH < (TSLPRM_LINROT_PROX_OUT_TH+1)) || (TSLPRM_LINROT_PROX_IN_TH > (TSLPRM_LINROT_DETECT_OUT_TH-1)))
+#if ((TSLPRM_LINROT_PROX_IN_TH < (TSLPRM_LINROT_PROX_OUT_TH + 1)) || (TSLPRM_LINROT_PROX_IN_TH > (TSLPRM_LINROT_DETECT_OUT_TH - 1)))
 #error "TSLPRM_LINROT_PROX_IN_TH is out of range (TSLPRM_LINROT_PROX_OUT_TH+1 .. TSLPRM_LINROT_DETECT_OUT_TH-1)."
 #endif
 #endif
@@ -158,12 +158,12 @@
 #endif
 
 #if TSLPRM_COEFF_TH == 0
-#if ((TSLPRM_TKEY_DETECT_OUT_TH < (TSLPRM_TKEY_PROX_IN_TH+1)) || (TSLPRM_TKEY_DETECT_OUT_TH > (TSLPRM_TKEY_DETECT_IN_TH-1)))
+#if ((TSLPRM_TKEY_DETECT_OUT_TH < (TSLPRM_TKEY_PROX_IN_TH + 1)) || (TSLPRM_TKEY_DETECT_OUT_TH > (TSLPRM_TKEY_DETECT_IN_TH - 1)))
 #error "TSLPRM_TKEY_DETECT_OUT_TH is out of range (TSLPRM_TKEY_PROX_IN_TH+1 .. TSLPRM_TKEY_DETECT_IN_TH-1)."
 #endif
 #endif
 
-#if ((TSLPRM_TKEY_DETECT_IN_TH < (TSLPRM_TKEY_DETECT_OUT_TH+1)) || (TSLPRM_TKEY_DETECT_IN_TH > 255))
+#if ((TSLPRM_TKEY_DETECT_IN_TH < (TSLPRM_TKEY_DETECT_OUT_TH + 1)) || (TSLPRM_TKEY_DETECT_IN_TH > 255))
 #error "TSLPRM_TKEY_DETECT_IN_TH is out of range (TSLPRM_TKEY_DETECT_OUT_TH+1 .. 255)."
 #endif
 
@@ -178,12 +178,12 @@
 #endif
 
 #if TSLPRM_COEFF_TH == 0
-#if ((TSLPRM_LINROT_DETECT_OUT_TH < (TSLPRM_LINROT_PROX_IN_TH+1)) || (TSLPRM_LINROT_DETECT_OUT_TH > (TSLPRM_LINROT_DETECT_IN_TH-1)))
+#if ((TSLPRM_LINROT_DETECT_OUT_TH < (TSLPRM_LINROT_PROX_IN_TH + 1)) || (TSLPRM_LINROT_DETECT_OUT_TH > (TSLPRM_LINROT_DETECT_IN_TH - 1)))
 #error "TSLPRM_LINROT_DETECT_OUT_TH is out of range (TSLPRM_LINROT_PROX_IN_TH+1 .. TSLPRM_LINROT_DETECT_IN_TH-1)."
 #endif
 #endif
 
-#if ((TSLPRM_LINROT_DETECT_IN_TH < (TSLPRM_LINROT_DETECT_OUT_TH+1)) || (TSLPRM_LINROT_DETECT_IN_TH > 255))
+#if ((TSLPRM_LINROT_DETECT_IN_TH < (TSLPRM_LINROT_DETECT_OUT_TH + 1)) || (TSLPRM_LINROT_DETECT_IN_TH > 255))
 #error "TSLPRM_LINROT_DETECT_IN_TH is out of range (TSLPRM_LINROT_DETECT_OUT_TH+1 .. 255)."
 #endif
 
@@ -383,7 +383,7 @@
 #error "TSLPRM_TICK_FREQ is not defined."
 #endif
 
-#if ((TSLPRM_TICK_FREQ != 125) && (TSLPRM_TICK_FREQ != 250) && (TSLPRM_TICK_FREQ != 500) &&\
+#if ((TSLPRM_TICK_FREQ != 125) && (TSLPRM_TICK_FREQ != 250) && (TSLPRM_TICK_FREQ != 500) && \
      (TSLPRM_TICK_FREQ != 1000) && (TSLPRM_TICK_FREQ != 2000))
 #error "TSLPRM_TICK_FREQ is out of range (125, 250, 500, 1000, 2000)."
 #endif

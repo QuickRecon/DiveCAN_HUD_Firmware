@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * File Name          : freertos.c
-  * Description        : Code for freertos applications
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * File Name          : freertos.c
+ * Description        : Code for freertos applications
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2025 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -63,17 +63,16 @@ void vApplicationMallocFailedHook(void);
 /* Functions needed when configGENERATE_RUN_TIME_STATS is on */
 __weak void configureTimerForRunTimeStats(void)
 {
-
 }
 
 __weak unsigned long getRunTimeCounterValue(void)
 {
-return 0;
+   return 0;
 }
 /* USER CODE END 1 */
 
 /* USER CODE BEGIN 2 */
-void vApplicationIdleHook( void )
+void vApplicationIdleHook(void)
 {
    /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
    to 1 in FreeRTOSConfig.h. It will be called on each iteration of the idle
@@ -115,12 +114,12 @@ void vApplicationMallocFailedHook(void)
 /* USER CODE BEGIN PREPOSTSLEEP */
 __weak void PreSleepProcessing(uint32_t ulExpectedIdleTime)
 {
-/* place for user code */
+   /* place for user code */
 }
 
 __weak void PostSleepProcessing(uint32_t ulExpectedIdleTime)
 {
-/* place for user code */
+   /* place for user code */
 }
 /* USER CODE END PREPOSTSLEEP */
 
@@ -128,4 +127,3 @@ __weak void PostSleepProcessing(uint32_t ulExpectedIdleTime)
 /* USER CODE BEGIN Application */
 
 /* USER CODE END Application */
-

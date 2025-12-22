@@ -8,7 +8,6 @@ extern IWDG_HandleTypeDef hiwdg;
 
 extern CAN_HandleTypeDef hcan1;
 
-
 /**
  * @brief Go to our lowest power mode that we can be woken from by the DiveCAN bus
  * @param config The device config, needed to ensure that we don't let the O2S cells go into analog standby mode, we can't get the input impedence above ~118kOhm and we need it above 150kOhm to get it to stay out of analog mode
@@ -17,7 +16,7 @@ void Shutdown()
 {
     /* We've been asked to shut down cleanly, reset the last fatal reason so we're not logging upsets when we start back up again*/
     bool writeErrOk = SetFatalError(NONE_FERR);
-    if(!writeErrOk)
+    if (!writeErrOk)
     {
         serial_printf("Failed to reset last fatal error on shutdown");
     }

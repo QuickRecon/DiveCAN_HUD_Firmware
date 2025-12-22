@@ -1,27 +1,27 @@
 /**
-  ******************************************************************************
-  * @file    tsl_ecs.c
-  * @author  MCD Application Team
-  * @brief   This file contains all functions to manage the ECS.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
-  *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
-  *
-  *        http://www.st.com/software_license_agreement_liberty_v2
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    tsl_ecs.c
+ * @author  MCD Application Team
+ * @brief   This file contains all functions to manage the ECS.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+ *
+ * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ *
+ *        http://www.st.com/software_license_agreement_liberty_v2
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************
+ */
 
 /* Includes ------------------------------------------------------------------*/
 #include "tsl_ecs.h"
@@ -30,30 +30,30 @@
 /* Private typedefs ----------------------------------------------------------*/
 /* Private defines -----------------------------------------------------------*/
 
-#define THIS_OBJ_TYPE      TSL_Globals.This_Obj->Type
-#define THIS_TKEY_REF      TSL_Globals.This_TKey->p_ChD->Ref
-#define THIS_TKEY_REFREST  TSL_Globals.This_TKey->p_ChD->RefRest
-#define THIS_TKEY_DELTA    TSL_Globals.This_TKey->p_ChD->Delta
-#define THIS_TKEY_STATEID  TSL_Globals.This_TKey->p_Data->StateId
+#define THIS_OBJ_TYPE TSL_Globals.This_Obj->Type
+#define THIS_TKEY_REF TSL_Globals.This_TKey->p_ChD->Ref
+#define THIS_TKEY_REFREST TSL_Globals.This_TKey->p_ChD->RefRest
+#define THIS_TKEY_DELTA TSL_Globals.This_TKey->p_ChD->Delta
+#define THIS_TKEY_STATEID TSL_Globals.This_TKey->p_Data->StateId
 
-#define THIS_LINROT_STATEID      TSL_Globals.This_LinRot->p_Data->StateId
-#define THIS_LINROT_NB_CHANNELS  TSL_Globals.This_LinRot->NbChannels
+#define THIS_LINROT_STATEID TSL_Globals.This_LinRot->p_Data->StateId
+#define THIS_LINROT_NB_CHANNELS TSL_Globals.This_LinRot->NbChannels
 
 /* Private macros ------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
 /* Private functions prototype -----------------------------------------------*/
 
 /**
-  * @brief Calculate the K coefficient
-  * @param[in] objgrp Pointer to the objects group to process
-  * @param[in] k_slow  K coefficient when objects have different delta variation
-  * @param[in] k_fast  K coefficient when objects have the same delta variation
-  * @retval    K coefficient (slow or fast)
-  */
+ * @brief Calculate the K coefficient
+ * @param[in] objgrp Pointer to the objects group to process
+ * @param[in] k_slow  K coefficient when objects have different delta variation
+ * @param[in] k_fast  K coefficient when objects have the same delta variation
+ * @retval    K coefficient (slow or fast)
+ */
 TSL_tKCoeff_T TSL_ecs_CalcK(TSL_ObjectGroup_T *objgrp, TSL_tKCoeff_T k_slow, TSL_tKCoeff_T k_fast)
 {
-  TSL_tIndex_T idx_obj; // Index of current object
-  TSL_tIndex_T idx_ch; // Index of current channel
+  TSL_tIndex_T idx_obj;    // Index of current object
+  TSL_tIndex_T idx_ch;     // Index of current channel
   TSL_tDelta_T ldelta = 0; // Temporary delta
   TSL_tDelta_T ECS_Fast_Enable = 1;
   TSL_tDelta_T ECS_Fast_Direction = 0;
@@ -63,8 +63,10 @@ TSL_tKCoeff_T TSL_ecs_CalcK(TSL_ObjectGroup_T *objgrp, TSL_tKCoeff_T k_slow, TSL
   TSL_ChannelData_T *p_Ch = 0;
 
   // Check parameters
-  if (k_slow > 255) k_slow = 255;
-  if (k_fast > 255) k_fast = 255;
+  if (k_slow > 255)
+    k_slow = 255;
+  if (k_fast > 255)
+    k_fast = 255;
 
   pobj = objgrp->p_Obj; // First object in the group
 
@@ -81,7 +83,7 @@ TSL_tKCoeff_T TSL_ecs_CalcK(TSL_ObjectGroup_T *objgrp, TSL_tKCoeff_T k_slow, TSL
       // Ignore object if not in Release state (OFF or Error in this case)
       if (THIS_TKEY_STATEID != TSL_STATEID_RELEASE)
       {
-        pobj++; // Next object
+        pobj++;   // Next object
         continue; // Stop processing of current object
       }
       nb_channels = 1;
@@ -96,7 +98,7 @@ TSL_tKCoeff_T TSL_ecs_CalcK(TSL_ObjectGroup_T *objgrp, TSL_tKCoeff_T k_slow, TSL
       // Ignore object if not in Release state (OFF or Error in this case)
       if (THIS_LINROT_STATEID != TSL_STATEID_RELEASE)
       {
-        pobj++; // Next object
+        pobj++;   // Next object
         continue; // Stop processing of current object
       }
       nb_channels = THIS_LINROT_NB_CHANNELS;
@@ -105,7 +107,8 @@ TSL_tKCoeff_T TSL_ecs_CalcK(TSL_ObjectGroup_T *objgrp, TSL_tKCoeff_T k_slow, TSL
 #endif
 
     // Check channel pointer variable
-    if (p_Ch == 0) return 0;
+    if (p_Ch == 0)
+      return 0;
 
     // Check all channels of current object
     for (idx_ch = 0; idx_ch < nb_channels; idx_ch++)
@@ -161,27 +164,27 @@ TSL_tKCoeff_T TSL_ecs_CalcK(TSL_ObjectGroup_T *objgrp, TSL_tKCoeff_T k_slow, TSL
   return retval;
 }
 
-
 /**
-  * @brief Calculate the new Reference on a group of objects
-  * @param[in] objgrp Pointer to the objects group to process
-  * @param[in] Kcoeff K coefficient to apply
-  * @retval None
-  */
+ * @brief Calculate the new Reference on a group of objects
+ * @param[in] objgrp Pointer to the objects group to process
+ * @param[in] Kcoeff K coefficient to apply
+ * @retval None
+ */
 void TSL_ecs_ProcessK(TSL_ObjectGroup_T *objgrp, TSL_tKCoeff_T Kcoeff)
 {
   TSL_tIndex_T idx_obj; // Index of current object
-  TSL_tIndex_T idx_ch; // Index of current channel
+  TSL_tIndex_T idx_ch;  // Index of current channel
   CONST TSL_Object_T *pobj;
   TSL_tKCoeff_T Kcoeff_comp;
   uint32_t ECS_meas;
   uint32_t ECS_ref;
   TSL_tNb_T nb_channels = 0; // Number of channels inside current object
   TSL_ChannelData_T *p_Ch = 0;
-  void(*pFunc_SetStateCalibration)(TSL_tCounter_T delay) = 0;
+  void (*pFunc_SetStateCalibration)(TSL_tCounter_T delay) = 0;
 
   // Check parameter
-  if (Kcoeff > 255) Kcoeff = 255;
+  if (Kcoeff > 255)
+    Kcoeff = 255;
 
   pobj = objgrp->p_Obj; // First object in the group
 
@@ -201,7 +204,7 @@ void TSL_ecs_ProcessK(TSL_ObjectGroup_T *objgrp, TSL_tKCoeff_T Kcoeff)
       // Ignore object if not in Release state (OFF or Error in this case)
       if (THIS_TKEY_STATEID != TSL_STATEID_RELEASE)
       {
-        pobj++; // Next object
+        pobj++;   // Next object
         continue; // Stop processing of current object
       }
       nb_channels = 1;
@@ -217,7 +220,7 @@ void TSL_ecs_ProcessK(TSL_ObjectGroup_T *objgrp, TSL_tKCoeff_T Kcoeff)
       // Ignore object if not in Release state (OFF or Error in this case)
       if (THIS_LINROT_STATEID != TSL_STATEID_RELEASE)
       {
-        pobj++; // Next object
+        pobj++;   // Next object
         continue; // Stop processing of current object
       }
       nb_channels = THIS_LINROT_NB_CHANNELS;
@@ -227,7 +230,8 @@ void TSL_ecs_ProcessK(TSL_ObjectGroup_T *objgrp, TSL_tKCoeff_T Kcoeff)
 #endif
 
     // Check channel pointer variable
-    if (p_Ch == 0) return;
+    if (p_Ch == 0)
+      return;
 
     // Calculate the new reference + rest for all channels
     for (idx_ch = 0; idx_ch < nb_channels; idx_ch++)
@@ -256,18 +260,16 @@ void TSL_ecs_ProcessK(TSL_ObjectGroup_T *objgrp, TSL_tKCoeff_T Kcoeff)
     pobj++; // Next object
 
   } // for all objects
-
 }
 
-
 /**
-  * @brief ECS algorithm on a group of objects
-  * The ECS is only performed if at least an object is in Release state and
-  * if no objects are in active states (Prox, Detect or Touch)
-  * An optional delay is added after the ECS condition (all sensors in Release state) is reached.
-  * @param[in] objgrp Pointer to the objects group to process
-  * @retval Status
-  */
+ * @brief ECS algorithm on a group of objects
+ * The ECS is only performed if at least an object is in Release state and
+ * if no objects are in active states (Prox, Detect or Touch)
+ * An optional delay is added after the ECS condition (all sensors in Release state) is reached.
+ * @param[in] objgrp Pointer to the objects group to process
+ * @retval Status
+ */
 TSL_Status_enum_T TSL_ecs_Process(TSL_ObjectGroup_T *objgrp)
 {
   TSL_tKCoeff_T MyKcoeff;

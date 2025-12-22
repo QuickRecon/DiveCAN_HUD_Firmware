@@ -1,27 +1,27 @@
 /**
-  ******************************************************************************
-  * @file    tsl_acq_tsc.c
-  * @author  MCD Application Team
-  * @brief   This file contains all functions to manage the TSC acquisition.
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
-  *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
-  *
-  *        http://www.st.com/software_license_agreement_liberty_v2
-  *
-  * Unless required by applicable law or agreed to in writing, software
-  * distributed under the License is distributed on an "AS IS" BASIS,
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file    tsl_acq_tsc.c
+ * @author  MCD Application Team
+ * @brief   This file contains all functions to manage the TSC acquisition.
+ ******************************************************************************
+ * @attention
+ *
+ * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+ *
+ * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+ * You may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at:
+ *
+ *        http://www.st.com/software_license_agreement_liberty_v2
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ ******************************************************************************
+ */
 
 /* Includes ------------------------------------------------------------------*/
 #include "tsl_acq_tsc.h"
@@ -36,10 +36,10 @@
 static void SoftDelay(uint32_t val);
 
 /**
-  * @brief Configures a Bank.
-  * @param[in] idx_bk  Index of the Bank to configure
-  * @retval Status
-  */
+ * @brief Configures a Bank.
+ * @param[in] idx_bk  Index of the Bank to configure
+ * @retval Status
+ */
 TSL_Status_enum_T TSL_acq_BankConfig(TSL_tIndex_T idx_bk)
 {
   uint32_t idx_ch;
@@ -60,7 +60,7 @@ TSL_Status_enum_T TSL_acq_BankConfig(TSL_tIndex_T idx_bk)
   bank = &(TSL_Globals.Bank_Array[idx_bk]);
   pchSrc = bank->p_chSrc;
   pchDest = bank->p_chDest;
-  
+
   // Mark the current bank processed
   TSL_Globals.This_Bank = idx_bk;
 
@@ -107,12 +107,11 @@ TSL_Status_enum_T TSL_acq_BankConfig(TSL_tIndex_T idx_bk)
   return TSL_STATUS_OK;
 }
 
-
 /**
-  * @brief Start acquisition on a previously configured bank
-  * @param None
-  * @retval None
-  */
+ * @brief Start acquisition on a previously configured bank
+ * @param None
+ * @retval None
+ */
 void TSL_acq_BankStartAcq(void)
 {
   // Clear both EOAIC and MCEIC flags
@@ -134,10 +133,10 @@ void TSL_acq_BankStartAcq(void)
 }
 
 /**
-  * @brief Start acquisition in Interrupt mode on a previously configured bank
-  * @param None
-  * @retval None
-  */
+ * @brief Start acquisition in Interrupt mode on a previously configured bank
+ * @param None
+ * @retval None
+ */
 void TSL_acq_BankStartAcq_IT(void)
 {
   // Clear both EOAIC and MCEIC flags
@@ -153,16 +152,16 @@ void TSL_acq_BankStartAcq_IT(void)
 
   // Set both EOA and MCE interrupts
   TSC->IER |= 0x03;
-  
+
   // Start acquisition
   TSC->CR |= 0x02;
 }
 
 /**
-  * @brief Wait end of acquisition
-  * @param None
-  * @retval Status
-  */
+ * @brief Wait end of acquisition
+ * @param None
+ * @retval Status
+ */
 TSL_Status_enum_T TSL_acq_BankWaitEOC(void)
 {
   TSL_Status_enum_T retval = TSL_STATUS_BUSY;
@@ -190,117 +189,110 @@ TSL_Status_enum_T TSL_acq_BankWaitEOC(void)
   return retval;
 }
 
-
 /**
-  * @brief Return the current measure
-  * @param[in] index Index of the measure source
-  * @retval Measure
-  */
+ * @brief Return the current measure
+ * @param[in] index Index of the measure source
+ * @retval Measure
+ */
 TSL_tMeas_T TSL_acq_GetMeas(TSL_tIndex_T index)
 {
   if (index < TSC_NB_GROUPS_SUPPORTED)
   {
-    return((TSL_tMeas_T)(TSC->IOGXCR[index]));
+    return ((TSL_tMeas_T)(TSC->IOGXCR[index]));
   }
   else
   {
-    return((TSL_tMeas_T)0);
+    return ((TSL_tMeas_T)0);
   }
 }
 
-
 /**
-  * @brief Compute the Delta value
-  * @param[in] ref Reference value
-  * @param[in] meas Last Measurement value
-  * @retval Delta value
-  */
+ * @brief Compute the Delta value
+ * @param[in] ref Reference value
+ * @param[in] meas Last Measurement value
+ * @retval Delta value
+ */
 TSL_tDelta_T TSL_acq_ComputeDelta(TSL_tRef_T ref, TSL_tMeas_T meas)
 {
-  return((TSL_tDelta_T)(ref - meas));
+  return ((TSL_tDelta_T)(ref - meas));
 }
 
-
 /**
-  * @brief Compute the Measurement value
-  * @param[in] ref Reference value
-  * @param[in] delta Delta value
-  * @retval Measurement value
-  */
+ * @brief Compute the Measurement value
+ * @param[in] ref Reference value
+ * @param[in] delta Delta value
+ * @retval Measurement value
+ */
 TSL_tMeas_T TSL_acq_ComputeMeas(TSL_tRef_T ref, TSL_tDelta_T delta)
 {
-  return((TSL_tMeas_T)(ref - delta));
+  return ((TSL_tMeas_T)(ref - delta));
 }
 
-
 /**
-  * @brief  Check noise (not used)
-  * @param  None
-  * @retval Status
-  */
+ * @brief  Check noise (not used)
+ * @param  None
+ * @retval Status
+ */
 TSL_AcqStatus_enum_T TSL_acq_CheckNoise(void)
 {
   return TSL_ACQ_STATUS_OK;
 }
 
-
 /**
-  * @brief Check if a filter must be used on the current channel (not used)
-  * @param[in] pCh Pointer on the channel data information
-  * @retval Result TRUE if a filter can be applied
-  */
+ * @brief Check if a filter must be used on the current channel (not used)
+ * @param[in] pCh Pointer on the channel data information
+ * @retval Result TRUE if a filter can be applied
+ */
 TSL_Bool_enum_T TSL_acq_UseFilter(TSL_ChannelData_T *pCh)
 {
   return TSL_TRUE;
 }
 
-
 /**
-  * @brief Test if the Reference is incorrect (not used)
-  * @param[in] pCh Pointer on the channel data information
-  * @retval Result TRUE if the Reference is out of range
-  */
+ * @brief Test if the Reference is incorrect (not used)
+ * @param[in] pCh Pointer on the channel data information
+ * @retval Result TRUE if the Reference is out of range
+ */
 TSL_Bool_enum_T TSL_acq_TestReferenceOutOfRange(TSL_ChannelData_T *pCh)
 {
   return TSL_FALSE;
 }
 
-
 /**
-  * @brief Test if the measure has crossed the reference target (not used)
-  * @param[in] pCh Pointer on the channel data information
-  * @param[in] new_meas Measure of the last acquisition on this channel
-  * @retval Result TRUE if the Reference is valid
-  */
+ * @brief Test if the measure has crossed the reference target (not used)
+ * @param[in] pCh Pointer on the channel data information
+ * @param[in] new_meas Measure of the last acquisition on this channel
+ * @retval Result TRUE if the Reference is valid
+ */
 TSL_Bool_enum_T TSL_acq_TestFirstReferenceIsValid(TSL_ChannelData_T *pCh, TSL_tMeas_T new_meas)
 {
   return TSL_TRUE;
 }
 
-
 #if defined(__IAR_SYSTEMS_ICC__) // IAR/EWARM
-#pragma optimize=low
+#pragma optimize = low
 #elif defined(__CC_ARM) // Keil/MDK-ARM
 #pragma O1
 #pragma Ospace
 #elif defined(__GNUC__) // Atollic/True Studio + AC6/SW4STM32
 #pragma GCC push_options
-#pragma GCC optimize ("O0")
+#pragma GCC optimize("O0")
 #endif
 /**
-  * @brief  Software delay (private routine)
-  * @param  val Wait delay
-  * @retval None
-  * @note Measurements done with HCLK=72MHz and Keil/MDK-ARM compiler
-  * val =  500: ~ 63µs
-  * val = 1000: ~126µs
-  * val = 2000: ~251µs
-  */
+ * @brief  Software delay (private routine)
+ * @param  val Wait delay
+ * @retval None
+ * @note Measurements done with HCLK=72MHz and Keil/MDK-ARM compiler
+ * val =  500: ~ 63ï¿½s
+ * val = 1000: ~126ï¿½s
+ * val = 2000: ~251ï¿½s
+ */
 void SoftDelay(uint32_t val)
 {
   volatile uint32_t idx;
   for (idx = val; idx > 0; idx--)
-  {}
+  {
+  }
 }
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

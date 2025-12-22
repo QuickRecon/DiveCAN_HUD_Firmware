@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * File Name    tsl_conf.h
-  * Description   TSC configuration file.
-  ******************************************************************************
-  ******************************************************************************
-   * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * File Name    tsl_conf.h
+ * Description   TSC configuration file.
+ ******************************************************************************
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2025 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
@@ -29,30 +29,30 @@
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
 /** @defgroup Common_Parameters Common Parameters
-  * @{ */
+ * @{ */
 
 /*============================================================================*/
 /* Number of elements                                                         */
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_Number_Of_Elements 01 - Number of elements
-  * @{ */
+ * @{ */
 
 /** Total number of channels in application (range=1..255)
-*/
+ */
 #define TSLPRM_TOTAL_CHANNELS (1)
 
 /** Total number of banks in application (range=1..255)
-*/
+ */
 
 #define TSLPRM_TOTAL_BANKS (1)
 
 /** Total number of "Extended" TouchKeys in application (range=0..255)
-*/
+ */
 #define TSLPRM_TOTAL_TOUCHKEYS (0)
 
 /** Total number of "Basic" TouchKeys in application (range=0..255)
-*/
+ */
 #define TSLPRM_TOTAL_TOUCHKEYS_B (1)
 
 /** Total number of "Extended" Linear and Rotary sensors in application (range=0..255)
@@ -82,7 +82,7 @@
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_Options 02 - Optional features
-  * @{ */
+ * @{ */
 
 /** Record the last measure (0=No, 1=Yes)
   - If No the measure is recalculated using the Reference and Delta
@@ -90,7 +90,7 @@
 #define TSLPRM_USE_MEAS (1)
 
 /** Proximity detection usage (0=No, 1=Yes)
-*/
+ */
 #define TSLPRM_USE_PROX (1)
 
 /** @} Common_Parameters_Options */
@@ -100,7 +100,7 @@
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_Acquisition_Limits 03 - Acquisition limits
-  * @{ */
+ * @{ */
 
 /** Minimum acquisition measurement (range=0..65535)
   - This is the minimum acceptable value for the acquisition measure.
@@ -121,7 +121,7 @@
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_Calibration 04 - Calibration
-  * @{ */
+ * @{ */
 
 /** Number of calibration samples (range=4, 8, 16)
   - Low value = faster calibration but less precision.
@@ -142,7 +142,7 @@
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_TouchKey_Thresholds 05 - Thresholds for TouchKey sensors
-  * @{ */
+ * @{ */
 
 /** TouchKeys Proximity state input threshold (range=0..255)
   - Enter Proximity state if delta is above
@@ -187,7 +187,7 @@
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_LinRot_Thresholds 06 - Thresholds for Linear and Rotary sensors
-  * @{ */
+ * @{ */
 
 /** Linear/Rotary Proximity state input threshold (range=0..255)
   - Enter Proximity state if delta is above
@@ -242,7 +242,7 @@
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_LinRot_Used 07 - Linear/Rotary sensors used
-  * @{ */
+ * @{ */
 
 /** Select which Linear and Rotary sensors you use in your application.
     - 0 = Not Used
@@ -257,24 +257,24 @@
 */
 #define TSLPRM_USE_3CH_LIN_M1 (0)
 #define TSLPRM_USE_3CH_LIN_M2 (0)
-#define TSLPRM_USE_3CH_LIN_H  (0)
-#define TSLPRM_USE_3CH_ROT_M  (0)
+#define TSLPRM_USE_3CH_LIN_H (0)
+#define TSLPRM_USE_3CH_ROT_M (0)
 
 #define TSLPRM_USE_4CH_LIN_M1 (0)
 #define TSLPRM_USE_4CH_LIN_M2 (0)
-#define TSLPRM_USE_4CH_LIN_H  (0)
-#define TSLPRM_USE_4CH_ROT_M  (0)
+#define TSLPRM_USE_4CH_LIN_H (0)
+#define TSLPRM_USE_4CH_ROT_M (0)
 
 #define TSLPRM_USE_5CH_LIN_M1 (0)
 #define TSLPRM_USE_5CH_LIN_M2 (0)
-#define TSLPRM_USE_5CH_LIN_H  (0)
-#define TSLPRM_USE_5CH_ROT_M  (0)
-#define TSLPRM_USE_5CH_ROT_D  (0)
+#define TSLPRM_USE_5CH_LIN_H (0)
+#define TSLPRM_USE_5CH_ROT_M (0)
+#define TSLPRM_USE_5CH_ROT_D (0)
 
 #define TSLPRM_USE_6CH_LIN_M1 (0)
 #define TSLPRM_USE_6CH_LIN_M2 (0)
-#define TSLPRM_USE_6CH_LIN_H  (0)
-#define TSLPRM_USE_6CH_ROT_M  (0)
+#define TSLPRM_USE_6CH_LIN_H (0)
+#define TSLPRM_USE_6CH_ROT_M (0)
 
 /** @} Common_Parameters_LinRot_used */
 
@@ -283,7 +283,7 @@
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_LinRot_Position 08 - Linear/Rotary sensors position
-  * @{ */
+ * @{ */
 
 /** Position resolution in number of bits (range=1..8)
   - A Low value will result in a low resolution and will be less subject to noise.
@@ -314,7 +314,7 @@
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_Debounce 09 - Debounce counters
-  * @{ */
+ * @{ */
 
 /** Proximity state debounce in samples unit (range=0..63)
   - A Low value will result in a higher sensitivity during the Proximity detection but with less noise filtering.
@@ -353,7 +353,7 @@
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_ECS 10 - ECS
-  * @{ */
+ * @{ */
 
 /** Environment Change System Slow K factor (range=0..255)
   - The higher value is K, the faster is the response time.
@@ -377,7 +377,7 @@
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_DTO 11 - DTO
-  * @{ */
+ * @{ */
 
 /** Detection Time Out delay in seconds (range=0..63)
   - Value 0: DTO processing not compiled in the code (to gain size if not used).
@@ -399,10 +399,10 @@
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_DXS 12 - DXS
-  * @{ */
+ * @{ */
 
 /** Detection Exclusion System (0=No, 1=Yes)
-*/
+ */
 #define TSLPRM_USE_DXS (0)
 
 /** @} Common_Parameters_DXS */
@@ -412,7 +412,7 @@
 /*============================================================================*/
 
 /** @defgroup Common_Parameters_Misc 13 - Miscellaneous
-  * @{ */
+ * @{ */
 
 /** Timing tick frequency in Hz (range=125, 250, 500, 1000, 2000)
   - Result to a timing interrupt respectively every 8ms, 4ms, 2ms, 1ms, 0.5ms
@@ -446,4 +446,3 @@ be configured to output push-pull low (excepted for Linear sensors).
 #include "tsl_acq_tsc.h" /* The TSC acquisition is used for this device. Do not change it! */
 
 #endif /* __TSL_CONF_H */
-
