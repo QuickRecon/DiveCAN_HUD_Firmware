@@ -26,6 +26,7 @@
 #include "Hardware/leds.h"
 #include "DiveCAN/DiveCAN.h"
 #include "DiveCAN/Transciever.h"
+#include "Hardware/pwr_management.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -238,6 +239,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
+  Shutdown();
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
