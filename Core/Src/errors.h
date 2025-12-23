@@ -116,8 +116,11 @@ extern "C"
         /** @brief We tried to fire the solenoid but were inhibited */
         SOLENOID_DISABLED_ERR = 30,
 
+        /** @brief Touch sensing controller error */
+        TSC_ERR = 31,
+
         /** @brief The largest nonfatal error code in use, we use this to manage the flash storage of the errors **/
-        MAX_ERR = SOLENOID_DISABLED_ERR
+        MAX_ERR = TSC_ERR
     } NonFatalError_t;
 
     void NonFatalError_Detail(NonFatalError_t error, uint32_t additionalInfo, uint32_t lineNumber, const char *fileName);

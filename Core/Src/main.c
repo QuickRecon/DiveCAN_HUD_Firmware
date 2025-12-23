@@ -145,6 +145,46 @@ static inline bool cell_alert(uint8_t cellVal)
 {
   return (cellVal < 40 || cellVal > 165);
 }
+
+/* Standard HAL structure defined globally or in main */
+extern TSC_HandleTypeDef htsc;
+
+uint32_t Get_TSC_RawValue(uint32_t ChannelIO, uint32_t SamplingIO, uint32_t GroupIndex)
+{
+  uint32_t raw_value = 0;
+  TSC_IOConfigTypeDef ioConfig = {0};
+
+  // 1. Discharge all IOs to ensure a clean starting state
+  HAL_TSC_IODischarge(&htsc, ENABLE);
+  HAL_Delay(1); // Wait for discharge (depends on Cs value)
+  HAL_TSC_IODischarge(&htsc, DISABLE);
+
+  // 2. Configure the specific IO Group for this measurement
+  ioConfig.ChannelIOs = ChannelIO;   // e.g., TSC_GROUP2_IO1
+  ioConfig.SamplingIOs = SamplingIO; // e.g., TSC_GROUP2_IO2
+  if (HAL_TSC_IOConfig(&htsc, &ioConfig) != HAL_OK)
+  {
+    return 0xFFFF; // Error
+  }
+
+  // 3. Start acquisition and poll for completion
+  if (HAL_TSC_Start(&htsc) == HAL_OK)
+  {
+    // Polling avoids the need for the RTOS scheduler or interrupts
+    if (HAL_TSC_PollForAcquisition(&htsc) == HAL_OK)
+    {
+      // 4. Retrieve the raw counter value for the group
+      raw_value = HAL_TSC_GroupGetValue(&htsc, GroupIndex);
+    } else {
+      NON_FATAL_ERROR(TSC_ERR);
+    }
+  } else {
+      NON_FATAL_ERROR(TSC_ERR);
+  }
+
+  return raw_value;
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -186,6 +226,15 @@ int main(void)
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
+
+  // Check for finger before starting up
+  volatile uint32_t touchVal = Get_TSC_RawValue(TSC_GROUP2_IO1, TSC_GROUP2_IO2, TSC_GROUP2_IDX);
+
+  if (touchVal < 590)
+  { // Example threshold
+    // Execute "Pre-boot" or "Hidden Menu" logic here
+  }
+
   const DiveCANDevice_t defaultDeviceSpec = {
       .name = "ALHUD",
       .type = DIVECAN_MONITOR,
