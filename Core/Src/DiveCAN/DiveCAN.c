@@ -60,7 +60,6 @@ void InitDiveCAN(const DiveCANDevice_t *const deviceSpec)
     osThreadId_t *CANTaskHandle = getOSThreadId();
     task_params.deviceSpec = *deviceSpec;
     *CANTaskHandle = osThreadNew(CANTask, &task_params, &CANTask_attributes);
-    txStartDevice(DIVECAN_MONITOR, DIVECAN_CONTROLLER);
 }
 
 /** @brief This task is the context in which we handle inbound CAN messages (which sometimes requires a response), dispatch of our other outgoing traffic may occur elsewhere
@@ -71,6 +70,7 @@ void CANTask(void *arg)
     DiveCANTask_params_t *task_params = (DiveCANTask_params_t *)arg;
     const DiveCANDevice_t *const deviceSpec = &(task_params->deviceSpec);
 
+    txStartDevice(DIVECAN_MONITOR, DIVECAN_CONTROLLER);
     while (true)
     {
         DiveCANMessage_t message = {0};

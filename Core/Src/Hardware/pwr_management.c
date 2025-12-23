@@ -41,7 +41,6 @@ void Shutdown()
     (void)HAL_PWREx_EnableGPIOPullDown(PWR_GPIO_B, PWR_GPIO_BIT_6);
     (void)HAL_PWREx_EnableGPIOPullDown(PWR_GPIO_B, PWR_GPIO_BIT_7);
 
-
     /* Pull the enable pin high for a safe high-idle*/
     /* CAN_EN: GPIO C Pin 13*/
     (void)HAL_PWREx_EnableGPIOPullUp(PWR_GPIO_C, PWR_GPIO_BIT_14);
@@ -49,21 +48,6 @@ void Shutdown()
     /* Pull down the pwr bus */
     (void)HAL_PWREx_EnableGPIOPullDown(PWR_GPIO_C, PWR_GPIO_BIT_15);
 
-    /* Disable IRQs */
-    (void)__disable_irq();
-    (void)__disable_fault_irq();
-
-    /* Clear any pending wakeups */
-    (void)__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WUF1);
-    (void)__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WUF2);
-    (void)__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WUF3);
-    (void)__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WUF4);
-    (void)__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WUF5);
-
-    /* Set up the wakeup and shutdown*/
-    HAL_PWREx_EnableInternalWakeUpLine();
-    HAL_PWREx_DisableInternalWakeUpLine();
-    (void)__HAL_PWR_CLEAR_FLAG(PWR_FLAG_WU);
     HAL_PWR_EnterSTANDBYMode();
 }
 

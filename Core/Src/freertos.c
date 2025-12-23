@@ -35,6 +35,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 extern TIM_HandleTypeDef htim7;
+extern IWDG_HandleTypeDef hiwdg;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -62,77 +63,77 @@ void vApplicationMallocFailedHook(void);
 /* USER CODE BEGIN 1 */
 __weak void configureTimerForRunTimeStats(void)
 {
-  (void)HAL_TIM_Base_Start_IT(&htim7);
+   (void)HAL_TIM_Base_Start_IT(&htim7);
 }
 extern volatile uint32_t ulHighFrequencyTimerTicks;
 __weak RuntimeCounter_t getRunTimeCounterValue(void)
 {
-  return ulHighFrequencyTimerTicks;
+   return ulHighFrequencyTimerTicks;
 }
 /* USER CODE END 1 */
 
 /* USER CODE BEGIN 2 */
 void vApplicationIdleHook(void)
 {
-  /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
-  to 1 in FreeRTOSConfig.h. It will be called on each iteration of the idle
-  task. It is essential that code added to this hook function never attempts
-  to block in any way (for example, call xQueueReceive() with a block time
-  specified, or call vTaskDelay()). If the application makes use of the
-  vTaskDelete() API function (as this demo application does) then it is also
-  important that vApplicationIdleHook() is permitted to return to its calling
-  function, because it is the responsibility of the idle task to clean up
-  memory allocated by the kernel to any task that has since been deleted. */
+   /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
+   to 1 in FreeRTOSConfig.h. It will be called on each iteration of the idle
+   task. It is essential that code added to this hook function never attempts
+   to block in any way (for example, call xQueueReceive() with a block time
+   specified, or call vTaskDelay()). If the application makes use of the
+   vTaskDelete() API function (as this demo application does) then it is also
+   important that vApplicationIdleHook() is permitted to return to its calling
+   function, because it is the responsibility of the idle task to clean up
+   memory allocated by the kernel to any task that has since been deleted. */
+   (void)HAL_IWDG_Refresh(&hiwdg);
 }
 /* USER CODE END 2 */
 
 /* USER CODE BEGIN 4 */
 void vApplicationStackOverflowHook(TaskHandle_t, signed char *pcTaskName)
 {
-  //volatile signed char *taskName = pcTaskName;
-  //blocking_serial_printf("STACK OVERFLOW: %s", taskName);
-  FATAL_ERROR(STACK_OVERFLOW_FERR);
-  /* Run time stack overflow checking is performed if
-  configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
-  called if a stack overflow is detected. */
+   // volatile signed char *taskName = pcTaskName;
+   // blocking_serial_printf("STACK OVERFLOW: %s", taskName);
+   FATAL_ERROR(STACK_OVERFLOW_FERR);
+   /* Run time stack overflow checking is performed if
+   configCHECK_FOR_STACK_OVERFLOW is defined to 1 or 2. This hook function is
+   called if a stack overflow is detected. */
 }
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN 5 */
 void vApplicationMallocFailedHook(void)
 {
-  FATAL_ERROR(MALLOC_FAIL_FERR);
-  /* vApplicationMallocFailedHook() will only be called if
-  configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h. It is a hook
-  function that will get called if a call to pvPortMalloc() fails.
-  pvPortMalloc() is called internally by the kernel whenever a task, queue,
-  timer or semaphore is created. It is also called by various parts of the
-  demo application. If heap_1.c or heap_2.c are used, then the size of the
-  heap available to pvPortMalloc() is defined by configTOTAL_HEAP_SIZE in
-  FreeRTOSConfig.h, and the xPortGetFreeHeapSize() API function can be used
-  to query the size of free heap space that remains (although it does not
-  provide information on how the remaining heap might be fragmented). */
+   FATAL_ERROR(MALLOC_FAIL_FERR);
+   /* vApplicationMallocFailedHook() will only be called if
+   configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h. It is a hook
+   function that will get called if a call to pvPortMalloc() fails.
+   pvPortMalloc() is called internally by the kernel whenever a task, queue,
+   timer or semaphore is created. It is also called by various parts of the
+   demo application. If heap_1.c or heap_2.c are used, then the size of the
+   heap available to pvPortMalloc() is defined by configTOTAL_HEAP_SIZE in
+   FreeRTOSConfig.h, and the xPortGetFreeHeapSize() API function can be used
+   to query the size of free heap space that remains (although it does not
+   provide information on how the remaining heap might be fragmented). */
 }
 /* USER CODE END 5 */
 
 /* USER CODE BEGIN PREPOSTSLEEP */
 __weak void PreSleepProcessing(uint32_t ulExpectedIdleTime)
 {
-  (void)ulExpectedIdleTime;
-  /* place for user code */
-  (void)HAL_TIM_Base_Stop_IT(&htim7);
-  HAL_NVIC_ClearPendingIRQ(TIM7_IRQn);
-  HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+   (void)ulExpectedIdleTime;
+   /* place for user code */
+   (void)HAL_TIM_Base_Stop_IT(&htim7);
+   HAL_NVIC_ClearPendingIRQ(TIM7_IRQn);
+   HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
 }
 
 __weak void PostSleepProcessing(uint32_t ulExpectedIdleTime)
 {
-  (void)ulExpectedIdleTime;
-  /* place for user code */
-  (void)HAL_TIM_Base_Start_IT(&htim7);
+   (void)ulExpectedIdleTime;
+   /* place for user code */
+   (void)HAL_TIM_Base_Start_IT(&htim7);
 }
 /* USER CODE END PREPOSTSLEEP */
-
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */

@@ -11,6 +11,8 @@ const uint8_t LED_MIN_BRIGHTNESS = 3;
 const uint8_t MAX_BLINKS = 25;
 const uint32_t BLINK_PERIOD = TIMEOUT_250MS_TICKS;
 
+extern IWDG_HandleTypeDef hiwdg;
+
 struct GPIO_PinMap
 {
     GPIO_TypeDef *port;
@@ -50,20 +52,26 @@ void initLEDs(void)
     {
         setRGB(i, LED_BRIGHTNESS[0], 0, 0); /* Red*/
         HAL_Delay(STARTUP_DELAY_MS);
+        (void)HAL_IWDG_Refresh(&hiwdg);
         setRGB(i, 0, LED_BRIGHTNESS[1], 0); /* Green*/
         HAL_Delay(STARTUP_DELAY_MS);
+        (void)HAL_IWDG_Refresh(&hiwdg);
         setRGB(i, 0, 0, LED_BRIGHTNESS[2]); /* Blue*/
         HAL_Delay(STARTUP_DELAY_MS);
+        (void)HAL_IWDG_Refresh(&hiwdg);
         setRGB(i, 0, 0, 0); /* Off*/
     }
 
     /* LEDS should be verified, turn off the RED LEDS*/
     HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, GPIO_PIN_RESET);
     HAL_Delay(STARTUP_DELAY_MS);
+    (void)HAL_IWDG_Refresh(&hiwdg);
     HAL_GPIO_WritePin(LED_2_GPIO_Port, LED_2_Pin, GPIO_PIN_RESET);
     HAL_Delay(STARTUP_DELAY_MS);
+    (void)HAL_IWDG_Refresh(&hiwdg);
     HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_RESET);
     HAL_Delay(STARTUP_DELAY_MS);
+    (void)HAL_IWDG_Refresh(&hiwdg);
     HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
 }
 

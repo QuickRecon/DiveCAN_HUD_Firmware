@@ -122,7 +122,7 @@ static void MX_GPIO_Init(void);
 static void MX_CAN1_Init(void);
 static void MX_TSC_Init(void);
 static void MX_CRC_Init(void);
-// static void MX_IWDG_Init(void);
+static void MX_IWDG_Init(void);
 static void MX_TIM7_Init(void);
 void TSCTaskFunc(void *argument);
 void BlinkTaskFunc(void *argument);
@@ -175,11 +175,15 @@ uint32_t Get_TSC_RawValue(uint32_t ChannelIO, uint32_t SamplingIO, uint32_t Grou
     {
       // 4. Retrieve the raw counter value for the group
       raw_value = HAL_TSC_GroupGetValue(&htsc, GroupIndex);
-    } else {
+    }
+    else
+    {
       NON_FATAL_ERROR(TSC_ERR);
     }
-  } else {
-      NON_FATAL_ERROR(TSC_ERR);
+  }
+  else
+  {
+    NON_FATAL_ERROR(TSC_ERR);
   }
 
   return raw_value;
@@ -220,7 +224,7 @@ int main(void)
   MX_TSC_Init();
   MX_TOUCHSENSING_Init();
   MX_CRC_Init();
-  // MX_IWDG_Init();
+  MX_IWDG_Init();
   MX_TIM7_Init();
 
   /* Initialize interrupts */
@@ -228,11 +232,20 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   // Check for finger before starting up
-  volatile uint32_t touchVal = Get_TSC_RawValue(TSC_GROUP2_IO1, TSC_GROUP2_IO2, TSC_GROUP2_IDX);
 
-  if (touchVal < 590)
-  { // Example threshold
-    // Execute "Pre-boot" or "Hidden Menu" logic here
+  const uint16_t LED_Pins[4] = {LED_0_Pin, LED_1_Pin, LED_2_Pin, LED_3_Pin};
+  GPIO_TypeDef *LED_Ports[4] = {LED_0_GPIO_Port, LED_1_GPIO_Port, LED_2_GPIO_Port, LED_3_GPIO_Port};
+
+  for (uint8_t i = 0; i < 4; i++)
+  {
+    volatile uint32_t touchVal = Get_TSC_RawValue(TSC_GROUP2_IO1, TSC_GROUP2_IO2, TSC_GROUP2_IDX);
+    if (touchVal > 590)
+    {
+      Shutdown();
+    }
+    HAL_GPIO_WritePin(LED_Ports[i], LED_Pins[i], GPIO_PIN_SET);
+    HAL_Delay(500);
+    (void)HAL_IWDG_Refresh(&hiwdg);
   }
 
   const DiveCANDevice_t defaultDeviceSpec = {
@@ -241,6 +254,7 @@ int main(void)
       .manufacturerID = DIVECAN_MANUFACTURER_SRI,
       .firmwareVersion = 1};
 
+  (void)HAL_IWDG_Refresh(&hiwdg);
   initLEDs();
 
   InitDiveCAN(&defaultDeviceSpec);
@@ -288,7 +302,6 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
-  Shutdown();
   /* USER CODE END RTOS_EVENTS */
 
   /* Start scheduler */
@@ -453,33 +466,33 @@ static void MX_CRC_Init(void)
   /* USER CODE END CRC_Init 2 */
 }
 
-// /**
-//  * @brief IWDG Initialization Function
-//  * @param None
-//  * @retval None
-//  */
-// static void MX_IWDG_Init(void)
-// {
+/**
+ * @brief IWDG Initialization Function
+ * @param None
+ * @retval None
+ */
+static void MX_IWDG_Init(void)
+{
 
-//   /* USER CODE BEGIN IWDG_Init 0 */
+  /* USER CODE BEGIN IWDG_Init 0 */
 
-//   /* USER CODE END IWDG_Init 0 */
+  /* USER CODE END IWDG_Init 0 */
 
-//   /* USER CODE BEGIN IWDG_Init 1 */
+  /* USER CODE BEGIN IWDG_Init 1 */
 
-//   /* USER CODE END IWDG_Init 1 */
-//   hiwdg.Instance = IWDG;
-//   hiwdg.Init.Prescaler = IWDG_PRESCALER_4;
-//   hiwdg.Init.Window = 4095;
-//   hiwdg.Init.Reload = 4095;
-//   if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
-//   {
-//     Error_Handler();
-//   }
-//   /* USER CODE BEGIN IWDG_Init 2 */
+  /* USER CODE END IWDG_Init 1 */
+  hiwdg.Instance = IWDG;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_32;
+  hiwdg.Init.Window = 4095;
+  hiwdg.Init.Reload = 4095;
+  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN IWDG_Init 2 */
 
-//   /* USER CODE END IWDG_Init 2 */
-// }
+  /* USER CODE END IWDG_Init 2 */
+}
 
 /**
  * @brief TIM7 Initialization Function
