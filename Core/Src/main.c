@@ -27,6 +27,7 @@
 #include "DiveCAN/DiveCAN.h"
 #include "DiveCAN/Transciever.h"
 #include "Hardware/pwr_management.h"
+#include "Hardware/flash.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -247,6 +248,8 @@ int main(void)
     HAL_Delay(500);
     (void)HAL_IWDG_Refresh(&hiwdg);
   }
+
+  initFlash();
 
   const DiveCANDevice_t defaultDeviceSpec = {
       .name = "ALHUD",

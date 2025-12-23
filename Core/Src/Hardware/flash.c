@@ -34,8 +34,8 @@ void setOptionBytes(void)
         /* nBoot0 irrelevant, leave as true*/
         optionBytes.USERConfig = set_bit(optionBytes.USERConfig, FLASH_OPTR_nBOOT0_Pos, true);
 
-        /* nSWBOOT0 true to take boot mode from pin */
-        optionBytes.USERConfig = set_bit(optionBytes.USERConfig, FLASH_OPTR_nSWBOOT0_Pos, true);
+        /* nSWBOOT0 false to not take boot mode from pin (ensures we always launch into APP) */
+        optionBytes.USERConfig = set_bit(optionBytes.USERConfig, FLASH_OPTR_nSWBOOT0_Pos, false);
 
         /* Reset SRAM2 on reset */
         optionBytes.USERConfig = set_bit(optionBytes.USERConfig, FLASH_OPTR_SRAM2_RST_Pos, false);
