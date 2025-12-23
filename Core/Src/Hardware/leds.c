@@ -79,7 +79,7 @@ void setLEDBrightness(uint8_t level, GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
     {
 
         HAL_GPIO_WritePin(GPIOx, GPIO_Pin, GPIO_PIN_RESET);
-        HAL_Delay(10); // Reset the LED
+        HAL_Delay(6); // Reset the LED, 5ms is the maximum specified delay
         __disable_irq();
         for (uint8_t i = 0; i < nPulses; i++) /* This could probably be done as a timer with HW interrupts but lets be lazy until we determine we need the CPU cycles*/
         {
