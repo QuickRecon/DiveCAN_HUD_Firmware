@@ -47,31 +47,34 @@ void initLEDs(void)
     HAL_GPIO_WritePin(B2_GPIO_Port, B2_Pin, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(B3_GPIO_Port, B3_Pin, GPIO_PIN_RESET);
 
-    /* Sequence through them one at a time */
+    /* Show each color*/
     for (uint8_t i = 0; i < 3; i++)
     {
         setRGB(i, LED_BRIGHTNESS[0], 0, 0); /* Red*/
-        HAL_Delay(STARTUP_DELAY_MS);
-        (void)HAL_IWDG_Refresh(&hiwdg);
-        setRGB(i, 0, LED_BRIGHTNESS[1], 0); /* Green*/
-        HAL_Delay(STARTUP_DELAY_MS);
-        (void)HAL_IWDG_Refresh(&hiwdg);
-        setRGB(i, 0, 0, LED_BRIGHTNESS[2]); /* Blue*/
-        HAL_Delay(STARTUP_DELAY_MS);
-        (void)HAL_IWDG_Refresh(&hiwdg);
-        setRGB(i, 0, 0, 0); /* Off*/
+    }
+    HAL_Delay(STARTUP_DELAY_MS);
+    (void)HAL_IWDG_Refresh(&hiwdg);
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        setRGB(i, 0, LED_BRIGHTNESS[1], 0); /* Green */
+    }
+    HAL_Delay(STARTUP_DELAY_MS);
+    (void)HAL_IWDG_Refresh(&hiwdg);
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        setRGB(i, 0, 0, LED_BRIGHTNESS[2]); /* Blue */
+    }
+    HAL_Delay(STARTUP_DELAY_MS);
+    (void)HAL_IWDG_Refresh(&hiwdg);
+    for (uint8_t i = 0; i < 3; i++)
+    {
+        setRGB(i, 0, 0, 0); /* Off */
     }
 
     /* LEDS should be verified, turn off the RED LEDS*/
     HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, GPIO_PIN_RESET);
-    HAL_Delay(STARTUP_DELAY_MS);
-    (void)HAL_IWDG_Refresh(&hiwdg);
     HAL_GPIO_WritePin(LED_2_GPIO_Port, LED_2_Pin, GPIO_PIN_RESET);
-    HAL_Delay(STARTUP_DELAY_MS);
-    (void)HAL_IWDG_Refresh(&hiwdg);
     HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_RESET);
-    HAL_Delay(STARTUP_DELAY_MS);
-    (void)HAL_IWDG_Refresh(&hiwdg);
     HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
 }
 

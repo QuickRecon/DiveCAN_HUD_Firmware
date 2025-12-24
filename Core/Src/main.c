@@ -28,6 +28,7 @@
 #include "DiveCAN/Transciever.h"
 #include "Hardware/pwr_management.h"
 #include "Hardware/flash.h"
+#include "menu_state_machine.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -656,10 +657,12 @@ void TSC_Handler(void)
   if (MyTKeysB[0].p_Data->StateId == TSL_STATEID_DETECT)
   {
     // HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
+    onButtonPress();
   }
   else if (MyTKeysB[0].p_Data->StateId == TSL_STATEID_RELEASE)
   {
     // HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_RESET);
+    onButtonRelease();
   }
 }
 /* USER CODE END 4 */
@@ -679,6 +682,7 @@ void TSCTaskFunc(void *argument)
   {
     tsl_user_Exec();
     TSC_Handler();
+    menuStateMachineTick();
     osDelay(1);
   }
   /* USER CODE END 5 */
@@ -754,7 +758,7 @@ void AlertTaskFunc(void *argument)
   /* Infinite loop */
   for (;;)
   {
-    if (alerting)
+    if (alerting && ! menuActive())
     {
       HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
       HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_SET);

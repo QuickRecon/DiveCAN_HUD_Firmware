@@ -47,6 +47,7 @@ Core/Src/Hardware/leds.c \
 Core/Src/DiveCAN/DiveCAN.c \
 Core/Src/stm32l4xx_it.c \
 Core/Src/freertos.c \
+Core/Src/menu_state_machine.c \
 Core/Src/stm32l4xx_hal_msp.c \
 Core/Src/stm32l4xx_hal_timebase_tim.c \
 TOUCHSENSING/App/touchsensing.c \
