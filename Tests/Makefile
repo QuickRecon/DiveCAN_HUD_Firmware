@@ -8,7 +8,11 @@ BUILD_DIR = build
 
 # CppUTest configuration
 CPPUTEST_HOME = cpputest
-CPPUTEST_BUILD = $(CPPUTEST_HOME)/build
+CPPUTEST_BUILD = build/cpputest
+
+# CppUTest libraries
+CPPUTEST_LIBS = $(CPPUTEST_BUILD)/src/CppUTest/libCppUTest.a \
+                $(CPPUTEST_BUILD)/src/CppUTestExt/libCppUTestExt.a
 
 # Compiler
 CXX = g++
@@ -45,17 +49,25 @@ HUDCONTROL_MOCK_SRC = $(MOCKS_DIR)/MockQueue.cpp $(MOCKS_DIR)/MockLEDs.cpp
 MENU_STATE_MACHINE_OBJS = $(BUILD_DIR)/menu_state_machine.o $(BUILD_DIR)/MenuStateMachineTest.o $(BUILD_DIR)/MockHAL.o
 HUDCONTROL_OBJS = $(BUILD_DIR)/HUDControl.o $(BUILD_DIR)/HUDControlTest.o $(BUILD_DIR)/MockQueue.o $(BUILD_DIR)/MockLEDs.o $(BUILD_DIR)/MockHAL.o
 
-.PHONY: all clean test
+.PHONY: all clean clean_all test verbose_test list_tests
 
 all: $(TESTS)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/menu_state_machine_test: $(MENU_STATE_MACHINE_OBJS)
+# Build CppUTest libraries if they don't exist
+$(CPPUTEST_LIBS):
+	@echo "Building CppUTest libraries..."
+	@mkdir -p $(CPPUTEST_BUILD)
+	@cd $(CPPUTEST_HOME) && cmake -B ../$(CPPUTEST_BUILD) -S .
+	@cmake --build $(CPPUTEST_BUILD)
+	@echo "CppUTest libraries built successfully"
+
+$(BUILD_DIR)/menu_state_machine_test: $(MENU_STATE_MACHINE_OBJS) | $(CPPUTEST_LIBS)
 	$(CXX) $^ -o $@ $(LD_LIBRARIES)
 
-$(BUILD_DIR)/hudcontrol_test: $(HUDCONTROL_OBJS)
+$(BUILD_DIR)/hudcontrol_test: $(HUDCONTROL_OBJS) | $(CPPUTEST_LIBS)
 	$(CXX) $^ -o $@ $(LD_LIBRARIES)
 
 $(BUILD_DIR)/menu_state_machine.o: $(MENU_STATE_MACHINE_SRC) | $(BUILD_DIR)
@@ -88,6 +100,9 @@ test: $(TESTS)
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+# Note: clean already removes $(BUILD_DIR) which includes build/cpputest
+clean_all: clean
 
 # Additional helpful targets
 verbose_test: $(TESTS)
