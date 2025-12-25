@@ -65,3 +65,27 @@ typedef enum {
 
 /* pdMS_TO_TICKS macro - in test environment, just pass through the value */
 #define pdMS_TO_TICKS(x) (x)
+
+/* FreeRTOS/CMSIS-RTOS v2 types for queue operations */
+typedef long BaseType_t;
+typedef void* osMessageQueueId_t;
+
+typedef enum {
+    osOK = 0,
+    osError = -1,
+    osErrorTimeout = -2,
+    osErrorResource = -3
+} osStatus_t;
+
+/* Function declarations - implemented in MockQueue.cpp */
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+osStatus_t osMessageQueuePut(osMessageQueueId_t queue_id, const void *msg_ptr, uint8_t msg_prio, uint32_t timeout);
+osStatus_t osMessageQueueGet(osMessageQueueId_t queue_id, void *msg_ptr, uint8_t *msg_prio, uint32_t timeout);
+void osDelay(TickType_t ticks);
+
+#ifdef __cplusplus
+}
+#endif

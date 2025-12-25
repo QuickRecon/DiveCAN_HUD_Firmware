@@ -9,22 +9,27 @@
 extern osMessageQueueId_t PPO2QueueHandle;
 extern osMessageQueueId_t CellStatQueueHandle;
 
-static inline int16_t div10_round(int16_t x)
+inline int16_t div10_round(int16_t x)
 {
     /* rounds x/10 to nearest integer, handles negatives safely via int64_t */
     return (int16_t)(((int32_t)x + (x >= 0 ? 5 : -5)) / 10);
 }
 
-static inline bool cell_alert(uint8_t cellVal)
+inline bool cell_alert(uint8_t cellVal)
 {
     return (cellVal < 40 || cellVal > 165);
 }
 
+/**
+ * @brief Process PPO2 data from the queue and control LED blinking accordingly
+ * @param cellValues Pointer to CellValues_t structure to store dequeued values, initialized by caller with sensible default values if the queue is empty
+ * @param alerting Pointer to a boolean flag indicating if an alert is active
+ */
 void PPO2Blink(CellValues_t *cellValues, bool *alerting)
 {
     const uint8_t centerValue = 100;
     /* Dequeue the latest PPO2 information */
-    osStatus_t osStat = osMessageQueueGet(PPO2QueueHandle, &cellValues, NULL, 0);
+    osStatus_t osStat = osMessageQueueGet(PPO2QueueHandle, cellValues, NULL, 0);
     if (osStat != osOK)
     {
         blinkNoData();
