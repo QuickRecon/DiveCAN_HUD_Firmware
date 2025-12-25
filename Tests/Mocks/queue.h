@@ -24,6 +24,7 @@ QueueHandle_t xQueueCreateStatic(uint32_t uxQueueLength,
                                   StaticQueue_t *pxQueueBuffer);
 
 BaseType_t xQueueReceive(QueueHandle_t xQueue, void *pvBuffer, TickType_t xTicksToWait);
+BaseType_t xQueueSend(QueueHandle_t xQueue, const void *pvItemToQueue, TickType_t xTicksToWait);
 BaseType_t xQueuePeek(QueueHandle_t xQueue, void *pvBuffer, TickType_t xTicksToWait);
 BaseType_t xQueueReset(QueueHandle_t xQueue);
 

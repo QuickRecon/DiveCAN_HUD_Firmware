@@ -53,6 +53,7 @@ TEST_GROUP(RespPPO2) {
         MockErrors_Reset();
         MockPower_Reset();
         MockQueue_ResetFreeRTOS();
+        queuesInitialized = false;  /* Reset so next test recreates queues */
     }
 };
 
@@ -166,6 +167,7 @@ TEST_GROUP(RespPPO2Status) {
         MockErrors_Reset();
         MockPower_Reset();
         MockQueue_ResetFreeRTOS();
+        queuesInitialized = false;  /* Reset so next test recreates queues */
     }
 };
 
@@ -257,6 +259,7 @@ TEST_GROUP(RespPing) {
         MockErrors_Reset();
         MockPower_Reset();
         MockQueue_ResetFreeRTOS();
+        queuesInitialized = false;  /* Reset so next test recreates queues */
     }
 };
 
@@ -399,6 +402,7 @@ TEST_GROUP(RespShutdown) {
         MockErrors_Reset();
         MockPower_Reset();
         MockQueue_ResetFreeRTOS();
+        queuesInitialized = false;  /* Reset so next test recreates queues */
     }
 };
 
@@ -522,6 +526,7 @@ TEST_GROUP(RespSerialNumber) {
         MockErrors_Reset();
         MockPower_Reset();
         MockQueue_ResetFreeRTOS();
+        queuesInitialized = false;  /* Reset so next test recreates queues */
     }
 };
 

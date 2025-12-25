@@ -1,33 +1,40 @@
 #include "queue.h"
-#include <queue>
-#include <map>
 #include <cstring>
 #include <cstdlib>
 
-/* Queue structure for mocking */
-struct MockFreeRTOSQueue {
-    std::queue<uint8_t*> messages;
-    uint32_t itemSize;
-    uint32_t maxLength;
+/* Simple circular buffer implementation to replace std::queue */
+#define MAX_QUEUE_ITEMS 16
 
-    MockFreeRTOSQueue(uint32_t length, uint32_t size)
-        : itemSize(size), maxLength(length) {}
-
-    ~MockFreeRTOSQueue() {
-        while (!messages.empty()) {
-            free(messages.front());  /* Use free() instead of delete[] */
-            messages.pop();
-        }
-    }
+struct MessageBuffer {
+    uint8_t* items[MAX_QUEUE_ITEMS];
+    uint32_t head;
+    uint32_t tail;
+    uint32_t count;
 };
 
-/* Storage for created queues */
-static std::map<QueueHandle_t, MockFreeRTOSQueue*> queues;
+/* Queue structure for mocking */
+struct MockFreeRTOSQueue {
+    MessageBuffer buffer;
+    uint32_t itemSize;
+    uint32_t maxLength;
+};
+
+/* Storage for created queues using fixed-size array */
+#define MAX_QUEUES 8
+
+struct QueueRecord {
+    QueueHandle_t handle;
+    MockFreeRTOSQueue* queue;
+    bool valid;
+};
+
+static QueueRecord queues[MAX_QUEUES];
 static uint32_t nextQueueHandle = 1;
 
 /* Mock behavior control */
 static BaseType_t receiveReturnValue = pdPASS;
 static uint32_t receiveDelayTicks = 0;
+static BaseType_t sendReturnValue = pdPASS;
 static BaseType_t isrReturnValue = pdPASS;
 
 /* osDelay tracking */
@@ -40,6 +47,16 @@ QueueHandle_t CellStatQueueHandle = nullptr;
 
 extern "C" {
 
+/* Helper function to find queue by handle */
+static MockFreeRTOSQueue* findQueue(QueueHandle_t handle) {
+    for (uint32_t i = 0; i < MAX_QUEUES; i++) {
+        if (queues[i].valid && queues[i].handle == handle) {
+            return queues[i].queue;
+        }
+    }
+    return nullptr;
+}
+
 QueueHandle_t xQueueCreateStatic(uint32_t uxQueueLength,
                                   uint32_t uxItemSize,
                                   uint8_t *pucQueueStorageBuffer,
@@ -47,11 +64,24 @@ QueueHandle_t xQueueCreateStatic(uint32_t uxQueueLength,
     (void)pucQueueStorageBuffer;
     (void)pxQueueBuffer;
 
-    MockFreeRTOSQueue *queue = new MockFreeRTOSQueue(uxQueueLength, uxItemSize);
-    QueueHandle_t handle = (QueueHandle_t)(uintptr_t)nextQueueHandle++;
-    queues[handle] = queue;
+    /* Find empty slot */
+    for (uint32_t i = 0; i < MAX_QUEUES; i++) {
+        if (!queues[i].valid) {
+            MockFreeRTOSQueue *queue = (MockFreeRTOSQueue*)malloc(sizeof(MockFreeRTOSQueue));
+            memset(queue, 0, sizeof(MockFreeRTOSQueue));
+            queue->itemSize = uxItemSize;
+            queue->maxLength = uxQueueLength;
 
-    return handle;
+            QueueHandle_t handle = (QueueHandle_t)(uintptr_t)nextQueueHandle++;
+            queues[i].handle = handle;
+            queues[i].queue = queue;
+            queues[i].valid = true;
+
+            return handle;
+        }
+    }
+
+    return nullptr;  /* No space for more queues */
 }
 
 BaseType_t xQueueReceive(QueueHandle_t xQueue, void *pvBuffer, TickType_t xTicksToWait) {
@@ -65,21 +95,52 @@ BaseType_t xQueueReceive(QueueHandle_t xQueue, void *pvBuffer, TickType_t xTicks
         return receiveReturnValue;
     }
 
-    auto it = queues.find(xQueue);
-    if (it == queues.end() || pvBuffer == nullptr) {
+    MockFreeRTOSQueue *queue = findQueue(xQueue);
+    if (queue == nullptr || pvBuffer == nullptr) {
         return pdFAIL;
     }
 
-    MockFreeRTOSQueue *queue = it->second;
-    if (queue->messages.empty()) {
+    /* Check if queue is empty */
+    if (queue->buffer.count == 0) {
         return pdFAIL;
     }
 
-    /* Copy data and remove from queue */
-    uint8_t *data = queue->messages.front();
+    /* Copy data from head and remove from queue */
+    uint8_t *data = queue->buffer.items[queue->buffer.head];
     memcpy(pvBuffer, data, queue->itemSize);
-    free(data);  /* Use free() instead of delete[] */
-    queue->messages.pop();
+    free(data);
+
+    /* Advance head */
+    queue->buffer.items[queue->buffer.head] = nullptr;
+    queue->buffer.head = (queue->buffer.head + 1) % MAX_QUEUE_ITEMS;
+    queue->buffer.count--;
+
+    return pdPASS;
+}
+
+BaseType_t xQueueSend(QueueHandle_t xQueue, const void *pvItemToQueue, TickType_t xTicksToWait) {
+    (void)xTicksToWait;
+
+    if (sendReturnValue != pdPASS) {
+        return sendReturnValue;
+    }
+
+    MockFreeRTOSQueue *queue = findQueue(xQueue);
+    if (queue == nullptr || pvItemToQueue == nullptr) {
+        return pdFAIL;
+    }
+
+    /* Check if queue is full */
+    if (queue->buffer.count >= queue->maxLength || queue->buffer.count >= MAX_QUEUE_ITEMS) {
+        return pdFAIL;
+    }
+
+    /* Add message to back of queue */
+    uint8_t *data = (uint8_t*)malloc(queue->itemSize);
+    memcpy(data, pvItemToQueue, queue->itemSize);
+    queue->buffer.items[queue->buffer.tail] = data;
+    queue->buffer.tail = (queue->buffer.tail + 1) % MAX_QUEUE_ITEMS;
+    queue->buffer.count++;
 
     return pdPASS;
 }
@@ -91,34 +152,41 @@ BaseType_t xQueuePeek(QueueHandle_t xQueue, void *pvBuffer, TickType_t xTicksToW
         return receiveReturnValue;
     }
 
-    auto it = queues.find(xQueue);
-    if (it == queues.end() || pvBuffer == nullptr) {
+    MockFreeRTOSQueue *queue = findQueue(xQueue);
+    if (queue == nullptr || pvBuffer == nullptr) {
         return pdFAIL;
     }
 
-    MockFreeRTOSQueue *queue = it->second;
-    if (queue->messages.empty()) {
+    /* Check if queue is empty */
+    if (queue->buffer.count == 0) {
         return pdFAIL;
     }
 
-    /* Copy data but DON'T remove from queue (peek) */
-    uint8_t *data = queue->messages.front();
+    /* Copy data from head but DON'T remove from queue (peek) */
+    uint8_t *data = queue->buffer.items[queue->buffer.head];
     memcpy(pvBuffer, data, queue->itemSize);
 
     return pdPASS;
 }
 
 BaseType_t xQueueReset(QueueHandle_t xQueue) {
-    auto it = queues.find(xQueue);
-    if (it == queues.end()) {
+    MockFreeRTOSQueue *queue = findQueue(xQueue);
+    if (queue == nullptr) {
         return pdFAIL;
     }
 
-    MockFreeRTOSQueue *queue = it->second;
-    while (!queue->messages.empty()) {
-        free(queue->messages.front());  /* Use free() instead of delete[] */
-        queue->messages.pop();
+    /* Free all items in the buffer */
+    for (uint32_t i = 0; i < MAX_QUEUE_ITEMS; i++) {
+        if (queue->buffer.items[i] != nullptr) {
+            free(queue->buffer.items[i]);
+            queue->buffer.items[i] = nullptr;
+        }
     }
+
+    /* Reset buffer state */
+    queue->buffer.head = 0;
+    queue->buffer.tail = 0;
+    queue->buffer.count = 0;
 
     return pdPASS;
 }
@@ -132,23 +200,28 @@ BaseType_t xQueueOverwriteFromISR(QueueHandle_t xQueue,
         return isrReturnValue;
     }
 
-    auto it = queues.find(xQueue);
-    if (it == queues.end() || pvItemToQueue == nullptr) {
+    MockFreeRTOSQueue *queue = findQueue(xQueue);
+    if (queue == nullptr || pvItemToQueue == nullptr) {
         return pdFAIL;
     }
 
-    MockFreeRTOSQueue *queue = it->second;
-
-    /* Overwrite: clear queue first, then add new item */
-    while (!queue->messages.empty()) {
-        free(queue->messages.front());  /* Use free() instead of delete[] */
-        queue->messages.pop();
+    /* Overwrite: clear queue first */
+    for (uint32_t i = 0; i < MAX_QUEUE_ITEMS; i++) {
+        if (queue->buffer.items[i] != nullptr) {
+            free(queue->buffer.items[i]);
+            queue->buffer.items[i] = nullptr;
+        }
     }
+    queue->buffer.head = 0;
+    queue->buffer.tail = 0;
+    queue->buffer.count = 0;
 
-    /* Add new message - use malloc() instead of new */
+    /* Add new message */
     uint8_t *data = (uint8_t*)malloc(queue->itemSize);
     memcpy(data, pvItemToQueue, queue->itemSize);
-    queue->messages.push(data);
+    queue->buffer.items[queue->buffer.tail] = data;
+    queue->buffer.tail = (queue->buffer.tail + 1) % MAX_QUEUE_ITEMS;
+    queue->buffer.count = 1;
 
     return pdPASS;
 }
@@ -162,22 +235,22 @@ BaseType_t xQueueSendToBackFromISR(QueueHandle_t xQueue,
         return isrReturnValue;
     }
 
-    auto it = queues.find(xQueue);
-    if (it == queues.end() || pvItemToQueue == nullptr) {
+    MockFreeRTOSQueue *queue = findQueue(xQueue);
+    if (queue == nullptr || pvItemToQueue == nullptr) {
         return pdFAIL;
     }
-
-    MockFreeRTOSQueue *queue = it->second;
 
     /* Check if queue is full */
-    if (queue->messages.size() >= queue->maxLength) {
+    if (queue->buffer.count >= queue->maxLength || queue->buffer.count >= MAX_QUEUE_ITEMS) {
         return pdFAIL;
     }
 
-    /* Add message to back of queue - use malloc() instead of new */
+    /* Add message to back of queue */
     uint8_t *data = (uint8_t*)malloc(queue->itemSize);
     memcpy(data, pvItemToQueue, queue->itemSize);
-    queue->messages.push(data);
+    queue->buffer.items[queue->buffer.tail] = data;
+    queue->buffer.tail = (queue->buffer.tail + 1) % MAX_QUEUE_ITEMS;
+    queue->buffer.count++;
 
     return pdPASS;
 }
@@ -185,15 +258,29 @@ BaseType_t xQueueSendToBackFromISR(QueueHandle_t xQueue,
 /* Mock control functions */
 void MockQueue_ResetFreeRTOS(void) {
     /* Clean up all queues */
-    for (auto &pair : queues) {
-        delete pair.second;
+    for (uint32_t i = 0; i < MAX_QUEUES; i++) {
+        if (queues[i].valid && queues[i].queue != nullptr) {
+            /* Free all items in the queue buffer */
+            for (uint32_t j = 0; j < MAX_QUEUE_ITEMS; j++) {
+                if (queues[i].queue->buffer.items[j] != nullptr) {
+                    free(queues[i].queue->buffer.items[j]);
+                }
+            }
+            /* Free the queue itself */
+            free(queues[i].queue);
+        }
     }
-    queues.clear();
+    memset(queues, 0, sizeof(queues));
     nextQueueHandle = 1;
+
+    /* Reset application queue handles */
+    PPO2QueueHandle = nullptr;
+    CellStatQueueHandle = nullptr;
 
     /* Reset behavior */
     receiveReturnValue = pdPASS;
     receiveDelayTicks = 0;
+    sendReturnValue = pdPASS;
     isrReturnValue = pdPASS;
     delayCallCount = 0;
     totalDelayTicks = 0;
@@ -201,46 +288,46 @@ void MockQueue_ResetFreeRTOS(void) {
 
 void MockQueue_ClearAllQueues(void) {
     /* Clear messages from all queues without destroying queue handles */
-    for (auto &pair : queues) {
-        MockFreeRTOSQueue *queue = pair.second;
-        /* Free all message data - use free() instead of delete[] */
-        while (!queue->messages.empty()) {
-            free(queue->messages.front());
-            queue->messages.pop();
+    for (uint32_t i = 0; i < MAX_QUEUES; i++) {
+        if (queues[i].valid && queues[i].queue != nullptr) {
+            MockFreeRTOSQueue *queue = queues[i].queue;
+            /* Free all message data */
+            for (uint32_t j = 0; j < MAX_QUEUE_ITEMS; j++) {
+                if (queue->buffer.items[j] != nullptr) {
+                    free(queue->buffer.items[j]);
+                    queue->buffer.items[j] = nullptr;
+                }
+            }
+            /* Reset buffer state */
+            queue->buffer.head = 0;
+            queue->buffer.tail = 0;
+            queue->buffer.count = 0;
         }
-        /* Force std::queue to release internal std::deque buffers */
-        queue->messages = std::queue<uint8_t*>();
     }
 }
 
 uint32_t MockQueue_GetMessageCount(QueueHandle_t xQueue) {
-    auto it = queues.find(xQueue);
-    if (it == queues.end()) {
+    MockFreeRTOSQueue *queue = findQueue(xQueue);
+    if (queue == nullptr) {
         return 0;
     }
 
-    return static_cast<uint32_t>(it->second->messages.size());
+    return queue->buffer.count;
 }
 
 bool MockQueue_GetLastMessage(QueueHandle_t xQueue, void *pvBuffer) {
-    auto it = queues.find(xQueue);
-    if (it == queues.end() || pvBuffer == nullptr) {
+    MockFreeRTOSQueue *queue = findQueue(xQueue);
+    if (queue == nullptr || pvBuffer == nullptr) {
         return false;
     }
 
-    MockFreeRTOSQueue *queue = it->second;
-    if (queue->messages.empty()) {
+    if (queue->buffer.count == 0) {
         return false;
     }
 
-    /* Get the last message (back of queue) */
-    /* Note: std::queue doesn't provide back() access, so we need to copy all and get last */
-    std::queue<uint8_t*> temp = queue->messages;
-    uint8_t *lastData = nullptr;
-    while (!temp.empty()) {
-        lastData = temp.front();
-        temp.pop();
-    }
+    /* Get the last message (most recently added, which is tail - 1) */
+    uint32_t lastIndex = (queue->buffer.tail == 0) ? (MAX_QUEUE_ITEMS - 1) : (queue->buffer.tail - 1);
+    uint8_t *lastData = queue->buffer.items[lastIndex];
 
     if (lastData != nullptr) {
         memcpy(pvBuffer, lastData, queue->itemSize);

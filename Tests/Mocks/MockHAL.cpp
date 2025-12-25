@@ -1,21 +1,29 @@
 #include "MockHAL.h"
-#include <map>
-#include <utility>
+#include <cstring>
 
-/* Mock GPIO port instances */
-static GPIO_TypeDef LED_0_Port_Instance;
-static GPIO_TypeDef LED_1_Port_Instance;
-static GPIO_TypeDef LED_2_Port_Instance;
-static GPIO_TypeDef LED_3_Port_Instance;
+/* GPIO port instances - shared across all compilation units */
+GPIO_TypeDef LED_0_Port_Static;
+GPIO_TypeDef LED_1_Port_Static;
+GPIO_TypeDef LED_2_Port_Static;
+GPIO_TypeDef LED_3_Port_Static;
+GPIO_TypeDef R_Port_Static;
+GPIO_TypeDef G_Port_Static;
+GPIO_TypeDef B_Port_Static;
+GPIO_TypeDef ASC_EN_Port_Static;
 
-GPIO_TypeDef* LED_0_GPIO_Port = &LED_0_Port_Instance;
-GPIO_TypeDef* LED_1_GPIO_Port = &LED_1_Port_Instance;
-GPIO_TypeDef* LED_2_GPIO_Port = &LED_2_Port_Instance;
-GPIO_TypeDef* LED_3_GPIO_Port = &LED_3_Port_Instance;
+/* GPIO pin state tracking using simple array */
+#define MAX_GPIO_PINS 64
+
+struct GPIOPinStateRecord {
+    GPIO_TypeDef* port;
+    uint16_t pin;
+    GPIO_PinState state;
+    bool valid;
+};
 
 /* Mock state */
 static uint32_t currentTick = 0;
-static std::map<std::pair<GPIO_TypeDef*, uint16_t>, GPIO_PinState> pinStates;
+static GPIOPinStateRecord pinStates[MAX_GPIO_PINS];
 
 extern "C" {
 
@@ -24,7 +32,17 @@ uint32_t HAL_GetTick(void) {
 }
 
 void HAL_GPIO_WritePin(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState) {
-    pinStates[std::make_pair(GPIOx, GPIO_Pin)] = PinState;
+    /* Find existing entry or empty slot */
+    for (uint32_t i = 0; i < MAX_GPIO_PINS; i++) {
+        if (!pinStates[i].valid ||
+            (pinStates[i].port == GPIOx && pinStates[i].pin == GPIO_Pin)) {
+            pinStates[i].port = GPIOx;
+            pinStates[i].pin = GPIO_Pin;
+            pinStates[i].state = PinState;
+            pinStates[i].valid = true;
+            break;
+        }
+    }
 }
 
 void MockHAL_SetTick(uint32_t tick) {
@@ -37,13 +55,17 @@ void MockHAL_IncrementTick(uint32_t increment) {
 
 void MockHAL_Reset(void) {
     currentTick = 1; /* Start at 1 to avoid buttonPressTimestamp == 0 issue */
-    pinStates.clear();
+    memset(pinStates, 0, sizeof(pinStates));
 }
 
 GPIO_PinState MockHAL_GetPinState(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin) {
-    auto it = pinStates.find(std::make_pair(GPIOx, GPIO_Pin));
-    if (it != pinStates.end()) {
-        return it->second;
+    /* Search for pin state */
+    for (uint32_t i = 0; i < MAX_GPIO_PINS; i++) {
+        if (pinStates[i].valid &&
+            pinStates[i].port == GPIOx &&
+            pinStates[i].pin == GPIO_Pin) {
+            return pinStates[i].state;
+        }
     }
     return GPIO_PIN_RESET; /* Default to reset if not set */
 }

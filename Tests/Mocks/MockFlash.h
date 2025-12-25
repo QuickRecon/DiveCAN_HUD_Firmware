@@ -7,7 +7,9 @@
 extern "C" {
 #endif
 
-/* HAL Status Type */
+/* HAL Status Type (shared with MockDelay.h and MockCAN.h) */
+#ifndef HAL_STATUSDEF
+#define HAL_STATUSDEF
 typedef enum
 {
     HAL_OK = 0x00,
@@ -15,6 +17,7 @@ typedef enum
     HAL_BUSY = 0x02,
     HAL_TIMEOUT = 0x03
 } HAL_StatusTypeDef;
+#endif
 
 /* EE Status enum - from ST EEPROM emulation library */
 typedef enum

@@ -24,6 +24,16 @@ GPIO_TypeDef* GPIOH = &GPIOH_instance;
 /* CAN_EN is on GPIOC Pin 14 */
 GPIO_TypeDef* CAN_EN_GPIO_Port = &GPIOC_instance;
 
+/* CAN handle instance */
+/* When testing pwr_management, MockCAN is not linked, so define hcan1 here */
+/* Otherwise, hcan1 is defined in MockCAN.cpp */
+#ifdef TESTING_PWR_MANAGEMENT
+static CAN_TypeDef can1_instance = {0};
+CAN_HandleTypeDef hcan1 = {&can1_instance, 0, 0};  /* Instance, State, ErrorCode */
+#else
+extern CAN_HandleTypeDef hcan1;  /* Defined in MockCAN.cpp */
+#endif
+
 /* Pull-up/down configuration tracking using simple arrays */
 #define MAX_PIN_CONFIGS 32
 
@@ -242,6 +252,9 @@ bool MockPower_VerifyGPIOInit(GPIO_TypeDef *GPIOx, uint16_t pin, uint32_t mode, 
 }
 
 /* Power management API wrappers (from pwr_management.h) */
+/* Only include these when NOT testing pwr_management.c itself */
+#ifndef TESTING_PWR_MANAGEMENT
+
 bool getBusStatus(void) {
     /* Default implementation: CAN_EN is on GPIOC Pin 14 */
     extern GPIO_TypeDef *CAN_EN_GPIO_Port;
@@ -277,5 +290,7 @@ void Shutdown(void) {
     /* Enter STANDBY mode */
     HAL_PWR_EnterSTANDBYMode();
 }
+
+#endif /* !TESTING_PWR_MANAGEMENT */
 
 } /* extern "C" */

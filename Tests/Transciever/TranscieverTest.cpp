@@ -44,7 +44,8 @@ TEST_GROUP(RxInterrupt_ISRHandling) {
     void teardown() {
         MockCAN_Reset();
         MockErrors_Reset();
-        MockQueue_ResetFreeRTOS();
+        /* Don't destroy queues, just clear their contents to avoid recreating handles */
+        MockQueue_ClearAllQueues();
     }
 };
 

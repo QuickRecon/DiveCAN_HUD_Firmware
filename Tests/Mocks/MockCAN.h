@@ -35,9 +35,12 @@ typedef enum
 } FunctionalState;
 
 /* CAN TypeDef (opaque pointer in tests) */
+#ifndef CAN_TYPEDEF
+#define CAN_TYPEDEF
 typedef struct {
     uint32_t dummy;
 } CAN_TypeDef;
+#endif
 
 /* CAN Tx Header structure */
 typedef struct
@@ -63,12 +66,15 @@ typedef struct
 } CAN_RxHeaderTypeDef;
 
 /* CAN Handle structure (simplified for mocking) */
+#ifndef CAN_HANDLETYPEDEF
+#define CAN_HANDLETYPEDEF
 typedef struct
 {
     CAN_TypeDef *Instance;
     uint32_t State;
     uint32_t ErrorCode;
 } CAN_HandleTypeDef;
+#endif
 
 /* CAN handle instance */
 extern CAN_HandleTypeDef hcan1;

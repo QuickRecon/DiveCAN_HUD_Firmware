@@ -9,6 +9,27 @@
 extern "C" {
 #endif
 
+/* Forward declarations for types used by pwr_management.c */
+/* CAN TypeDef (opaque in tests) */
+#ifndef CAN_TYPEDEF
+#define CAN_TYPEDEF
+typedef struct {
+    uint32_t dummy;
+} CAN_TypeDef;
+#endif
+
+#ifndef CAN_HANDLETYPEDEF
+#define CAN_HANDLETYPEDEF
+typedef struct {
+    CAN_TypeDef *Instance;
+    uint32_t State;
+    uint32_t ErrorCode;
+} CAN_HandleTypeDef;
+#endif
+
+/* External handle declarations */
+extern CAN_HandleTypeDef hcan1;
+
 /* PWR GPIO port definitions (from stm32l4xx_hal_pwr_ex.h) */
 #define PWR_GPIO_A 0x00000000U
 #define PWR_GPIO_B 0x00000001U

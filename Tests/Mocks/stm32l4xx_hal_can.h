@@ -1,4 +1,4 @@
 #pragma once
 
-/* This file wraps MockCAN.h for HAL CAN compatibility */
+/* Mock CAN HAL header for testing */
 #include "MockCAN.h"
