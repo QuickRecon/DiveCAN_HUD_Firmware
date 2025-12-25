@@ -30,3 +30,9 @@ test-lib/
 ./src/
 cmake/
 .mxproject
+
+# CppUTest build artifacts
+Tests/*.o
+Tests/menu_state_machine_test
+Tests/*_test
+Tests/CppUTest
