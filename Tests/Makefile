@@ -33,7 +33,7 @@ CFLAGS += -Wall -Wextra -std=c11 -g
 LD_LIBRARIES = $(CPPUTEST_BUILD)/src/CppUTest/libCppUTest.a $(CPPUTEST_BUILD)/src/CppUTestExt/libCppUTestExt.a -lstdc++ -lpthread
 
 # Test targets
-TESTS = $(BUILD_DIR)/menu_state_machine_test $(BUILD_DIR)/hudcontrol_test
+TESTS = $(BUILD_DIR)/menu_state_machine_test $(BUILD_DIR)/hudcontrol_test $(BUILD_DIR)/flash_test
 
 # Source files - Menu State Machine
 MENU_STATE_MACHINE_SRC = $(CORE_SRC)/menu_state_machine.c
@@ -45,9 +45,15 @@ HUDCONTROL_SRC = $(CORE_SRC)/HUDControl.c
 HUDCONTROL_TEST_SRC = HUDControl/HUDControlTest.cpp
 HUDCONTROL_MOCK_SRC = $(MOCKS_DIR)/MockQueue.cpp $(MOCKS_DIR)/MockLEDs.cpp
 
+# Source files - Flash
+FLASH_SRC = $(CORE_SRC)/Hardware/flash.c
+FLASH_TEST_SRC = flash/FlashTest.cpp
+FLASH_MOCK_SRC = $(MOCKS_DIR)/MockFlash.cpp $(MOCKS_DIR)/MockErrors.cpp
+
 # Object files
 MENU_STATE_MACHINE_OBJS = $(BUILD_DIR)/menu_state_machine.o $(BUILD_DIR)/MenuStateMachineTest.o $(BUILD_DIR)/MockHAL.o
 HUDCONTROL_OBJS = $(BUILD_DIR)/HUDControl.o $(BUILD_DIR)/HUDControlTest.o $(BUILD_DIR)/MockQueue.o $(BUILD_DIR)/MockLEDs.o $(BUILD_DIR)/MockHAL.o
+FLASH_OBJS = $(BUILD_DIR)/flash.o $(BUILD_DIR)/FlashTest.o $(BUILD_DIR)/MockFlash.o $(BUILD_DIR)/MockErrors.o
 
 .PHONY: all clean clean_all test verbose_test list_tests
 
@@ -68,6 +74,9 @@ $(BUILD_DIR)/menu_state_machine_test: $(MENU_STATE_MACHINE_OBJS) | $(CPPUTEST_LI
 	$(CXX) $^ -o $@ $(LD_LIBRARIES)
 
 $(BUILD_DIR)/hudcontrol_test: $(HUDCONTROL_OBJS) | $(CPPUTEST_LIBS)
+	$(CXX) $^ -o $@ $(LD_LIBRARIES)
+
+$(BUILD_DIR)/flash_test: $(FLASH_OBJS) | $(CPPUTEST_LIBS)
 	$(CXX) $^ -o $@ $(LD_LIBRARIES)
 
 $(BUILD_DIR)/menu_state_machine.o: $(MENU_STATE_MACHINE_SRC) | $(BUILD_DIR)
@@ -91,12 +100,27 @@ $(BUILD_DIR)/MockQueue.o: $(MOCKS_DIR)/MockQueue.cpp | $(BUILD_DIR)
 $(BUILD_DIR)/MockLEDs.o: $(MOCKS_DIR)/MockLEDs.cpp | $(BUILD_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
+$(BUILD_DIR)/flash.o: $(FLASH_SRC) | $(BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/FlashTest.o: $(FLASH_TEST_SRC) | $(BUILD_DIR)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/MockFlash.o: $(MOCKS_DIR)/MockFlash.cpp | $(BUILD_DIR)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/MockErrors.o: $(MOCKS_DIR)/MockErrors.cpp | $(BUILD_DIR)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
 test: $(TESTS)
 	@echo "Running menu_state_machine tests..."
 	@$(BUILD_DIR)/menu_state_machine_test -c
 	@echo ""
 	@echo "Running HUDControl tests..."
 	@$(BUILD_DIR)/hudcontrol_test -c
+	@echo ""
+	@echo "Running flash tests..."
+	@$(BUILD_DIR)/flash_test -c
 
 clean:
 	rm -rf $(BUILD_DIR)
@@ -111,6 +135,9 @@ verbose_test: $(TESTS)
 	@echo ""
 	@echo "Running HUDControl tests with verbose output..."
 	@$(BUILD_DIR)/hudcontrol_test -v
+	@echo ""
+	@echo "Running flash tests with verbose output..."
+	@$(BUILD_DIR)/flash_test -v
 
 list_tests: $(TESTS)
 	@echo "=== menu_state_machine test groups ==="
@@ -118,3 +145,6 @@ list_tests: $(TESTS)
 	@echo ""
 	@echo "=== HUDControl test groups ==="
 	@$(BUILD_DIR)/hudcontrol_test -lg
+	@echo ""
+	@echo "=== flash test groups ==="
+	@$(BUILD_DIR)/flash_test -lg
