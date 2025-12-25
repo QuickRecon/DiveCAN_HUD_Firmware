@@ -126,6 +126,9 @@ void rxInterrupt(const uint32_t id, const uint8_t length, const uint8_t *const d
  * @param Id Message ID (extended)
  * @param data Pointer to the data to send, must be size dataLength
  * @param dataLength Size of the data to send */
+#ifndef TESTING
+static
+#endif
 void sendCANMessage(const DiveCANMessage_t message)
 {
     /* This isn't super time critical so if we're still waiting on stuff to tx then we can quite happily just wait */

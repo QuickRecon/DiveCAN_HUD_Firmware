@@ -33,6 +33,15 @@ extern "C"
 
     void InitDiveCAN(const DiveCANDevice_t *const deviceSpec);
 
+#ifdef TESTING
+    /* Exposed for testing */
+    void RespPing(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
+    void RespShutdown(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
+    void RespSerialNumber(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
+    void RespPPO2(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
+    void RespPPO2Status(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

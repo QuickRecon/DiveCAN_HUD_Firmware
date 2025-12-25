@@ -69,6 +69,12 @@ typedef enum {
 /* FreeRTOS/CMSIS-RTOS v2 types for queue operations */
 typedef long BaseType_t;
 typedef void* osMessageQueueId_t;
+typedef void* osThreadId_t;
+typedef void* StaticTask_t;
+
+/* FreeRTOS constants */
+#define pdTRUE  ((BaseType_t) 1)
+#define pdFALSE ((BaseType_t) 0)
 
 typedef enum {
     osOK = 0,
@@ -77,6 +83,21 @@ typedef enum {
     osErrorResource = -3
 } osStatus_t;
 
+/* Thread attributes */
+#define osThreadDetached 0x00000000U
+
+typedef struct {
+    const char *name;
+    uint32_t attr_bits;
+    void *cb_mem;
+    uint32_t cb_size;
+    void *stack_mem;
+    uint32_t stack_size;
+    osPriority_t priority;
+    uint32_t tz_module;
+    uint32_t reserved;
+} osThreadAttr_t;
+
 /* Function declarations - implemented in MockQueue.cpp */
 #ifdef __cplusplus
 extern "C" {
@@ -84,7 +105,12 @@ extern "C" {
 
 osStatus_t osMessageQueuePut(osMessageQueueId_t queue_id, const void *msg_ptr, uint8_t msg_prio, uint32_t timeout);
 osStatus_t osMessageQueueGet(osMessageQueueId_t queue_id, void *msg_ptr, uint8_t *msg_prio, uint32_t timeout);
+osStatus_t osMessageQueueReset(osMessageQueueId_t queue_id);
 void osDelay(TickType_t ticks);
+
+/* Thread management */
+typedef void (*osThreadFunc_t)(void *argument);
+osThreadId_t osThreadNew(osThreadFunc_t func, void *argument, const osThreadAttr_t *attr);
 
 #ifdef __cplusplus
 }
