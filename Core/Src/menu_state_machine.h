@@ -7,12 +7,11 @@ extern "C"
 {
 #endif
 
-
-bool menuActive(void);
-void onButtonPress(void);
-void onButtonRelease(void);
-void menuStateMachineTick(void);
-void resetMenuStateMachine(void);
+    bool menuActive(void);
+    void onButtonPress(void);
+    void onButtonRelease(void);
+    void menuStateMachineTick(void);
+    void resetMenuStateMachine(void);
 
 #ifdef __cplusplus
 }

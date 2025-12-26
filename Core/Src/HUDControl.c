@@ -71,7 +71,7 @@ bool alerting = false;
 void RGBBlinkControl()
 {
     /* We have LED control, turn the blue LEDS on while we wait for a signal */
-    for(uint8_t channel = 0; channel < 3; channel++)
+    for (uint8_t channel = 0; channel < 3; channel++)
     {
         setRGB(channel, 0, 0, 3); // Blue
     }

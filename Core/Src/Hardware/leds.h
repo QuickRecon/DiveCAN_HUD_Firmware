@@ -3,8 +3,8 @@
 #include "../errors.h"
 
 #ifdef TESTING
-    /* Include mock HAL for testing */
-    #include "main.h"
+/* Include mock HAL for testing */
+#include "main.h"
 #endif
 
 #ifdef __cplusplus
