@@ -1,11 +1,12 @@
 #pragma once
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
-/* Mock printer - serial_printf stub */
-void serial_printf(const char *format, ...);
+    /* Mock printer - serial_printf stub */
+    void serial_printf(const char *format, ...);
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,8 @@
 
 /* Mock main.h for testing */
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "MockCAN.h"
