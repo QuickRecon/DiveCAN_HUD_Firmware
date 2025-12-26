@@ -4,6 +4,7 @@
 extern "C" {
 #include "../../Core/Src/menu_state_machine.h"
 #include "../Mocks/MockHAL.h"
+extern bool inShutdown;
 }
 
 TEST_GROUP(MenuStateMachine)
@@ -50,6 +51,13 @@ TEST_GROUP(MenuStateMachine)
         MockHAL_IncrementTick(2001); /* Just above hold threshold (code uses >) */
         menuStateMachineTick();
         simulateRelease();
+    }
+
+    void simulateHoldNoRelease()
+    {
+        onButtonPress();
+        MockHAL_IncrementTick(2001); /* Just above hold threshold (code uses >) */
+        menuStateMachineTick();
     }
 
     /* Helper to verify LED state */
@@ -223,7 +231,7 @@ TEST(MenuStateMachine, EightShortPressesReturnToIdle)
 /*
  * Test: HoldOn4thPressEntersShutdown
  * Setup: Menu starts in idle state
- * Action: Three short presses, then hold button on 4th press (>2000ms)
+ * Action: Three short presses, then hold button on 5th press (>2000ms)
  * Expected: Menu enters shutdown state (active), all LEDs on
  */
 TEST(MenuStateMachine, HoldOn4thPressEntersShutdown)
@@ -231,7 +239,8 @@ TEST(MenuStateMachine, HoldOn4thPressEntersShutdown)
     simulateShortPress();
     simulateShortPress();
     simulateShortPress();
-    simulateHold();
+    simulateShortPress();
+    simulateHoldNoRelease();
 
     CHECK_TRUE(menuActive());
     /* Shutdown state lights all LEDs */
@@ -249,7 +258,7 @@ TEST(MenuStateMachine, HoldOn8thPressEntersCalibration)
     for (int i = 0; i < 7; i++) {
         simulateShortPress();
     }
-    simulateHold();
+    simulateHoldNoRelease();
 
     CHECK_TRUE(menuActive());
 }
@@ -257,25 +266,24 @@ TEST(MenuStateMachine, HoldOn8thPressEntersCalibration)
 /*
  * Test: ShutdownStateIsPersistent
  * Setup: Menu starts in idle state
- * Action: Enter shutdown state (3 presses + hold), then attempt more button presses
- * Expected: Menu stays in shutdown state (active), all LEDs remain on (state is terminal)
+ * Action: Enter shutdown state (4 presses + hold)
+ * Expected: Menu goes into shutdown state, shutting down flag is true
  */
-TEST(MenuStateMachine, ShutdownStateIsPersistent)
+TEST(MenuStateMachine, ShutdownStateSetsFlag)
 {
     /* Enter shutdown */
     simulateShortPress();
     simulateShortPress();
+    simulateShortPress();    
+    CHECK_FALSE(inShutdown);
     simulateShortPress();
-    simulateHold();
+    simulateHoldNoRelease();
 
-    /* Try to exit with more presses */
-    simulateShortPress();
-    simulateShortPress();
 
     /* Should still be in shutdown (menuActive) */
     CHECK_TRUE(menuActive());
-    /* LEDs should still be all on */
-    verifyLEDState(GPIO_PIN_SET, GPIO_PIN_SET, GPIO_PIN_SET, GPIO_PIN_SET);
+
+    CHECK_TRUE(inShutdown);
 }
 
 /*
@@ -430,7 +438,8 @@ TEST(MenuStateMachine, ButtonPressExactlyAtThresholdTriggersPress)
  */
 TEST(MenuStateMachine, ButtonHoldExactlyAtThresholdTriggersHold)
 {
-    /* Get to state 3 */
+    /* Get to state 4 */
+    simulateShortPress();
     simulateShortPress();
     simulateShortPress();
     simulateShortPress();
@@ -551,6 +560,7 @@ TEST(MenuStateMachine, LEDPatternState7)
  */
 TEST(MenuStateMachine, LEDPatternShutdown)
 {
+    simulateShortPress();
     simulateShortPress();
     simulateShortPress();
     simulateShortPress();
