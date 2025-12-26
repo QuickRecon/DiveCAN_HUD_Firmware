@@ -76,6 +76,9 @@ extern "C"
     void MockPower_SetPullDownBehavior(HAL_StatusTypeDef returnValue);
     void MockPower_SetPullUpBehavior(HAL_StatusTypeDef returnValue);
 
+    /* Shutdown state variable */
+    extern bool inShutdown;
+
     /* Mock query functions */
     bool MockPower_GetPullUpDownConfigEnabled(void);
     bool MockPower_GetStandbyEntered(void);

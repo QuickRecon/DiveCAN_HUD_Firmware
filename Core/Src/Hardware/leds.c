@@ -116,8 +116,9 @@ void setRGB(uint8_t channel, uint8_t r, uint8_t g, uint8_t b)
  * @param c3 Channel 3 blinks
  * @param statusMask 3 bit wide mask to indicate which cells are voted in, voted out cells get a yellow background, 1 implies cell voted in
  * @param failMask 3 bit wide mask to indicate which cells are in fail state, failed cells get constant red indication, 1 implies cell OK
+ * @param break Pointer to a boolean that can be set to true to break out of the blink early
  */
-void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t failMask)
+void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t failMask, bool *breakout)
 {
     int8_t channel_values[3] = {c1, c2, c3};
 
@@ -169,6 +170,10 @@ void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t fail
                 }
             }
         }
+        if (breakout != NULL && *breakout)
+        {
+            return;
+        }
         osDelay(BLINK_PERIOD);                            // Let the digits cook for a bit
         for (uint8_t channel = 0; channel < 3; channel++) // Turn everything off
         {
@@ -184,6 +189,10 @@ void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t fail
             {
                 setRGB(channel, 0, 0, 0); // Off
             }
+        }
+        if (breakout != NULL && *breakout)
+        {
+            return;
         }
         osDelay(BLINK_PERIOD);
     }

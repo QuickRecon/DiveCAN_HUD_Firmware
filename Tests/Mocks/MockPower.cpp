@@ -79,6 +79,9 @@ struct GPIOPinValue {
 
 static GPIOPinValue gpioPinValues[MAX_GPIO_PINS];
 
+/* Shutdown state variable */
+bool inShutdown = false;
+
 extern "C" {
 
 /* HAL Power API */
@@ -164,6 +167,7 @@ void MockPower_Reset(void) {
     pullDownCallCount = 0;
     pullUpCallCount = 0;
     gpioInitCount = 0;
+    inShutdown = false;
 
     /* Clear all arrays */
     memset(pullDownPins, 0, sizeof(pullDownPins));

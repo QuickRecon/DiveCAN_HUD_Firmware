@@ -43,7 +43,7 @@ MENU_STATE_MACHINE_MOCK_SRC = $(MOCKS_DIR)/MockHAL.cpp
 # Source files - HUDControl
 HUDCONTROL_SRC = $(CORE_SRC)/HUDControl.c
 HUDCONTROL_TEST_SRC = HUDControl/HUDControlTest.cpp
-HUDCONTROL_MOCK_SRC = $(MOCKS_DIR)/MockQueue.cpp $(MOCKS_DIR)/MockLEDs.cpp
+HUDCONTROL_MOCK_SRC = $(MOCKS_DIR)/MockQueue.cpp $(MOCKS_DIR)/MockLEDs.cpp $(MOCKS_DIR)/MockPower.cpp
 
 # Source files - Flash
 FLASH_SRC = $(CORE_SRC)/Hardware/flash.c
@@ -77,7 +77,7 @@ PRINTER_MOCK_SRC = $(MOCKS_DIR)/queue.cpp
 
 # Object files
 MENU_STATE_MACHINE_OBJS = $(BUILD_DIR)/menu_state_machine.o $(BUILD_DIR)/MenuStateMachineTest.o $(BUILD_DIR)/MockHAL.o
-HUDCONTROL_OBJS = $(BUILD_DIR)/HUDControl.o $(BUILD_DIR)/HUDControlTest.o $(BUILD_DIR)/MockQueue.o $(BUILD_DIR)/MockLEDs.o $(BUILD_DIR)/MockHAL.o
+HUDCONTROL_OBJS = $(BUILD_DIR)/HUDControl.o $(BUILD_DIR)/HUDControlTest.o $(BUILD_DIR)/MockQueue.o $(BUILD_DIR)/MockLEDs.o $(BUILD_DIR)/MockHAL.o $(BUILD_DIR)/MockPower_hud.o
 FLASH_OBJS = $(BUILD_DIR)/flash.o $(BUILD_DIR)/FlashTest.o $(BUILD_DIR)/MockFlash.o $(BUILD_DIR)/MockErrors.o
 TRANSCIEVER_OBJS = $(BUILD_DIR)/Transciever.o $(BUILD_DIR)/TranscieverTest.o $(BUILD_DIR)/MockCAN.o $(BUILD_DIR)/MockErrors.o $(BUILD_DIR)/queue.o
 DIVECAN_OBJS = $(BUILD_DIR)/DiveCAN.o $(BUILD_DIR)/Transciever_divecan.o $(BUILD_DIR)/DiveCANTest.o $(BUILD_DIR)/MockCAN.o $(BUILD_DIR)/MockErrors.o $(BUILD_DIR)/MockPower.o $(BUILD_DIR)/queue.o $(BUILD_DIR)/printer.o
@@ -143,6 +143,9 @@ $(BUILD_DIR)/MockQueue.o: $(MOCKS_DIR)/MockQueue.cpp | $(BUILD_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/MockLEDs.o: $(MOCKS_DIR)/MockLEDs.cpp | $(BUILD_DIR)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/MockPower_hud.o: $(MOCKS_DIR)/MockPower.cpp | $(BUILD_DIR)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/flash.o: $(FLASH_SRC) | $(BUILD_DIR)

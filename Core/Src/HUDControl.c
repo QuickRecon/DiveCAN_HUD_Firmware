@@ -5,9 +5,12 @@
 #include "common.h"
 #include "menu_state_machine.h"
 #include "DiveCAN/DiveCAN.h"
+#include "Hardware/pwr_management.h"
 
 extern osMessageQueueId_t PPO2QueueHandle;
 extern osMessageQueueId_t CellStatQueueHandle;
+
+extern bool inShutdown;
 
 inline int16_t div10_round(int16_t x)
 {
@@ -64,7 +67,27 @@ void PPO2Blink(CellValues_t *cellValues, bool *alerting)
         statusMask = 0b111; // Default to all good if no status available
     }
 
-    blinkCode((int8_t)c1, (int8_t)c2, (int8_t)c3, statusMask, failMask);
+    blinkCode((int8_t)c1, (int8_t)c2, (int8_t)c3, statusMask, failMask, &inShutdown);
+}
+
+void ShutdownFadeout()
+{
+    for (uint8_t brightness = 10; brightness > 0; brightness--)
+    {
+        if (inShutdown)
+        {
+            for (uint8_t channel = 0; channel < 3; channel++)
+            {
+                setRGB(channel, brightness, 0, 0); // Red fading
+            }
+            osDelay(TIMEOUT_500MS_TICKS);
+        } else {
+            /* We'll zip through the rest of the loop and end */
+        }
+    }
+    if(inShutdown){
+        Shutdown();
+    }
 }
 
 bool alerting = false;
@@ -79,7 +102,14 @@ void RGBBlinkControl()
     CellValues_t cellValues = {0};
     for (;;)
     {
-        PPO2Blink(&cellValues, &alerting);
+        if (inShutdown)
+        {
+            ShutdownFadeout();
+        }
+        else
+        {
+            PPO2Blink(&cellValues, &alerting);
+        }
     }
 }
 

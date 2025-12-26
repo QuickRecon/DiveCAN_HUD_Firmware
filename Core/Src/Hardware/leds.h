@@ -14,8 +14,7 @@ extern "C"
     void initLEDs(void);
 
     void setRGB(uint8_t channel, uint8_t r, uint8_t g, uint8_t b);
-
-    void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t failMask);
+    void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t failMask, bool *breakout);
     void blinkNoData(void);
     void blinkAlarm();
 

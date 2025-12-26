@@ -28,6 +28,7 @@ typedef enum
 {
     NONE,
     PRESS,
+    PRESSED,
     HOLD
 } ButtonState_t;
 
@@ -48,9 +49,14 @@ bool menuActive()
     return currentMenuState != MENU_STATE_IDLE;
 }
 
+bool inShutdown = false;
+
 void onButtonPress()
 {
-    buttonPressTimestamp = HAL_GetTick();
+    if (buttonPressTimestamp == 0)
+    {
+        buttonPressTimestamp = HAL_GetTick();
+    }
 }
 
 void onButtonRelease()
@@ -58,7 +64,7 @@ void onButtonRelease()
     buttonPressTimestamp = 0;
 }
 
-void incrementState(ButtonState_t button_state)
+bool incrementState(ButtonState_t button_state)
 {
     MenuState_t previousState = currentMenuState;
     switch (currentMenuState)
@@ -82,20 +88,25 @@ void incrementState(ButtonState_t button_state)
         }
         break;
     case MENU_STATE_3PRESS:
-        if (button_state == HOLD)
-        {
-            currentMenuState = MENU_STATE_SHUTDOWN;
-        }
-        else if (button_state == PRESS)
+        if (button_state == PRESS)
         {
             currentMenuState = MENU_STATE_4PRESS;
         }
         break;
     case MENU_STATE_SHUTDOWN:
         // Stay here until reset
+        if (button_state == NONE)
+        {
+            // Go back to idle once button is released
+            currentMenuState = MENU_STATE_IDLE;
+        }
         break;
     case MENU_STATE_4PRESS:
-        if (button_state == PRESS)
+        if (button_state == HOLD)
+        {
+            currentMenuState = MENU_STATE_SHUTDOWN;
+        }
+        else if (button_state == PRESS)
         {
             currentMenuState = MENU_STATE_5PRESS;
         }
@@ -123,22 +134,14 @@ void incrementState(ButtonState_t button_state)
         }
         break;
     case MENU_STATE_CALIBRATE:
-        // Stay here until reset
+        currentMenuState = MENU_STATE_IDLE;
         break;
     default:
         currentMenuState = MENU_STATE_IDLE;
         break;
     }
 
-    if (previousState != currentMenuState)
-    {
-        // State has changed, reset button timestamp
-        buttonPressTimestamp = 0;
-        if (currentMenuState != MENU_STATE_IDLE)
-        {
-            timeInState = HAL_GetTick();
-        }
-    }
+    return previousState != currentMenuState;
 }
 
 void resetMenuStateMachine()
@@ -226,22 +229,36 @@ void displayLEDsForState()
 
 void menuStateMachineTick()
 {
-    ButtonState_t button_state = NONE;
+    static ButtonState_t button_state = NONE;
     if (buttonPressTimestamp != 0)
     {
         if (HAL_GetTick() - buttonPressTimestamp > BUTTON_HOLD_TIME_MS)
         {
             button_state = HOLD;
         }
-        else if (HAL_GetTick() - buttonPressTimestamp > BUTTON_PRESS_TIME_MS)
+        else if (HAL_GetTick() - buttonPressTimestamp > BUTTON_PRESS_TIME_MS && button_state == NONE)
         {
             button_state = PRESS;
         }
     }
+    else
+    {
+        button_state = NONE;
+    }
     displayLEDsForState();
-    incrementState(button_state);
+    bool stateIncremented = incrementState(button_state);
 
-    if ((timeInState != 0) && (HAL_GetTick() - timeInState > MENU_MODE_TIMEOUT_MS) && button_state == NONE)
+    if (stateIncremented)
+    {
+        timeInState = HAL_GetTick();
+        if (button_state == PRESS)
+        {
+            button_state = PRESSED;
+        }
+    }
+
+    inShutdown = currentMenuState == MENU_STATE_SHUTDOWN;
+    if ((timeInState != 0) && (HAL_GetTick() - timeInState > MENU_MODE_TIMEOUT_MS) && buttonPressTimestamp == 0)
     {
         resetMenuStateMachine();
     }
