@@ -224,6 +224,9 @@ static bool WriteInt32(uint16_t addr, uint32_t value)
  */
 bool GetFatalError(FatalError_t *err)
 {
+    // Assertion 1: Verify pointer is not NULL
+    assert(err != NULL);
+
     bool readOk = false;
     if (NULL == err)
     {
@@ -235,6 +238,9 @@ bool GetFatalError(FatalError_t *err)
         EE_Status result = EE_ReadVariable32bits(FATAL_ERROR_BASE_ADDR, &errInt);
 
         *err = (FatalError_t)errInt;
+
+        // Assertion 2: Verify error value is within valid range
+        assert(*err < 0xFF);
 
         if (result == EE_OK)
         {
