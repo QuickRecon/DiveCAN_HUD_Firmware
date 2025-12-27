@@ -116,6 +116,14 @@ void setLEDBrightness(uint8_t level, GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 
 void setRGB(uint8_t channel, uint8_t r, uint8_t g, uint8_t b)
 {
+    // Assertion 1: Verify channel is within valid range
+    assert(channel < 3);
+
+    // Assertion 2: Verify RGB values are within LED brightness limits
+    assert(r <= LED_MAX_BRIGHTNESS);
+    assert(g <= LED_MAX_BRIGHTNESS);
+    assert(b <= LED_MAX_BRIGHTNESS);
+
     setLEDBrightness(r, LED_PinMap[channel][0].port, LED_PinMap[channel][0].pin);
     setLEDBrightness(g, LED_PinMap[channel][1].port, LED_PinMap[channel][1].pin);
     setLEDBrightness(b, LED_PinMap[channel][2].port, LED_PinMap[channel][2].pin);
