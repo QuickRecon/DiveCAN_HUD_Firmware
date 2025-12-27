@@ -76,6 +76,9 @@ void onButtonPress()
 void onButtonRelease()
 {
     buttonPressTimestamp = 0;
+
+    // Assertion: Verify timestamp was cleared (postcondition)
+    assert(buttonPressTimestamp == 0);
 }
 
 bool incrementState(ButtonState_t button_state)
