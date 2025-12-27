@@ -45,6 +45,13 @@ inline bool cell_alert(uint8_t cellVal)
  */
 void PPO2Blink(CellValues_t *cellValues, bool *alerting)
 {
+    // Assertion 1: Verify pointer parameters are not NULL
+    assert(cellValues != NULL);
+    assert(alerting != NULL);
+
+    // Assertion 2: Verify queue handle is valid
+    assert(PPO2QueueHandle != NULL);
+
     const uint8_t centerValue = 100;
     /* Dequeue the latest PPO2 information */
     osStatus_t osStat = osMessageQueueGet(PPO2QueueHandle, cellValues, NULL, 0);
