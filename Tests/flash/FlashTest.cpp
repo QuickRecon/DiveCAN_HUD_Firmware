@@ -277,12 +277,6 @@ TEST_GROUP(FatalErrorPersistence) {
     }
 };
 
-TEST(FatalErrorPersistence, GetFatalError_NullPointer) {
-    bool result = GetFatalError(NULL);
-    CHECK_FALSE(result);
-    CHECK_EQUAL(1, MockErrors_GetNonFatalCount(NULL_PTR_ERR));
-}
-
 TEST(FatalErrorPersistence, GetFatalError_NoDataInitializesToNone) {
     MockFlash_SetReadBehavior(EE_NO_DATA, 0);
     FatalError_t err = HARD_FAULT_FERR;

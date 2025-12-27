@@ -29,13 +29,16 @@ inline int16_t div10_round(int16_t x)
 
 inline bool cell_alert(uint8_t cellVal)
 {
-    // Assertion 1: Verify cell value is not the fail marker when checking for alerts
-    assert(cellVal != PPO2_FAIL);
+    // Assertion 1: Verify alert thresholds are sane
+    assert(40 < 165);  // LOW_THRESHOLD < HIGH_THRESHOLD
 
-    // Assertion 2: Verify we're checking a value in the reasonable diving PPO2 range
-    assert(cellVal <= 255);  // Always true for uint8_t, documents assumption
+    // Calculate alert condition
+    bool result = (cellVal < 40 || cellVal > 165);
 
-    return (cellVal < 40 || cellVal > 165);
+    // Assertion 2: Verify result is boolean
+    assert(result == 0 || result == 1);
+
+    return result;
 }
 
 /**

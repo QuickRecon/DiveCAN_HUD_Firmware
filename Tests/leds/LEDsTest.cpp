@@ -19,7 +19,7 @@ extern "C" {
 
 /* Test constants from leds.c */
 const uint32_t STARTUP_DELAY_MS = 500;
-const uint8_t LED_MAX_BRIGHTNESS = 32;
+/* LED_MAX_BRIGHTNESS is now exported from leds.h, no need to redefine */
 const uint8_t LED_BRIGHTNESS[3] = {10, 3, 3};  // R, G, B
 const uint8_t LED_MIN_BRIGHTNESS = 3;
 const uint32_t BLINK_PERIOD = 500;  /* TIMEOUT_250MS_TICKS is actually 500ms (from common.h:32) */
@@ -246,7 +246,8 @@ TEST_GROUP(BlinkCode) {
 
 /* Verify positive value blinks green */
 TEST(BlinkCode, PositiveValue_GreenBlinks) {
-    blinkCode(3, 0, 0, 0x07, 0x07);  /* 3 green blinks on channel 0, all cells OK and voted in */
+    bool breakout = false;
+    blinkCode(3, 0, 0, 0x07, 0x07, &breakout);  /* 3 green blinks on channel 0, all cells OK and voted in */
 
     /* Should have 3 blink cycles: on period + off period per blink */
     /* Total osDelay calls: 2 * max_blinks = 2 * 3 = 6 */
@@ -256,7 +257,8 @@ TEST(BlinkCode, PositiveValue_GreenBlinks) {
 
 /* Verify negative value blinks red */
 TEST(BlinkCode, NegativeValue_RedBlinks) {
-    blinkCode(-5, 0, 0, 0x07, 0x07);  /* 5 red blinks on channel 0 */
+    bool breakout = false;
+    blinkCode(-5, 0, 0, 0x07, 0x07, &breakout);  /* 5 red blinks on channel 0 */
 
     /* Should have 5 blink cycles: on period + off period per blink */
     CHECK_EQUAL(10, MockQueue_GetDelayCallCount());
@@ -265,7 +267,8 @@ TEST(BlinkCode, NegativeValue_RedBlinks) {
 
 /* Verify multiple channels use max blink count */
 TEST(BlinkCode, MultipleChannels_UseMaxCount) {
-    blinkCode(2, 5, 3, 0x07, 0x07);  /* Max is 5 */
+    bool breakout = false;
+    blinkCode(2, 5, 3, 0x07, 0x07, &breakout);  /* Max is 5 */
 
     /* Should have 5 blink cycles (max of 2, 5, 3) */
     CHECK_EQUAL(10, MockQueue_GetDelayCallCount());
@@ -274,7 +277,8 @@ TEST(BlinkCode, MultipleChannels_UseMaxCount) {
 
 /* Verify failed cell shows constant red (failMask = 0 for that channel) */
 TEST(BlinkCode, FailedCell_ConstantRed) {
-    blinkCode(5, 3, 0, 0x07, 0x06);  /* Channel 0 failed (bit 0 of failMask = 0), channel 1 OK with 3 blinks */
+    bool breakout = false;
+    blinkCode(5, 3, 0, 0x07, 0x06, &breakout);  /* Channel 0 failed (bit 0 of failMask = 0), channel 1 OK with 3 blinks */
 
     /* Failed cell (channel 0) should show min brightness red */
     CHECK_EQUAL(GPIO_PIN_SET, MockHAL_GetPinState(R1_GPIO_Port, R1_Pin));
@@ -284,7 +288,8 @@ TEST(BlinkCode, FailedCell_ConstantRed) {
 
 /* Verify voted-out cell shows yellow background (statusMask = 0 for that channel) */
 TEST(BlinkCode, VotedOutCell_YellowBackground) {
-    blinkCode(0, 5, 0, 0x05, 0x07);  /* Channel 1 voted out (bit 1 of statusMask = 0) */
+    bool breakout = false;
+    blinkCode(0, 5, 0, 0x05, 0x07, &breakout);  /* Channel 1 voted out (bit 1 of statusMask = 0) */
 
     /* After blinking completes, voted-out channel should have yellow */
     CHECK_EQUAL(GPIO_PIN_SET, MockHAL_GetPinState(R2_GPIO_Port, R2_Pin));
@@ -294,7 +299,8 @@ TEST(BlinkCode, VotedOutCell_YellowBackground) {
 
 /* Verify zero value with all cells OK */
 TEST(BlinkCode, ZeroValues_NoBlinks) {
-    blinkCode(0, 0, 0, 0x07, 0x07);
+    bool breakout = false;
+    blinkCode(0, 0, 0, 0x07, 0x07, &breakout);
 
     /* No blinks, but delay calls still happen in the loop (0 iterations) */
     CHECK_EQUAL(0, MockQueue_GetDelayCallCount());
@@ -302,7 +308,8 @@ TEST(BlinkCode, ZeroValues_NoBlinks) {
 
 /* Verify mixed positive and negative values */
 TEST(BlinkCode, MixedValues_CorrectColors) {
-    blinkCode(3, -2, 4, 0x07, 0x07);  /* Max is 4, channels 0 and 2 green, channel 1 red */
+    bool breakout = false;
+    blinkCode(3, -2, 4, 0x07, 0x07, &breakout);  /* Max is 4, channels 0 and 2 green, channel 1 red */
 
     /* Should have 4 blink cycles */
     CHECK_EQUAL(8, MockQueue_GetDelayCallCount());

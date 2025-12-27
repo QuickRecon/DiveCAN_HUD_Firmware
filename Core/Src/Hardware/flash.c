@@ -226,6 +226,8 @@ bool GetFatalError(FatalError_t *err)
 {
     // Assertion 1: Verify pointer is not NULL
     assert(err != NULL);
+    // Assertion 2: Verify EEPROM address is defined
+    assert(FATAL_ERROR_BASE_ADDR != 0);
 
     bool readOk = false;
     if (NULL == err)
@@ -239,8 +241,8 @@ bool GetFatalError(FatalError_t *err)
 
         *err = (FatalError_t)errInt;
 
-        // Assertion 2: Verify error value is within valid range
-        assert(*err < 0xFF);
+        // Assertion 3: Verify error value is within valid fatal error range
+        assert(*err <= MAX_FERR);
 
         if (result == EE_OK)
         {

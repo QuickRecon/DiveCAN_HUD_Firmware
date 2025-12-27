@@ -47,11 +47,8 @@ const uint32_t MENU_MODE_TIMEOUT_MS = TIMEOUT_10S_TICKS;
  */
 bool menuActive()
 {
-    // Assertion 1: Verify current state is valid
+    // Assertion: Verify current state is valid
     assert(currentMenuState <= MENU_STATE_CALIBRATE);
-
-    // Assertion 2: Verify state is within enum bounds
-    assert(currentMenuState >= MENU_STATE_IDLE);
 
     return currentMenuState != MENU_STATE_IDLE;
 }
@@ -84,10 +81,10 @@ void onButtonRelease()
 bool incrementState(ButtonState_t button_state)
 {
     // Assertion 1: Verify button state is valid
-    assert(button_state >= NONE && button_state <= HOLD);
+    assert(button_state <= HOLD);
 
     // Assertion 2: Verify current menu state is valid before transition
-    assert(currentMenuState >= MENU_STATE_IDLE && currentMenuState <= MENU_STATE_CALIBRATE);
+    assert(currentMenuState <= MENU_STATE_CALIBRATE);
 
     MenuState_t previousState = currentMenuState;
     switch (currentMenuState)
@@ -165,7 +162,7 @@ bool incrementState(ButtonState_t button_state)
     }
 
     // Assertion 3: Verify new state is valid after transition
-    assert(currentMenuState >= MENU_STATE_IDLE && currentMenuState <= MENU_STATE_CALIBRATE);
+    assert(currentMenuState <= MENU_STATE_CALIBRATE);
 
     return previousState != currentMenuState;
 }
@@ -185,7 +182,7 @@ void resetMenuStateMachine()
 void displayLEDsForState()
 {
     // Assertion 1: Verify current state is valid
-    assert(currentMenuState >= MENU_STATE_IDLE && currentMenuState <= MENU_STATE_CALIBRATE);
+    assert(currentMenuState <= MENU_STATE_CALIBRATE);
 
     // Assertion 2: Verify GPIO ports are valid
     assert(LED_0_GPIO_Port != NULL);
@@ -274,10 +271,7 @@ void menuStateMachineTick()
     assert(BUTTON_PRESS_TIME_MS > 0);
     assert(MENU_MODE_TIMEOUT_MS > 0);
 
-    static ButtonState_t button_state = NONE;
-
-    // Assertion 2: Verify button state is valid
-    assert(button_state >= NONE && button_state <= HOLD);
+    ButtonState_t button_state = NONE;
 
     if (buttonPressTimestamp != 0)
     {
