@@ -251,9 +251,17 @@ void blinkNoData(void)
 
 void blinkAlarm()
 {
+    // Assertion 1: Verify LED max brightness is valid
+    assert(LED_MAX_BRIGHTNESS <= 32);
+    assert(LED_MAX_BRIGHTNESS > 0);
+
+    // Assertion 2: Verify timeout constant is valid
+    assert(TIMEOUT_50MS_TICKS > 0);
+
     /* We go do a "nightrider" sweep to the left and back to the right 3 times (100ms per LED) */
     for (int i = 0; i < 5; i++)
     {
+        assert(i >= 0 && i < 5);
         setRGB(0, LED_MAX_BRIGHTNESS, 0, 0);
         osDelay(TIMEOUT_50MS_TICKS);
         setRGB(0, 0, 0, 0);
