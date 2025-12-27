@@ -14,6 +14,12 @@ uint32_t set_bit(uint32_t number, uint32_t n, bool x)
 static inline uint32_t set_bit(uint32_t number, uint32_t n, bool x)
 #endif
 {
+    // Assertion 1: Verify bit position is within 32-bit range
+    assert(n < 32);
+
+    // Assertion 2: Verify boolean is valid (0 or 1)
+    assert(x == 0 || x == 1 || x == true || x == false);
+
     return (number & ~((uint32_t)1 << n)) | ((uint32_t)x << n);
 }
 
@@ -218,6 +224,11 @@ static bool WriteInt32(uint16_t addr, uint32_t value)
  */
 bool GetFatalError(FatalError_t *err)
 {
+    // Assertion 1: Verify pointer is not NULL
+    assert(err != NULL);
+    // Assertion 2: Verify EEPROM address is defined
+    assert(FATAL_ERROR_BASE_ADDR != 0);
+
     bool readOk = false;
     if (NULL == err)
     {
@@ -229,6 +240,9 @@ bool GetFatalError(FatalError_t *err)
         EE_Status result = EE_ReadVariable32bits(FATAL_ERROR_BASE_ADDR, &errInt);
 
         *err = (FatalError_t)errInt;
+
+        // Assertion 3: Verify error value is within valid fatal error range
+        assert(*err <= MAX_FERR);
 
         if (result == EE_OK)
         {

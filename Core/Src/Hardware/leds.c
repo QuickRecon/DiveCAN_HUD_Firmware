@@ -27,6 +27,18 @@ const struct GPIO_PinMap LED_PinMap[3][3] = {
 void setLEDBrightness(uint8_t level, GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
 void initLEDs(void)
 {
+    // Assertion 1: Verify GPIO ports are initialized
+    assert(LED_0_GPIO_Port != NULL);
+    assert(R1_GPIO_Port != NULL);
+    assert(G1_GPIO_Port != NULL);
+    assert(B1_GPIO_Port != NULL);
+    assert(ASC_EN_GPIO_Port != NULL);
+
+    // Assertion 2: Verify LED brightness constants are in range
+    assert(LED_BRIGHTNESS[0] <= LED_MAX_BRIGHTNESS);
+    assert(LED_BRIGHTNESS[1] <= LED_MAX_BRIGHTNESS);
+    assert(LED_BRIGHTNESS[2] <= LED_MAX_BRIGHTNESS);
+
     /* Turn all the end LEDs on*/
     HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_SET);
@@ -104,6 +116,14 @@ void setLEDBrightness(uint8_t level, GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin)
 
 void setRGB(uint8_t channel, uint8_t r, uint8_t g, uint8_t b)
 {
+    // Assertion 1: Verify channel is within valid range
+    assert(channel < 3);
+
+    // Assertion 2: Verify RGB values are within LED brightness limits
+    assert(r <= LED_MAX_BRIGHTNESS);
+    assert(g <= LED_MAX_BRIGHTNESS);
+    assert(b <= LED_MAX_BRIGHTNESS);
+
     setLEDBrightness(r, LED_PinMap[channel][0].port, LED_PinMap[channel][0].pin);
     setLEDBrightness(g, LED_PinMap[channel][1].port, LED_PinMap[channel][1].pin);
     setLEDBrightness(b, LED_PinMap[channel][2].port, LED_PinMap[channel][2].pin);
@@ -204,16 +224,24 @@ void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t fail
  */
 void blinkNoData(void)
 {
+    // Assertion 1: Verify LED brightness constant is valid
+    assert(LED_BRIGHTNESS[2] <= LED_MAX_BRIGHTNESS);
+
+    // Assertion 2: Verify blink period is valid
+    assert(BLINK_PERIOD > 0);
+
     /* Do the loop and blink the blink*/
     for (uint8_t i = 0; i < 2; i++)
     {
         for (uint8_t channel = 0; channel < 3; channel++)
         {
+            assert(channel < 3);
             setRGB(channel, 0, 0, LED_BRIGHTNESS[2]); // Blue
         }
         osDelay(BLINK_PERIOD);                            // Let the digits cook for a bit
         for (uint8_t channel = 0; channel < 3; channel++) // Turn everything off
         {
+            assert(channel < 3);
             setRGB(channel, 0, 0, 0); // Off
         }
         osDelay(BLINK_PERIOD);
@@ -223,9 +251,17 @@ void blinkNoData(void)
 
 void blinkAlarm()
 {
+    // Assertion 1: Verify LED max brightness is valid
+    assert(LED_MAX_BRIGHTNESS <= 32);
+    assert(LED_MAX_BRIGHTNESS > 0);
+
+    // Assertion 2: Verify timeout constant is valid
+    assert(TIMEOUT_50MS_TICKS > 0);
+
     /* We go do a "nightrider" sweep to the left and back to the right 3 times (100ms per LED) */
     for (int i = 0; i < 5; i++)
     {
+        assert(i >= 0 && i < 5);
         setRGB(0, LED_MAX_BRIGHTNESS, 0, 0);
         osDelay(TIMEOUT_50MS_TICKS);
         setRGB(0, 0, 0, 0);

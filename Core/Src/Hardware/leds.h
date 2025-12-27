@@ -2,6 +2,9 @@
 
 #include "../errors.h"
 
+/* LED brightness constant - maximum brightness level for setRGB() */
+extern const uint8_t LED_MAX_BRIGHTNESS;
+
 #ifdef TESTING
 /* Include mock HAL for testing */
 #include "main.h"

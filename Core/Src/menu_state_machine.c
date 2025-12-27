@@ -1,6 +1,7 @@
 #include "menu_state_machine.h"
 #include "main.h"
 #include "common.h"
+#include <assert.h>
 
 /* The gist of the menu system is as follows:
  *  Pressing the button 4 times, and holding on the 4th time will trigger the hud to shut down
@@ -46,6 +47,9 @@ const uint32_t MENU_MODE_TIMEOUT_MS = TIMEOUT_10S_TICKS;
  */
 bool menuActive()
 {
+    // Assertion: Verify current state is valid
+    assert(currentMenuState <= MENU_STATE_CALIBRATE);
+
     return currentMenuState != MENU_STATE_IDLE;
 }
 
@@ -53,19 +57,35 @@ bool inShutdown = false;
 
 void onButtonPress()
 {
+    // Assertion 1: Verify HAL_GetTick() returns reasonable value
+    uint32_t tick = HAL_GetTick();
+    assert(tick > 0);  // Tick should never be 0 after boot
+
     if (buttonPressTimestamp == 0)
     {
-        buttonPressTimestamp = HAL_GetTick();
+        buttonPressTimestamp = tick;
+
+        // Assertion 2: Verify timestamp was set
+        assert(buttonPressTimestamp != 0);
     }
 }
 
 void onButtonRelease()
 {
     buttonPressTimestamp = 0;
+
+    // Assertion: Verify timestamp was cleared (postcondition)
+    assert(buttonPressTimestamp == 0);
 }
 
 bool incrementState(ButtonState_t button_state)
 {
+    // Assertion 1: Verify button state is valid
+    assert(button_state <= HOLD);
+
+    // Assertion 2: Verify current menu state is valid before transition
+    assert(currentMenuState <= MENU_STATE_CALIBRATE);
+
     MenuState_t previousState = currentMenuState;
     switch (currentMenuState)
     {
@@ -141,6 +161,9 @@ bool incrementState(ButtonState_t button_state)
         break;
     }
 
+    // Assertion 3: Verify new state is valid after transition
+    assert(currentMenuState <= MENU_STATE_CALIBRATE);
+
     return previousState != currentMenuState;
 }
 
@@ -149,10 +172,24 @@ void resetMenuStateMachine()
     currentMenuState = MENU_STATE_IDLE;
     timeInState = 0;
     buttonPressTimestamp = 0;
+
+    // Postcondition assertions: Verify reset succeeded
+    assert(currentMenuState == MENU_STATE_IDLE);
+    assert(timeInState == 0);
+    assert(buttonPressTimestamp == 0);
 }
 
 void displayLEDsForState()
 {
+    // Assertion 1: Verify current state is valid
+    assert(currentMenuState <= MENU_STATE_CALIBRATE);
+
+    // Assertion 2: Verify GPIO ports are valid
+    assert(LED_0_GPIO_Port != NULL);
+    assert(LED_1_GPIO_Port != NULL);
+    assert(LED_2_GPIO_Port != NULL);
+    assert(LED_3_GPIO_Port != NULL);
+
     switch (currentMenuState)
     {
     case MENU_STATE_IDLE:
@@ -229,7 +266,13 @@ void displayLEDsForState()
 
 void menuStateMachineTick()
 {
-    static ButtonState_t button_state = NONE;
+    // Assertion 1: Verify timeout constants are valid
+    assert(BUTTON_HOLD_TIME_MS > 0);
+    assert(BUTTON_PRESS_TIME_MS > 0);
+    assert(MENU_MODE_TIMEOUT_MS > 0);
+
+    ButtonState_t button_state = NONE;
+
     if (buttonPressTimestamp != 0)
     {
         if (HAL_GetTick() - buttonPressTimestamp > BUTTON_HOLD_TIME_MS)

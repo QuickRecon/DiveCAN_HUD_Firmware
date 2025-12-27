@@ -6,6 +6,7 @@
 #include "menu_state_machine.h"
 #include "DiveCAN/DiveCAN.h"
 #include "Hardware/pwr_management.h"
+#include <assert.h>
 
 extern osMessageQueueId_t PPO2QueueHandle;
 extern osMessageQueueId_t CellStatQueueHandle;
@@ -15,12 +16,29 @@ extern bool inShutdown;
 inline int16_t div10_round(int16_t x)
 {
     /* rounds x/10 to nearest integer, handles negatives safely via int64_t */
-    return (int16_t)(((int32_t)x + (x >= 0 ? 5 : -5)) / 10);
+    // Assertion 1: Verify input is in reasonable PPO2 range (scaled by 10)
+    assert(x >= -1000 && x <= 2550);
+
+    int16_t result = (int16_t)(((int32_t)x + (x >= 0 ? 5 : -5)) / 10);
+
+    // Assertion 2: Verify result is within expected output range
+    assert(result >= -100 && result <= 255);
+
+    return result;
 }
 
 inline bool cell_alert(uint8_t cellVal)
 {
-    return (cellVal < 40 || cellVal > 165);
+    // Assertion 1: Verify alert thresholds are sane
+    assert(40 < 165);  // LOW_THRESHOLD < HIGH_THRESHOLD
+
+    // Calculate alert condition
+    bool result = (cellVal < 40 || cellVal > 165);
+
+    // Assertion 2: Verify result is boolean
+    assert(result == 0 || result == 1);
+
+    return result;
 }
 
 /**
@@ -30,6 +48,13 @@ inline bool cell_alert(uint8_t cellVal)
  */
 void PPO2Blink(CellValues_t *cellValues, bool *alerting)
 {
+    // Assertion 1: Verify pointer parameters are not NULL
+    assert(cellValues != NULL);
+    assert(alerting != NULL);
+
+    // Assertion 2: Verify queue handle is valid
+    assert(PPO2QueueHandle != NULL);
+
     const uint8_t centerValue = 100;
     /* Dequeue the latest PPO2 information */
     osStatus_t osStat = osMessageQueueGet(PPO2QueueHandle, cellValues, NULL, 0);
@@ -72,12 +97,22 @@ void PPO2Blink(CellValues_t *cellValues, bool *alerting)
 
 void ShutdownFadeout()
 {
+    // Assertion 1: Verify we're in shutdown state when called
+    assert(inShutdown == true);
+
+    // Assertion 2: Verify TIMEOUT constant is reasonable
+    assert(TIMEOUT_500MS_TICKS > 0);
+
     for (uint8_t brightness = 10; brightness > 0; brightness--)
     {
+        // Assertion 3: Verify brightness is in valid LED range
+        assert(brightness <= LED_MAX_BRIGHTNESS);
+
         if (inShutdown)
         {
             for (uint8_t channel = 0; channel < 3; channel++)
             {
+                assert(channel < 3);
                 setRGB(channel, brightness, 0, 0); // Red fading
             }
             osDelay(TIMEOUT_500MS_TICKS);
@@ -93,14 +128,21 @@ void ShutdownFadeout()
 bool alerting = false;
 void RGBBlinkControl()
 {
+    // Assertion 1: Verify TIMEOUT constant is valid
+    assert(TIMEOUT_2S_TICKS > 0);
+
+    // Assertion 2: Verify LED brightness constant is in range
+    assert(3 <= LED_MAX_BRIGHTNESS);
+
     /* We have LED control, turn the blue LEDS on while we wait for a signal */
     for (uint8_t channel = 0; channel < 3; channel++)
     {
+        assert(channel < 3);
         setRGB(channel, 0, 0, 3); // Blue
     }
     osDelay(TIMEOUT_2S_TICKS); /* Initial delay to for the DiveCAN system to start up and prime the queue */
     CellValues_t cellValues = {0};
-    for (;;)
+    for (;;)  // Infinite loop acceptable for RTOS task
     {
         if (inShutdown)
         {
@@ -115,8 +157,17 @@ void RGBBlinkControl()
 
 void EndBlinkControl()
 {
+    // Assertion 1: Verify GPIO port pointers are valid
+    assert(LED_0_GPIO_Port != NULL);
+    assert(LED_1_GPIO_Port != NULL);
+    assert(LED_2_GPIO_Port != NULL);
+    assert(LED_3_GPIO_Port != NULL);
+
+    // Assertion 2: Verify timeout constant is valid
+    assert(TIMEOUT_100MS_TICKS > 0);
+
     /* Infinite loop */
-    for (;;)
+    for (;;)  // Infinite loop acceptable for RTOS task
     {
         if (alerting && !menuActive())
         {

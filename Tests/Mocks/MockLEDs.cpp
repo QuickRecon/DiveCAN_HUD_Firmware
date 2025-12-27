@@ -25,6 +25,9 @@ static bool menuActiveState = false;
 
 extern "C" {
 
+/* LED brightness constant - must match the definition in leds.c */
+extern const uint8_t LED_MAX_BRIGHTNESS = 32;
+
 void MockLEDs_Reset(void) {
     setRGBCallCount = 0;
     lastSetRGB.channel = 0;
