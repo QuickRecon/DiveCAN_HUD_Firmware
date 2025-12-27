@@ -263,6 +263,7 @@ void displayLEDsForState()
         HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, GPIO_PIN_SET);
         break;
     case MENU_STATE_CALIBRATE:
+    {
         // Flash all LEDs to indicate calibration mode
         if (HAL_GetTick() - lastFlashToggle > 100) /* Flash every 100ms */
         {
@@ -275,6 +276,7 @@ void displayLEDsForState()
         HAL_GPIO_WritePin(LED_2_GPIO_Port, LED_2_Pin, pinState);
         HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, pinState);
         break;
+    }
     default:
         // Turn off all LEDs
         break;
