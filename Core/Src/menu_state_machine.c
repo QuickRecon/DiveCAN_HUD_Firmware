@@ -60,9 +60,16 @@ bool inShutdown = false;
 
 void onButtonPress()
 {
+    // Assertion 1: Verify HAL_GetTick() returns reasonable value
+    uint32_t tick = HAL_GetTick();
+    assert(tick > 0);  // Tick should never be 0 after boot
+
     if (buttonPressTimestamp == 0)
     {
-        buttonPressTimestamp = HAL_GetTick();
+        buttonPressTimestamp = tick;
+
+        // Assertion 2: Verify timestamp was set
+        assert(buttonPressTimestamp != 0);
     }
 }
 
