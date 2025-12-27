@@ -125,14 +125,21 @@ void ShutdownFadeout()
 bool alerting = false;
 void RGBBlinkControl()
 {
+    // Assertion 1: Verify TIMEOUT constant is valid
+    assert(TIMEOUT_2S_TICKS > 0);
+
+    // Assertion 2: Verify LED brightness constant is in range
+    assert(3 <= LED_MAX_BRIGHTNESS);
+
     /* We have LED control, turn the blue LEDS on while we wait for a signal */
     for (uint8_t channel = 0; channel < 3; channel++)
     {
+        assert(channel < 3);
         setRGB(channel, 0, 0, 3); // Blue
     }
     osDelay(TIMEOUT_2S_TICKS); /* Initial delay to for the DiveCAN system to start up and prime the queue */
     CellValues_t cellValues = {0};
-    for (;;)
+    for (;;)  // Infinite loop acceptable for RTOS task
     {
         if (inShutdown)
         {
