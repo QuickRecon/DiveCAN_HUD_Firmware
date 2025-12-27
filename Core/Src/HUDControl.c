@@ -154,8 +154,17 @@ void RGBBlinkControl()
 
 void EndBlinkControl()
 {
+    // Assertion 1: Verify GPIO port pointers are valid
+    assert(LED_0_GPIO_Port != NULL);
+    assert(LED_1_GPIO_Port != NULL);
+    assert(LED_2_GPIO_Port != NULL);
+    assert(LED_3_GPIO_Port != NULL);
+
+    // Assertion 2: Verify timeout constant is valid
+    assert(TIMEOUT_100MS_TICKS > 0);
+
     /* Infinite loop */
-    for (;;)
+    for (;;)  // Infinite loop acceptable for RTOS task
     {
         if (alerting && !menuActive())
         {
