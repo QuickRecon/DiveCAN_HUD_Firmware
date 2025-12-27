@@ -94,12 +94,22 @@ void PPO2Blink(CellValues_t *cellValues, bool *alerting)
 
 void ShutdownFadeout()
 {
+    // Assertion 1: Verify we're in shutdown state when called
+    assert(inShutdown == true);
+
+    // Assertion 2: Verify TIMEOUT constant is reasonable
+    assert(TIMEOUT_500MS_TICKS > 0);
+
     for (uint8_t brightness = 10; brightness > 0; brightness--)
     {
+        // Assertion 3: Verify brightness is in valid LED range
+        assert(brightness <= LED_MAX_BRIGHTNESS);
+
         if (inShutdown)
         {
             for (uint8_t channel = 0; channel < 3; channel++)
             {
+                assert(channel < 3);
                 setRGB(channel, brightness, 0, 0); // Red fading
             }
             osDelay(TIMEOUT_500MS_TICKS);
