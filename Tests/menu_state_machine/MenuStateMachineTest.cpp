@@ -4,7 +4,10 @@
 extern "C" {
 #include "../../Core/Src/menu_state_machine.h"
 #include "../Mocks/MockHAL.h"
+#include "../Mocks/MockQueue.h"
+#include "../Mocks/MockTransciever.h"
 extern bool inShutdown;
+extern bool inCalibration;
 }
 
 TEST_GROUP(MenuStateMachine)
@@ -12,12 +15,15 @@ TEST_GROUP(MenuStateMachine)
     void setup()
     {
         MockHAL_Reset();
+        MockQueue_Init();
+        MockTransciever_Reset();
         resetMenuStateMachine();
     }
 
     void teardown()
     {
         MockHAL_Reset();
+        MockQueue_Cleanup();
     }
 
     /* Helper to simulate a button press event */
@@ -224,6 +230,9 @@ TEST(MenuStateMachine, EightShortPressesReturnToIdle)
         simulateShortPress();
     }
 
+    /* Tick once more to ensure LED display is updated after transition to idle */
+    menuStateMachineTick();
+
     CHECK_FALSE(menuActive());
     verifyLEDState(GPIO_PIN_RESET, GPIO_PIN_RESET, GPIO_PIN_RESET, GPIO_PIN_RESET);
 }
@@ -241,6 +250,9 @@ TEST(MenuStateMachine, HoldOn4thPressEntersShutdown)
     simulateShortPress();
     simulateShortPress();
     simulateHoldNoRelease();
+
+    /* Tick once more to update LED display after state change */
+    menuStateMachineTick();
 
     CHECK_TRUE(menuActive());
     /* Shutdown state lights all LEDs */

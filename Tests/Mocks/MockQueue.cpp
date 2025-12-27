@@ -20,6 +20,7 @@ struct MockQueue {
 /* Queue instances */
 static MockQueue* ppo2Queue = nullptr;
 static MockQueue* cellStatQueue = nullptr;
+static MockQueue* calStateQueue = nullptr;
 
 /* Delay tracking */
 static uint32_t delayCallCount = 0;
@@ -28,6 +29,7 @@ static uint32_t totalDelayTicks = 0;
 /* Queue handles */
 osMessageQueueId_t PPO2QueueHandle = nullptr;
 osMessageQueueId_t CellStatQueueHandle = nullptr;
+osMessageQueueId_t CalStateQueueHandle = nullptr;
 
 extern "C" {
 
@@ -39,14 +41,20 @@ void MockQueue_Init(void) {
     if (cellStatQueue) {
         delete cellStatQueue;
     }
+    if (calStateQueue) {
+        delete calStateQueue;
+    }
 
     /* CellValues_t has 3 int16_t values = 6 bytes */
     ppo2Queue = new MockQueue(6);
     /* Cell status is a single uint8_t */
     cellStatQueue = new MockQueue(1);
+    /* CalibrationState_t is a single uint8_t (enum) */
+    calStateQueue = new MockQueue(1);
 
     PPO2QueueHandle = (osMessageQueueId_t)ppo2Queue;
     CellStatQueueHandle = (osMessageQueueId_t)cellStatQueue;
+    CalStateQueueHandle = (osMessageQueueId_t)calStateQueue;
 
     delayCallCount = 0;
     totalDelayTicks = 0;
@@ -65,6 +73,12 @@ void MockQueue_Reset(void) {
             cellStatQueue->data.pop();
         }
     }
+    if (calStateQueue) {
+        while (!calStateQueue->data.empty()) {
+            delete[] calStateQueue->data.front();
+            calStateQueue->data.pop();
+        }
+    }
 
     delayCallCount = 0;
     totalDelayTicks = 0;
@@ -79,9 +93,14 @@ void MockQueue_Cleanup(void) {
         delete cellStatQueue;
         cellStatQueue = nullptr;
     }
+    if (calStateQueue) {
+        delete calStateQueue;
+        calStateQueue = nullptr;
+    }
 
     PPO2QueueHandle = nullptr;
     CellStatQueueHandle = nullptr;
+    CalStateQueueHandle = nullptr;
 }
 
 uint32_t MockQueue_GetDelayCallCount(void) {
@@ -136,6 +155,22 @@ osStatus_t osMessageQueueGet(osMessageQueueId_t queue_id, void *msg_ptr, uint8_t
 void osDelay(TickType_t ticks) {
     delayCallCount++;
     totalDelayTicks += ticks;
+}
+
+osStatus_t osMessageQueueReset(osMessageQueueId_t queue_id) {
+    if (queue_id == nullptr) {
+        return osError;
+    }
+
+    MockQueue* queue = (MockQueue*)queue_id;
+
+    /* Clear all items from queue */
+    while (!queue->data.empty()) {
+        delete[] queue->data.front();
+        queue->data.pop();
+    }
+
+    return osOK;
 }
 
 } /* extern "C" */
