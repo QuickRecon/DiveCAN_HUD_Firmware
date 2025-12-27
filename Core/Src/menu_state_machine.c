@@ -83,6 +83,12 @@ void onButtonRelease()
 
 bool incrementState(ButtonState_t button_state)
 {
+    // Assertion 1: Verify button state is valid
+    assert(button_state >= NONE && button_state <= HOLD);
+
+    // Assertion 2: Verify current menu state is valid before transition
+    assert(currentMenuState >= MENU_STATE_IDLE && currentMenuState <= MENU_STATE_CALIBRATE);
+
     MenuState_t previousState = currentMenuState;
     switch (currentMenuState)
     {
@@ -157,6 +163,9 @@ bool incrementState(ButtonState_t button_state)
         currentMenuState = MENU_STATE_IDLE;
         break;
     }
+
+    // Assertion 3: Verify new state is valid after transition
+    assert(currentMenuState >= MENU_STATE_IDLE && currentMenuState <= MENU_STATE_CALIBRATE);
 
     return previousState != currentMenuState;
 }
