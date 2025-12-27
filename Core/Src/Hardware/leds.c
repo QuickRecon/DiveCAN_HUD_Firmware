@@ -224,16 +224,24 @@ void blinkCode(int8_t c1, int8_t c2, int8_t c3, uint8_t statusMask, uint8_t fail
  */
 void blinkNoData(void)
 {
+    // Assertion 1: Verify LED brightness constant is valid
+    assert(LED_BRIGHTNESS[2] <= LED_MAX_BRIGHTNESS);
+
+    // Assertion 2: Verify blink period is valid
+    assert(BLINK_PERIOD > 0);
+
     /* Do the loop and blink the blink*/
     for (uint8_t i = 0; i < 2; i++)
     {
         for (uint8_t channel = 0; channel < 3; channel++)
         {
+            assert(channel < 3);
             setRGB(channel, 0, 0, LED_BRIGHTNESS[2]); // Blue
         }
         osDelay(BLINK_PERIOD);                            // Let the digits cook for a bit
         for (uint8_t channel = 0; channel < 3; channel++) // Turn everything off
         {
+            assert(channel < 3);
             setRGB(channel, 0, 0, 0); // Off
         }
         osDelay(BLINK_PERIOD);
