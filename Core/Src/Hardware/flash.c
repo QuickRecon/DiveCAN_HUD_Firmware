@@ -14,6 +14,12 @@ uint32_t set_bit(uint32_t number, uint32_t n, bool x)
 static inline uint32_t set_bit(uint32_t number, uint32_t n, bool x)
 #endif
 {
+    // Assertion 1: Verify bit position is within 32-bit range
+    assert(n < 32);
+
+    // Assertion 2: Verify boolean is valid (0 or 1)
+    assert(x == 0 || x == 1 || x == true || x == false);
+
     return (number & ~((uint32_t)1 << n)) | ((uint32_t)x << n);
 }
 
