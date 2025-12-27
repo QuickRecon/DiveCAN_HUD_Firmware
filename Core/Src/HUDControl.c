@@ -6,6 +6,7 @@
 #include "menu_state_machine.h"
 #include "DiveCAN/DiveCAN.h"
 #include "Hardware/pwr_management.h"
+#include <assert.h>
 
 extern osMessageQueueId_t PPO2QueueHandle;
 extern osMessageQueueId_t CellStatQueueHandle;
@@ -15,7 +16,15 @@ extern bool inShutdown;
 inline int16_t div10_round(int16_t x)
 {
     /* rounds x/10 to nearest integer, handles negatives safely via int64_t */
-    return (int16_t)(((int32_t)x + (x >= 0 ? 5 : -5)) / 10);
+    // Assertion 1: Verify input is in reasonable PPO2 range (scaled by 10)
+    assert(x >= -1000 && x <= 2550);
+
+    int16_t result = (int16_t)(((int32_t)x + (x >= 0 ? 5 : -5)) / 10);
+
+    // Assertion 2: Verify result is within expected output range
+    assert(result >= -100 && result <= 255);
+
+    return result;
 }
 
 inline bool cell_alert(uint8_t cellVal)
