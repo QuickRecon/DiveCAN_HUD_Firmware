@@ -66,6 +66,39 @@ Tests are built using CppUTest framework (included as git submodule). See `Tests
 
 The build uses **aggressive warning flags and static analysis** (`-Werror`, `-fanalyzer`, `-pedantic`, etc.) with stack protection enabled. The codebase follows **C23 standard** (`-std=gnu23`).
 
+## Coding Standards
+
+### NASA's 10 Rules for Safety-Critical Code
+
+This project follows NASA's "Power of Ten" coding rules for developing safety-critical embedded systems. These rules are designed to eliminate common programming errors and improve code verifiability:
+
+1. **Avoid complex flow constructs**: No `goto` statements or recursion. Use simple control flow that is easy to verify.
+
+2. **All loops must have fixed bounds**: Every loop must have a statically determinable upper bound to prevent runaway code and ensure predictable worst-case execution time.
+
+3. **Avoid heap memory allocation**: No dynamic memory allocation (`malloc`, `calloc`, `realloc`) after initialization. This prevents memory leaks, fragmentation, and allocation failures during runtime.
+
+4. **Restrict functions to a single printed page**: Functions should be no longer than ~60 lines (one printed page). This improves readability and testability.
+
+5. **Use a minimum of two runtime assertions per function**: Include assertions to verify preconditions, postconditions, and invariants. This catches errors early during testing.
+
+6. **Restrict the scope of data to the smallest possible**: Declare data at the smallest scope (function-local preferred over file-scope, file-scope over global). Use `static` keyword to limit visibility.
+
+7. **Check return values of all non-void functions**: Always check return values or explicitly cast to `(void)` if intentionally ignored. This ensures error conditions are not silently dropped.
+
+8. **Use the preprocessor sparingly**: Limit preprocessor use to file inclusion and simple conditional compilation. Avoid complex macros that obscure code flow.
+
+9. **Limit pointer use to single dereference**: Avoid multi-level pointers (e.g., `**ptr`). Do not use function pointers where possible, as they complicate static analysis.
+
+10. **Compile with all possible warnings**: Enable maximum warning levels and treat warnings as errors (`-Werror`). Address all warnings before release.
+
+**Current Compliance Status**: The codebase is being audited for compliance. See audit reports for details on conformance and any justified deviations.
+
+**Known Deviations**:
+- FreeRTOS uses heap allocation (heap_5) - required by RTOS architecture
+- Function pointers used in HAL callbacks - required by STM32 HAL design
+- Some generated code may not fully comply - see STM32CubeMX sections
+
 ## Architecture Overview
 
 ### RTOS Architecture (FreeRTOS)
