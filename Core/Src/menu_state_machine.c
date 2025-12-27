@@ -184,6 +184,15 @@ void resetMenuStateMachine()
 
 void displayLEDsForState()
 {
+    // Assertion 1: Verify current state is valid
+    assert(currentMenuState >= MENU_STATE_IDLE && currentMenuState <= MENU_STATE_CALIBRATE);
+
+    // Assertion 2: Verify GPIO ports are valid
+    assert(LED_0_GPIO_Port != NULL);
+    assert(LED_1_GPIO_Port != NULL);
+    assert(LED_2_GPIO_Port != NULL);
+    assert(LED_3_GPIO_Port != NULL);
+
     switch (currentMenuState)
     {
     case MENU_STATE_IDLE:
