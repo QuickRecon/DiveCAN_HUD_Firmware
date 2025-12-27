@@ -27,6 +27,18 @@ const struct GPIO_PinMap LED_PinMap[3][3] = {
 void setLEDBrightness(uint8_t level, GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);
 void initLEDs(void)
 {
+    // Assertion 1: Verify GPIO ports are initialized
+    assert(LED_0_GPIO_Port != NULL);
+    assert(R1_GPIO_Port != NULL);
+    assert(G1_GPIO_Port != NULL);
+    assert(B1_GPIO_Port != NULL);
+    assert(ASC_EN_GPIO_Port != NULL);
+
+    // Assertion 2: Verify LED brightness constants are in range
+    assert(LED_BRIGHTNESS[0] <= LED_MAX_BRIGHTNESS);
+    assert(LED_BRIGHTNESS[1] <= LED_MAX_BRIGHTNESS);
+    assert(LED_BRIGHTNESS[2] <= LED_MAX_BRIGHTNESS);
+
     /* Turn all the end LEDs on*/
     HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, GPIO_PIN_SET);
