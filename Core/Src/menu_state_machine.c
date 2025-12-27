@@ -1,6 +1,7 @@
 #include "menu_state_machine.h"
 #include "main.h"
 #include "common.h"
+#include <assert.h>
 
 /* The gist of the menu system is as follows:
  *  Pressing the button 4 times, and holding on the 4th time will trigger the hud to shut down
@@ -46,6 +47,12 @@ const uint32_t MENU_MODE_TIMEOUT_MS = TIMEOUT_10S_TICKS;
  */
 bool menuActive()
 {
+    // Assertion 1: Verify current state is valid
+    assert(currentMenuState <= MENU_STATE_CALIBRATE);
+
+    // Assertion 2: Verify state is within enum bounds
+    assert(currentMenuState >= MENU_STATE_IDLE);
+
     return currentMenuState != MENU_STATE_IDLE;
 }
 
