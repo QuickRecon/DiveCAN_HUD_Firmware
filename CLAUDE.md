@@ -301,6 +301,33 @@ osDelay(TIMEOUT_2S_TICKS);     // 2 second delay
 
 Available: 5ms, 10ms, 50ms, 100ms, 250ms, 500ms, 1s, 2s, 4s, 5s, 10s, 25s
 
+### Code Style and Best Practices
+
+**Avoid `goto` Statements**
+
+Do not use `goto` statements in new code. Instead, use structured programming constructs:
+- **Flags/state variables**: Use boolean flags to break out of nested loops
+- **Helper functions**: Extract complex logic into separate functions
+- **Early returns**: Return early from functions when conditions are met
+
+Example of breaking out of nested loops without `goto`:
+```c
+// Instead of using goto
+bool found = false;
+for (int i = 0; i < rows && !found; i++) {
+    for (int j = 0; j < cols && !found; j++) {
+        if (condition) {
+            found = true;
+        }
+    }
+}
+if (found) {
+    // Handle result
+}
+```
+
+This keeps the control flow clear and easier to maintain.
+
 ## Important Constraints
 
 ### Stack Usage

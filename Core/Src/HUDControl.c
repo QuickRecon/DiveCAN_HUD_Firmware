@@ -136,11 +136,12 @@ void CalibrationCountdown()
     const uint8_t BRIGHTNESS = 5;
 
     CalibrationState_t calState = CAL_STATE_REQUESTED;
+    bool responseReceived = false;
 
     /* Countdown from left to right (channels 0, 1, 2) */
-    for (uint8_t channel = 0; channel < 3 && inCalibration; channel++)
+    for (uint8_t channel = 0; channel < 3 && inCalibration && !responseReceived; channel++)
     {
-        for (uint8_t step = 0; step < STEPS_PER_CHANNEL && inCalibration; step++)
+        for (uint8_t step = 0; step < STEPS_PER_CHANNEL && inCalibration && !responseReceived; step++)
         {
             /* Set current channel to blue to indicate waiting */
             setRGB(channel, 0, 0, BRIGHTNESS);
@@ -151,17 +152,22 @@ void CalibrationCountdown()
             if (status == osOK && (calState == CAL_STATE_SUCCESS || calState == CAL_STATE_FAILURE))
             {
                 /* We got a response, break out of countdown */
-                goto calibration_result;
+                responseReceived = true;
             }
         }
         /* Turn off the current channel after it's done */
-        setRGB(channel, 0, 0, 0);
+        if (!responseReceived)
+        {
+            setRGB(channel, 0, 0, 0);
+        }
     }
 
-    /* If we get here, calibration timed out */
-    calState = CAL_STATE_TIMEOUT;
+    /* If we didn't get a response, calibration timed out */
+    if (!responseReceived)
+    {
+        calState = CAL_STATE_TIMEOUT;
+    }
 
-calibration_result:
     /* Display result */
     if (calState == CAL_STATE_SUCCESS)
     {
