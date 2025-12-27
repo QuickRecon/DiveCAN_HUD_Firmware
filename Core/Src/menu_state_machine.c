@@ -175,6 +175,11 @@ void resetMenuStateMachine()
     currentMenuState = MENU_STATE_IDLE;
     timeInState = 0;
     buttonPressTimestamp = 0;
+
+    // Postcondition assertions: Verify reset succeeded
+    assert(currentMenuState == MENU_STATE_IDLE);
+    assert(timeInState == 0);
+    assert(buttonPressTimestamp == 0);
 }
 
 void displayLEDsForState()
