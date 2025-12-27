@@ -116,6 +116,16 @@ const osMessageQueueAttr_t CellStatQueue_attributes = {
     .cb_size = sizeof(CellStatControlBlock),
     .mq_mem = &CellStatBuffer,
     .mq_size = sizeof(CellStatBuffer)};
+/* Definitions for CalStateQueue */
+osMessageQueueId_t CalStateQueueHandle;
+uint8_t CalStateBuffer[1 * sizeof(CalibrationState_t)];
+osStaticMessageQDef_t CalStateControlBlock;
+const osMessageQueueAttr_t CalStateQueue_attributes = {
+    .name = "CalStateQueue",
+    .cb_mem = &CalStateControlBlock,
+    .cb_size = sizeof(CalStateControlBlock),
+    .mq_mem = &CalStateBuffer,
+    .mq_size = sizeof(CalStateBuffer)};
 /* USER CODE BEGIN PV */
 /* USER CODE END PV */
 
@@ -276,6 +286,9 @@ int main(void)
 
   /* creation of CellStatQueue */
   CellStatQueueHandle = osMessageQueueNew(1, sizeof(uint8_t), &CellStatQueue_attributes);
+
+  /* creation of CalStateQueue */
+  CalStateQueueHandle = osMessageQueueNew(1, sizeof(CalibrationState_t), &CalStateQueue_attributes);
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */

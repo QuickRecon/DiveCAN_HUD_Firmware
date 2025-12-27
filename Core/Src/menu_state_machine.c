@@ -2,6 +2,9 @@
 #include "main.h"
 #include "common.h"
 #include <assert.h>
+#include "DiveCAN/Transciever.h"
+
+extern osMessageQueueId_t CalStateQueueHandle;
 
 /* The gist of the menu system is as follows:
  *  Pressing the button 4 times, and holding on the 4th time will trigger the hud to shut down
@@ -54,6 +57,7 @@ bool menuActive()
 }
 
 bool inShutdown = false;
+bool inCalibration = false;
 
 void onButtonPress()
 {
@@ -190,6 +194,9 @@ void displayLEDsForState()
     assert(LED_2_GPIO_Port != NULL);
     assert(LED_3_GPIO_Port != NULL);
 
+    static uint32_t lastFlashToggle = 0;
+    static bool ledFlashState = false;
+
     switch (currentMenuState)
     {
     case MENU_STATE_IDLE:
@@ -257,6 +264,16 @@ void displayLEDsForState()
         break;
     case MENU_STATE_CALIBRATE:
         // Flash all LEDs to indicate calibration mode
+        if (HAL_GetTick() - lastFlashToggle > 100) /* Flash every 100ms */
+        {
+            ledFlashState = !ledFlashState;
+            lastFlashToggle = HAL_GetTick();
+        }
+        GPIO_PinState pinState = ledFlashState ? GPIO_PIN_SET : GPIO_PIN_RESET;
+        HAL_GPIO_WritePin(LED_0_GPIO_Port, LED_0_Pin, pinState);
+        HAL_GPIO_WritePin(LED_1_GPIO_Port, LED_1_Pin, pinState);
+        HAL_GPIO_WritePin(LED_2_GPIO_Port, LED_2_Pin, pinState);
+        HAL_GPIO_WritePin(LED_3_GPIO_Port, LED_3_Pin, pinState);
         break;
     default:
         // Turn off all LEDs
@@ -272,6 +289,7 @@ void menuStateMachineTick()
     assert(MENU_MODE_TIMEOUT_MS > 0);
 
     ButtonState_t button_state = NONE;
+    static bool calibrationRequested = false;
 
     if (buttonPressTimestamp != 0)
     {
@@ -298,9 +316,30 @@ void menuStateMachineTick()
         {
             button_state = PRESSED;
         }
+
+        /* Trigger calibration request when entering calibration state */
+        if (currentMenuState == MENU_STATE_CALIBRATE && !calibrationRequested)
+        {
+            calibrationRequested = true;
+            /* Send calibration request with PPO2 of 1.0 (100 = 1.0 bar) and standard atmospheric pressure (1013 mbar) */
+            txCalReq(DIVECAN_MONITOR, DIVECAN_OBOE, 100, 1013);
+            /* Reset the calibration queue to start fresh */
+            osMessageQueueReset(CalStateQueueHandle);
+            /* Set initial calibration state to REQUESTED */
+            CalibrationState_t calState = CAL_STATE_REQUESTED;
+            osMessageQueuePut(CalStateQueueHandle, &calState, 0, 0);
+        }
     }
 
     inShutdown = currentMenuState == MENU_STATE_SHUTDOWN;
+    inCalibration = currentMenuState == MENU_STATE_CALIBRATE;
+
+    /* Reset calibration flag when leaving calibration state */
+    if (currentMenuState != MENU_STATE_CALIBRATE)
+    {
+        calibrationRequested = false;
+    }
+
     if ((timeInState != 0) && (HAL_GetTick() - timeInState > MENU_MODE_TIMEOUT_MS) && buttonPressTimestamp == 0)
     {
         resetMenuStateMachine();

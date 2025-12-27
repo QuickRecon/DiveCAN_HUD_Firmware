@@ -10,8 +10,10 @@
 
 extern osMessageQueueId_t PPO2QueueHandle;
 extern osMessageQueueId_t CellStatQueueHandle;
+extern osMessageQueueId_t CalStateQueueHandle;
 
 extern bool inShutdown;
+extern bool inCalibration;
 
 inline int16_t div10_round(int16_t x)
 {
@@ -125,6 +127,84 @@ void ShutdownFadeout()
     }
 }
 
+void CalibrationCountdown()
+{
+    /* Total countdown time ~20 seconds across 3 channels */
+    /* Each channel gets approximately 6.67 seconds */
+    const uint8_t STEPS_PER_CHANNEL = 20; /* 20 steps per channel */
+    const TickType_t DELAY_PER_STEP = pdMS_TO_TICKS(333); /* 333ms per step = ~6.67s per channel */
+    const uint8_t BRIGHTNESS = 5;
+
+    CalibrationState_t calState = CAL_STATE_REQUESTED;
+
+    /* Countdown from left to right (channels 0, 1, 2) */
+    for (uint8_t channel = 0; channel < 3 && inCalibration; channel++)
+    {
+        for (uint8_t step = 0; step < STEPS_PER_CHANNEL && inCalibration; step++)
+        {
+            /* Set current channel to blue to indicate waiting */
+            setRGB(channel, 0, 0, BRIGHTNESS);
+
+            /* Check for calibration response */
+            osStatus_t status = osMessageQueueGet(CalStateQueueHandle, &calState, NULL, DELAY_PER_STEP);
+
+            if (status == osOK && (calState == CAL_STATE_SUCCESS || calState == CAL_STATE_FAILURE))
+            {
+                /* We got a response, break out of countdown */
+                goto calibration_result;
+            }
+        }
+        /* Turn off the current channel after it's done */
+        setRGB(channel, 0, 0, 0);
+    }
+
+    /* If we get here, calibration timed out */
+    calState = CAL_STATE_TIMEOUT;
+
+calibration_result:
+    /* Display result */
+    if (calState == CAL_STATE_SUCCESS)
+    {
+        /* Flash green 3 times */
+        for (uint8_t i = 0; i < 3 && inCalibration; i++)
+        {
+            for (uint8_t channel = 0; channel < 3; channel++)
+            {
+                setRGB(channel, 0, 10, 0); /* Green */
+            }
+            osDelay(TIMEOUT_500MS_TICKS);
+            for (uint8_t channel = 0; channel < 3; channel++)
+            {
+                setRGB(channel, 0, 0, 0); /* Off */
+            }
+            osDelay(TIMEOUT_500MS_TICKS);
+        }
+    }
+    else
+    {
+        /* Flash red 3 times for failure or timeout */
+        for (uint8_t i = 0; i < 3 && inCalibration; i++)
+        {
+            for (uint8_t channel = 0; channel < 3; channel++)
+            {
+                setRGB(channel, 10, 0, 0); /* Red */
+            }
+            osDelay(TIMEOUT_500MS_TICKS);
+            for (uint8_t channel = 0; channel < 3; channel++)
+            {
+                setRGB(channel, 0, 0, 0); /* Off */
+            }
+            osDelay(TIMEOUT_500MS_TICKS);
+        }
+    }
+
+    /* Clear all LEDs */
+    for (uint8_t channel = 0; channel < 3; channel++)
+    {
+        setRGB(channel, 0, 0, 0);
+    }
+}
+
 bool alerting = false;
 void RGBBlinkControl()
 {
@@ -147,6 +227,10 @@ void RGBBlinkControl()
         if (inShutdown)
         {
             ShutdownFadeout();
+        }
+        else if (inCalibration)
+        {
+            CalibrationCountdown();
         }
         else
         {

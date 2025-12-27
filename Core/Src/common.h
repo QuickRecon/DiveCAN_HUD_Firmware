@@ -58,6 +58,15 @@ extern "C"
 
     typedef enum
     {
+        CAL_STATE_IDLE,
+        CAL_STATE_REQUESTED,
+        CAL_STATE_SUCCESS,
+        CAL_STATE_FAILURE,
+        CAL_STATE_TIMEOUT
+    } CalibrationState_t;
+
+    typedef enum
+    {
         CELL_DIVEO2 = 0,
         CELL_ANALOG = 1,
         CELL_O2S = 2

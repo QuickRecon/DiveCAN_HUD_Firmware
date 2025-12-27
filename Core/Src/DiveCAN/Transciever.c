@@ -205,3 +205,22 @@ void txName(const DiveCANType_t deviceType, const char *const name)
         sendCANMessage(message);
     }
 }
+
+/*-----------------------------------------------------------------------------------*/
+/* Calibration Messages */
+
+/** @brief Transmit a calibration request
+ * @param deviceType the device type of this device
+ * @param targetDeviceType the device type to send the calibration request to
+ * @param FO2 Fraction of O2 (100 = 100% = 1.0)
+ * @param atmosphericPressure Atmospheric pressure in millibars
+ */
+void txCalReq(const DiveCANType_t deviceType, const DiveCANType_t targetDeviceType, const FO2_t FO2, const uint16_t atmosphericPressure)
+{
+    const DiveCANMessage_t message = {
+        .id = CAL_REQ_ID | (deviceType << 8) | targetDeviceType,
+        .data = {FO2, (uint8_t)(atmosphericPressure >> 8), (uint8_t)(atmosphericPressure & 0xFF), 0x00, 0x00, 0x00, 0x00, 0x00},
+        .length = 3,
+        .type = "CAL_REQ"};
+    sendCANMessage(message);
+}

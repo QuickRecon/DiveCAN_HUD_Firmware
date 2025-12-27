@@ -232,6 +232,7 @@ extern "C"
 
   typedef struct OxygenCellStruct OxygenCell_t;
 
+  void txCalReq(const DiveCANType_t deviceType, const DiveCANType_t targetDeviceType, const FO2_t FO2, const uint16_t atmosphericPressure);
   void txCalAck(const DiveCANType_t deviceType);
   void txCalResponse(const DiveCANType_t deviceType, DiveCANCalResponse_t response, const ShortMillivolts_t cell1, const ShortMillivolts_t cell2, const ShortMillivolts_t cell3, const FO2_t FO2, const uint16_t atmosphericPressure);
 

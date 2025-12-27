@@ -25,6 +25,7 @@ static const uint8_t DIVECAN_TYPE_MASK = 0xF;
 
 extern osMessageQueueId_t PPO2QueueHandle;
 extern osMessageQueueId_t CellStatQueueHandle;
+extern osMessageQueueId_t CalStateQueueHandle;
 
 /* FreeRTOS tasks */
 
@@ -113,6 +114,7 @@ void CANTask(void *arg)
                 break;
             case CAL_ID:
                 message.type = "CAL";
+                RespCal(&message, deviceSpec);
                 break;
             case CAL_REQ_ID:
                 message.type = "CAL_REQ";
@@ -243,4 +245,64 @@ void RespSerialNumber(const DiveCANMessage_t *const message, const DiveCANDevice
     char serial_number[sizeof(message->data) + 1] = {0};
     (void)memcpy(serial_number, message->data, sizeof(message->data));
     serial_printf("Received Serial Number of device %d: %s", origin, serial_number);
+}
+
+void RespCal(const DiveCANMessage_t *const message, const DiveCANDevice_t *const deviceSpec)
+{
+    (void)deviceSpec; /* Unused, but we need to match the function signature */
+
+    if (message->length < 1)
+    {
+        NON_FATAL_ERROR(CAN_OVERFLOW_ERR);
+        return;
+    }
+
+    DiveCANCalResponse_t response = (DiveCANCalResponse_t)message->data[0];
+    CalibrationState_t calState;
+
+    switch (response)
+    {
+    case DIVECAN_CAL_ACK:
+        /* Acknowledgment received, waiting for final result */
+        serial_printf("Calibration acknowledged, waiting for result...\n\r");
+        return; /* Don't update state yet, wait for final result */
+
+    case DIVECAN_CAL_RESULT_OK:
+        serial_printf("Calibration succeeded\n\r");
+        calState = CAL_STATE_SUCCESS;
+        break;
+
+    case DIVECAN_CAL_FAIL_LOW_EXT_BAT:
+        serial_printf("Calibration failed: Low external battery\n\r");
+        calState = CAL_STATE_FAILURE;
+        break;
+
+    case DIVECAN_CAL_FAIL_FO2_RANGE:
+        serial_printf("Calibration failed: FO2 out of range\n\r");
+        calState = CAL_STATE_FAILURE;
+        break;
+
+    case DIVECAN_CAL_FAIL_REJECTED:
+        serial_printf("Calibration rejected\n\r");
+        calState = CAL_STATE_FAILURE;
+        break;
+
+    case DIVECAN_CAL_FAIL_GEN:
+        serial_printf("Calibration failed: Generic error\n\r");
+        calState = CAL_STATE_FAILURE;
+        break;
+
+    default:
+        serial_printf("Calibration failed: Unknown response 0x%x\n\r", response);
+        calState = CAL_STATE_FAILURE;
+        break;
+    }
+
+    /* Send the calibration state to the queue */
+    osMessageQueueReset(CalStateQueueHandle);
+    osStatus_t enQueueStatus = osMessageQueuePut(CalStateQueueHandle, &calState, 0, 0);
+    if (enQueueStatus != osOK)
+    {
+        NON_FATAL_ERROR_DETAIL(QUEUEING_ERR, enQueueStatus);
+    }
 }
