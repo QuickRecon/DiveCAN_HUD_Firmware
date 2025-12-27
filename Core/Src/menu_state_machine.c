@@ -269,7 +269,16 @@ void displayLEDsForState()
 
 void menuStateMachineTick()
 {
+    // Assertion 1: Verify timeout constants are valid
+    assert(BUTTON_HOLD_TIME_MS > 0);
+    assert(BUTTON_PRESS_TIME_MS > 0);
+    assert(MENU_MODE_TIMEOUT_MS > 0);
+
     static ButtonState_t button_state = NONE;
+
+    // Assertion 2: Verify button state is valid
+    assert(button_state >= NONE && button_state <= HOLD);
+
     if (buttonPressTimestamp != 0)
     {
         if (HAL_GetTick() - buttonPressTimestamp > BUTTON_HOLD_TIME_MS)
