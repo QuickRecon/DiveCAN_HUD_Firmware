@@ -44,6 +44,7 @@ static uint32_t totalDelayTicks = 0;
 /* Application-specific queue handles */
 QueueHandle_t PPO2QueueHandle = nullptr;
 QueueHandle_t CellStatQueueHandle = nullptr;
+QueueHandle_t CalStateQueueHandle = nullptr;
 
 extern "C" {
 

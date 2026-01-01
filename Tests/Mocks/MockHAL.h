@@ -70,6 +70,9 @@ extern "C"
 #define ASC_EN_Pin GPIO_PIN_0
 #define GPIO_PIN_14 ((uint16_t)0x4000)
 
+    /* Stub for inCalibration variable from menu_state_machine.c */
+    extern bool inCalibration;
+
     /* Mock HAL functions */
     uint32_t HAL_GetTick(void);
     void HAL_GPIO_WritePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);

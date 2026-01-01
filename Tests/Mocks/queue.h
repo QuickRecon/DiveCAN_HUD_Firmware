@@ -46,6 +46,7 @@ extern "C"
     /* Application-specific queue handles (from main.c) */
     extern QueueHandle_t PPO2QueueHandle;
     extern QueueHandle_t CellStatQueueHandle;
+    extern QueueHandle_t CalStateQueueHandle;
 
     /* Initialize application queues for testing */
     void MockQueue_InitApplicationQueues(void);

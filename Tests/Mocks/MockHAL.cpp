@@ -27,6 +27,10 @@ static GPIOPinStateRecord pinStates[MAX_GPIO_PINS];
 
 extern "C" {
 
+/* Weak stub for inCalibration variable from menu_state_machine.c
+ * This allows the real definition to override when menu_state_machine.o is linked */
+bool inCalibration __attribute__((weak)) = false;
+
 uint32_t HAL_GetTick(void) {
     return currentTick;
 }
